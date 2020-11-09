@@ -31,7 +31,14 @@ public class APICalls {
     }
 
     @RequestMapping("/setup")
-    public void SetUp() throws IOException, JSONException {
+    public String SetUp() throws IOException, JSONException {
+        File dataFolder = new File(setOS() + "config.json");
+        if (!dataFolder.exists()) {
+            JSONObject result = new JSONObject();
+            result.put("Message", "User not registered, create your Decentralised Identity!");
+            result.put("Status", "Failed");
+            return result.toString();
+        }
         launch();
 
         String osName = Functions.getOsName();
