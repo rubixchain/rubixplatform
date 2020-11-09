@@ -2,6 +2,7 @@ package com.rubix.core.sender;
 
 import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Resources.Functions;
+import com.rubix.Resources.IPFSNetwork;
 import com.rubix.TokenTransfer.TokenReceiver;
 import com.rubix.core.Fractionalisation.FractionChooser;
 import org.json.JSONArray;
@@ -23,7 +24,13 @@ public class APICalls {
 
     public static String location = "";
 
-    @PostMapping("/setup")
+    @PostMapping("/create")
+    public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value) throws Exception {
+        JSONObject result = createDID(value, imageFile.getInputStream());
+        return result.toString();
+    }
+
+    @RequestMapping("/setup")
     public void SetUp() throws IOException, JSONException {
         launch();
 
@@ -61,11 +68,7 @@ public class APICalls {
     }
 
 
-    @PostMapping("/create")
-    public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value) throws Exception {
-        JSONObject result = createDID(value, imageFile.getInputStream());
-        return result.toString();
-    }
+
 
     @PostMapping("/initiateTransaction")
     public String initiateTransaction(@RequestBody Details details) throws JSONException, IOException {
@@ -96,8 +99,8 @@ public class APICalls {
         return resultObject.toString();
     }
 
-    @PostMapping("/getTxnDetails")
-    public String getTxnDetails(@RequestBody Details details) throws JSONException {
+    @RequestMapping("/getAccountInfo")
+    public String getAccountInfo() throws JSONException {
         File dataFolder = new File(setOS() + "config.json");
         if (!dataFolder.exists()) {
             JSONObject result = new JSONObject();
@@ -105,12 +108,11 @@ public class APICalls {
             result.put("Status", "Failed");
             return result.toString();
         }
-        String txnId = details.getTransactionID();
-        return transactionDetail(txnId);
+        return accountInformation();
     }
 
-    @PostMapping("/sync")
-    public String sync() throws IOException, JSONException {
+    @RequestMapping("/getBalance")
+    public String getBalance() throws JSONException {
         File dataFolder = new File(setOS() + "config.json");
         if (!dataFolder.exists()) {
             JSONObject result = new JSONObject();
@@ -118,7 +120,9 @@ public class APICalls {
             result.put("Status", "Failed");
             return result.toString();
         }
-        return networkInfo();
+        JSONObject result = new JSONObject();
+        result.put("Account Balance", accountBalance());
+        return result.toString();
     }
 
     @PostMapping("/viewProofs")
@@ -133,6 +137,19 @@ public class APICalls {
         String token = details.getToken();
         return proofChains(token);
 
+    }
+
+    @PostMapping("/getTxnDetails")
+    public String getTxnDetails(@RequestBody Details details) throws JSONException {
+        File dataFolder = new File(setOS() + "config.json");
+        if (!dataFolder.exists()) {
+            JSONObject result = new JSONObject();
+            result.put("Message", "User not registered, create your Decentralised Identity!");
+            result.put("Status", "Failed");
+            return result.toString();
+        }
+        String txnId = details.getTransactionID();
+        return transactionDetail(txnId);
     }
 
     @PostMapping("/getTxnByDate")
@@ -162,10 +179,7 @@ public class APICalls {
         return transactionsByCount(n);
     }
 
-    @PostMapping("/p2pClose")
-    public void p2pClose() {
-        closeStreams();
-    }
+
 
 
     @PostMapping("/getTxnByComment")
@@ -181,33 +195,9 @@ public class APICalls {
         return transactionsByComment(comment);
     }
 
-    @PostMapping("/getAccountInfo")
-    public String getAccountInfo() throws JSONException {
-        File dataFolder = new File(setOS() + "config.json");
-        if (!dataFolder.exists()) {
-            JSONObject result = new JSONObject();
-            result.put("Message", "User not registered, create your Decentralised Identity!");
-            result.put("Status", "Failed");
-            return result.toString();
-        }
-        return accountInformation();
-    }
 
-    @PostMapping("/getBalance")
-    public String getBalance() throws JSONException {
-        File dataFolder = new File(setOS() + "config.json");
-        if (!dataFolder.exists()) {
-            JSONObject result = new JSONObject();
-            result.put("Message", "User not registered, create your Decentralised Identity!");
-            result.put("Status", "Failed");
-            return result.toString();
-        }
-        JSONObject result = new JSONObject();
-        result.put("Account Balance", accountBalance());
-        return result.toString();
-    }
 
-    @PostMapping("/viewTokens")
+    @RequestMapping("/viewTokens")
     public String viewTokens() throws JSONException {
         File dataFolder = new File(setOS() + "config.json");
         JSONObject result = new JSONObject();
@@ -227,6 +217,31 @@ public class APICalls {
         return returnTokens.toString();
 
     }
+
+    @RequestMapping("/p2pClose")
+    public void p2pClose() {
+        closeStreams();
+    }
+
+
+    @RequestMapping("/sync")
+    public String sync() throws IOException, JSONException {
+        File dataFolder = new File(setOS() + "config.json");
+        if (!dataFolder.exists()) {
+            JSONObject result = new JSONObject();
+            result.put("Message", "User not registered, create your Decentralised Identity!");
+            result.put("Status", "Failed");
+            return result.toString();
+        }
+        return networkInfo();
+    }
+
+    @RequestMapping("/shutdown")
+    public void shutdown() throws IOException, JSONException {
+        IPFSNetwork.executeIPFSCommands("ipfs shutdown");
+        System.exit(0);
+    }
+
 
 }
 
