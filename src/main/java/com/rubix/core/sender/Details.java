@@ -19,6 +19,7 @@ public class Details {
     private String sDate;
     private String eDate;
     private String groupId;
+    private String did;
 
 
 
@@ -37,7 +38,7 @@ public class Details {
     public String getSender(){
         return sender;
     }
-
+    public String getDid(){return did; }
     public int getValue(){ return value;}
     public JSONArray getQuorum(){
         return quorum;

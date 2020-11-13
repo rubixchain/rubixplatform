@@ -19,6 +19,7 @@
 	</properties>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>com.did.core</groupId>
 			<artifactId>did</artifactId>

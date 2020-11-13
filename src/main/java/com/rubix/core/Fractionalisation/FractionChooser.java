@@ -1,6 +1,7 @@
 package com.rubix.core.Fractionalisation;
 
 import com.rubix.Resources.Functions;
+import com.rubix.core.RubixApplication;
 import com.rubix.core.sender.APICalls;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
