@@ -98,7 +98,13 @@ public class APICalls {
             result.put("Status", "Failed");
             return result.toString();
         }
-        return accountInformation();
+        String balance = getBalance();
+        JSONObject balanceObject = new JSONObject(balance);
+        String accountInfo =  accountInformation();
+        JSONObject accountObject = new JSONObject(accountInfo);
+        accountObject.put("balance", balanceObject.getInt("Balance"));
+
+        return accountObject.toString();
     }
 
     @RequestMapping("/getBalance")
@@ -110,8 +116,20 @@ public class APICalls {
             result.put("Status", "Failed");
             return result.toString();
         }
+        int balance = 0;
+        String tokenMapFile = readFile(location + "TokenMap.json");
+        JSONArray tokenMapArray = new JSONArray(tokenMapFile);
+
+        for(int i = 0; i < tokenMapArray.length(); i++){
+            String bankFile = readFile(location + tokenMapArray.getJSONObject(i).getString("type") + ".json");
+            JSONArray bankArray = new JSONArray(bankFile);
+            int tokenCount = bankArray.length();
+            int value = tokenCount * tokenMapArray.getJSONObject(i).getInt("value");
+            balance = balance + value;
+        }
+
         JSONObject result = new JSONObject();
-        result.put("Account Balance", accountBalance());
+        result.put("Balance", balance);
         return result.toString();
     }
 
