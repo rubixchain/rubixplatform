@@ -32,7 +32,7 @@ public class APICalls {
     }
 
     @RequestMapping("/setup")
-    public void SetUp() throws IOException, JSONException {
+    public String SetUp() throws IOException, JSONException {
         File dataFolder = new File(setOS() + "config.json");
         if (!dataFolder.exists()) {
             JSONObject result = new JSONObject();
@@ -53,25 +53,10 @@ public class APICalls {
         Thread quorumThread = new Thread(quorumClass);
         quorumThread.start();
 
-        while (true) {
-            String result = TokenReceiver.receive();
-            JSONObject tokenResult = new JSONObject(result);
-            if (tokenResult.getString("status").contains("Success")) {
-                JSONArray tokens = tokenResult.getJSONArray("tokens");
-                JSONArray tokenHeader = tokenResult.getJSONArray("tokenHeader");
-
-                for (int i = 0; i < tokens.length(); i++) {
-                    String bank = tokenHeader.getString(i);
-                    String bankFile = readFile(location + bank + ".json");
-                    JSONArray bankArray = new JSONArray(bankFile);
-                    JSONObject tokenObject = new JSONObject();
-                    tokenObject.put("tokenHash", tokens.getString(i));
-                    bankArray.put(tokenObject);
-                    Functions.writeToFile(location + bank + ".json", bankArray.toString(), false);
-
-                }
-            }
-        }
+        Receiver receiver = new Receiver();
+        Thread receiverThread = new Thread(receiver);
+        receiverThread.start();
+        return "Setup Complete!";
     }
 
     @PostMapping("/initiateTransaction")
