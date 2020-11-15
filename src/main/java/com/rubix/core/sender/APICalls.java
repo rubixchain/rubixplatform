@@ -260,11 +260,16 @@ public class APICalls {
         String dateTxn = txnPerDay();
         JSONObject dateTxnObject = new JSONObject(dateTxn);
 
+        String balance = getBalance();
+        JSONObject balanceObject = new JSONObject(balance);
+
+
         int totalTxn = accountObject.getInt("senderTxn") + accountObject.getInt("receiverTxn");
         accountObject.put("totalTxn", totalTxn);
         accountObject.put("onlinePeers", onlinePeersCount);
         accountObject.put("contactsCount", contactsCount);
         accountObject.put("transactionsPerDay", dateTxnObject);
+        accountObject.put("balance", balanceObject.getInt("Balance"));
 
         return accountObject.toString();
     }
