@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.*;
@@ -246,9 +247,8 @@ public class APICalls {
 
     @RequestMapping("/getDashboard")
     public String getDashboard() throws JSONException, IOException {
-        String onlinePeers = getOnlinePeers();
-        JSONObject onlinePeersObject = new JSONObject(onlinePeers);
-        int onlinePeersCount = onlinePeersObject.length();
+        ArrayList onlinePeers = onlinePeersList();
+        int onlinePeersCount = onlinePeers.size();
 
         String contacts = getContactsList();
         JSONArray contactsObject = new JSONArray(contacts);
