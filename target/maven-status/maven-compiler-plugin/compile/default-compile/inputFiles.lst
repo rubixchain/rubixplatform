@@ -1,6 +1,9 @@
-/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/sender/APICalls.java
 /Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/RubixApplication.java
 /Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/Fractionalisation/FractionChooser.java
-/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/sender/Details.java
-/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/sender/ExceptionHandler.java
-/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/sender/Receiver.java
+/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/Resources/CallerFunctions.java
+/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/Resources/Receiver.java
+/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/Controllers/Wallet.java
+/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/Controllers/Operations.java
+/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/Controllers/Basics.java
+/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/Resources/RequestModel.java
+/Users/aparna/Desktop/rubixplatform/src/main/java/com/rubix/core/Controllers/Transactions.java
