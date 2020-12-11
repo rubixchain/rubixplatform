@@ -1,8 +1,7 @@
 package com.rubix.core.Fractionalisation;
 
 import com.rubix.Resources.Functions;
-import com.rubix.core.RubixApplication;
-import com.rubix.core.sender.APICalls;
+import com.rubix.core.Controllers.Basics;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,14 +37,14 @@ public class FractionChooser {
                 return tokensList;
             }
 
-            mapList = new JSONArray(Functions.readFile(APICalls.location + "TokenMap.json"));
+            mapList = new JSONArray(Functions.readFile(Basics.location + "TokenMap.json"));
 
             for (i = 0; i < mapList.length(); i++) {
                 tempJsonObject = mapList.getJSONObject(i);
                 type = tempJsonObject.getString("type");
                 valueInt = tempJsonObject.getInt("value");
                 tknmap.put(String.valueOf(valueInt),type);
-                lists = Functions.readFile( APICalls.location + type + ".json");
+                lists = Functions.readFile( Basics.location + type + ".json");
                 tempJsonArray = new JSONArray(lists);
                 bnk.add(i, tempJsonArray);
                 size = tempJsonArray.length();
