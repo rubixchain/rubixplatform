@@ -12,27 +12,31 @@
 	<artifactId>core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Rubix</name>
-	<description>Rubix Project </description>
+	<description>Rubix Project</description>
 
 	<properties>
 		<java.version>11</java.version>
 	</properties>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>com.did.core</groupId>
 			<artifactId>did</artifactId>
-			<version>6.0</version>
+			<version>6.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.rubix.core</groupId>
 			<artifactId>rubix</artifactId>
-			<version>6.0</version>
+			<version>9.8</version><!-- 9.1 -21 version-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.4</version>
 		</dependency>
 
 		<dependency>
@@ -53,6 +57,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>2.4.4</version>
 			</plugin>
 		</plugins>
 	</build>
