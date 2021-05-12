@@ -35,6 +35,10 @@ public class Transactions {
             return result.toString();
         }
 
+        if(transactionDetails(txnId).length()==0) {
+            return noTxnError();
+        }
+
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", transactionDetails(txnId));
@@ -69,6 +73,10 @@ public class Transactions {
             return result.toString();
         }
 
+        if(transactionsByDate(s, e).length()==0) {
+            return noTxnError();
+        }
+
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", transactionsByDate(s, e));
@@ -89,8 +97,14 @@ public class Transactions {
             start();
 
         String comment = requestModel.getComment();
-        JSONObject result = new JSONObject();
+
+        if(transactionsByComment(comment).length()==0) {
+            return noTxnError();
+        }
+
+
         JSONObject contentObject = new JSONObject();
+        JSONObject result = new JSONObject();
         contentObject.put("response", transactionsByComment(comment));
         contentObject.put("count", transactionsByComment(comment).length());
         result.put("data", contentObject);
@@ -148,6 +162,11 @@ public class Transactions {
             result.put("error_code", 1311);
             return result.toString();
         }
+
+        if(transactionsByDID(did).length()==0) {
+            return noTxnError();
+        }
+
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", transactionsByDID(did));
@@ -177,6 +196,11 @@ public class Transactions {
             result.put("error_code", 1311);
             return result.toString();
         }
+
+        if(transactionsByRange(start, end).length()==0) {
+            return noTxnError();
+        }
+
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", transactionsByRange(start, end));
@@ -184,6 +208,17 @@ public class Transactions {
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
+        return result.toString();
+    }
+
+    private String noTxnError(){
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("message", "No transactions found!");
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "false");
+        result.put("error_code", 1311);
         return result.toString();
     }
 }
