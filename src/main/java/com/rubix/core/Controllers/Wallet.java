@@ -1,10 +1,12 @@
 package com.rubix.core.Controllers;
 
 
+import com.rubix.Resources.Functions;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,12 +19,13 @@ import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.getBalance;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
+@CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Wallet {
 
     @RequestMapping(value = "/getAccountInfo", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String getAccountInfo() throws JSONException {
+    public String getAccountInfo() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
         if(!mutex)
@@ -57,6 +60,15 @@ public class Wallet {
         JSONArray dateTxn = txnPerDay();
         JSONObject dateTxnObject = dateTxn.getJSONObject(0);
 
+        //To display the Mine Count of the wallet - Reading from QuorumSignedTransactions
+        String content = readFile(WALLET_DATA_PATH.concat("QuorumSignedTransactions.json"));
+        JSONArray contentArray = new JSONArray(content);
+        JSONArray finalArray = new JSONArray();
+        for (int j = 0; j < contentArray.length(); j++) {
+            if (!contentArray.getJSONObject(j).getBoolean("minestatus"))
+                finalArray.put(contentArray.getJSONObject(j));
+        }
+
 
         int totalTxn = accountObject.getInt("senderTxn") + accountObject.getInt("receiverTxn");
         accountObject.put("totalTxn", totalTxn);
@@ -64,6 +76,7 @@ public class Wallet {
         accountObject.put("contactsCount", contactsCount);
         accountObject.put("transactionsPerDay", dateTxnObject);
         accountObject.put("balance", getBalance());
+        accountObject.put("proofCredits", finalArray.length());
 
 
         JSONObject result = new JSONObject();
@@ -81,7 +94,7 @@ public class Wallet {
         if (!mainDir())
             return checkRubixDir();
 
-        if(!mutex)
+        if (!mutex)
             start();
 
         JSONObject result = new JSONObject();
@@ -96,10 +109,41 @@ public class Wallet {
 
     @RequestMapping(value = "/getContactsList", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String getContactsList() throws JSONException {
+    public String getContactsList() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
-        if(!mutex)
+        if (!mutex)
+            start();
+
+        String contactsTable = Functions.readFile(Functions.DATA_PATH + "Contacts.json");
+        JSONArray contactsArray = new JSONArray(contactsTable);
+
+        String DIDFile = readFile(DATA_PATH + "DID.json");
+        JSONArray didArray = new JSONArray(DIDFile);
+        String myDID = didArray.getJSONObject(0).getString("didHash");
+        JSONArray finalArray = new JSONArray();
+
+        for(int i = 0; i < contactsArray.length(); i++){
+            if(!(contactsArray.getJSONObject(i).getString("did").equals(myDID)))
+                finalArray.put(contactsArray.getJSONObject(i));
+        }
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", finalArray);
+        contentObject.put("count", finalArray.length());
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/getNetworkNodes", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+    public String getNetworkNodes() throws JSONException, IOException, InterruptedException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
             start();
 
         JSONObject result = new JSONObject();
@@ -114,10 +158,10 @@ public class Wallet {
 
     @RequestMapping(value = "/viewTokens", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String viewTokens() throws JSONException {
+    public String viewTokens() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
-        if(!mutex)
+        if (!mutex)
             start();
 
         File directoryPath = new File(TOKENS_PATH);
@@ -131,6 +175,59 @@ public class Wallet {
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", returnTokens);
         contentObject.put("count", returnTokens.length());
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+
+    }
+
+    @RequestMapping(value = "/addNickName", method = RequestMethod.POST,
+            produces = {"application/json", "application/xml"})
+    public static String addNickName(@RequestParam("did") String did, @RequestParam("nickname") String nickname) throws JSONException, IOException, InterruptedException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        pathSet();
+        String contactsFile = readFile(DATA_PATH + "Contacts.json");
+        JSONArray contactsArray = new JSONArray(contactsFile);
+
+        for (int i = 0; i < contactsArray.length(); i++) {
+            if (contactsArray.getJSONObject(i).getString("did").equals(did)) {
+                contentObject.put("response", "DID already assigned with same/another NickName");
+                contentObject.put("did", did);
+                contentObject.put("nickname", contactsArray.getJSONObject(i).getString("nickname"));
+                result.put("data", contentObject);
+                result.put("message", "");
+                result.put("status", "true");
+                return result.toString();
+            }
+        }
+        for (int i = 0; i < contactsArray.length(); i++) {
+            if (contactsArray.getJSONObject(i).getString("nickname").equals(nickname)) {
+                contentObject.put("response", "Nickname already assigned to same/another DID");
+                contentObject.put("did", nickname);
+                contentObject.put("nickname", contactsArray.getJSONObject(i).getString("did"));
+                result.put("data", contentObject);
+                result.put("message", "");
+                result.put("status", "true");
+                return result.toString();
+            }
+        }
+
+        JSONObject contactObject = new JSONObject();
+        contactObject.put("did", did);
+        contactObject.put("nickname", nickname);
+        contactsArray.put(contactObject);
+
+        writeToFile(DATA_PATH + "Contacts.json", contactsArray.toString(), false);
+        contentObject.put("response", "Added");
+
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");

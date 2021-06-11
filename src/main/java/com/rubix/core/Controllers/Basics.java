@@ -3,6 +3,8 @@ package com.rubix.core.Controllers;
 import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.Resources.Receiver;
+import io.ipfs.api.IPFS;
+import org.apache.log4j.PropertyConfigurator;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,9 +14,10 @@ import java.io.*;
 
 import static com.rubix.Resources.APIHandler.*;
 import static com.rubix.Resources.Functions.*;
+import static com.rubix.Resources.IPFSNetwork.executeIPFSCommands;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
-
+@CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Basics {
 
@@ -23,7 +26,7 @@ public class Basics {
 
     @RequestMapping(value = "/start", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public static String start() throws JSONException {
+    public static String start() throws JSONException, IOException {
         if(mutex){
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -143,7 +146,7 @@ public class Basics {
 
     @RequestMapping(value = "/check", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public static String checkRubixDir() throws JSONException {
+    public static String checkRubixDir() throws JSONException, IOException {
         String rubixFolders = checkDirectory();
         JSONObject folderStatus = new JSONObject(rubixFolders);
         if(!folderStatus.getString("status").contains("Success")){
@@ -156,6 +159,11 @@ public class Basics {
             return result.toString();
         }
 
+        File contactsFile = new File(DATA_PATH + "Contacts.json");
+        if(!contactsFile.exists()) {
+            contactsFile.createNewFile();
+            writeToFile(DATA_PATH + "Contacts.json", new JSONArray().toString(), false);
+        }
         location = dirPath + "PaymentsApp/";
         File workingDir = new File(location);
         if (!workingDir.exists()) {
@@ -217,7 +225,7 @@ public class Basics {
 
     @RequestMapping(value = "/p2pClose", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String p2pClose() throws JSONException {
+    public String p2pClose() throws JSONException, IOException {
         if(!mutex)
             start();
         closeStreams();
