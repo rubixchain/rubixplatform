@@ -15,13 +15,14 @@ import static com.rubix.core.Controllers.Basics.location;
 
 public class CallerFunctions {
 
-    public static boolean mainDir() throws JSONException {
+    public static boolean mainDir() throws JSONException, IOException {
         String folderStatus = checkRubixDir();
         JSONObject folder = new JSONObject(folderStatus);
         return folder.getString("status").contains("true");
     }
 
     public static void createWorkingDirectory() throws IOException, JSONException {
+        pathSet();
         setDir();
         location = dirPath + "PaymentsApp/";
         File workingDirectory = new File(location);
@@ -70,6 +71,12 @@ public class CallerFunctions {
         FileWriter tokenWriter = new FileWriter(tokenMapFile, false);
         tokenWriter.write(tokenMapArray.toString());
         tokenWriter.close();
+
+
+        File contactsFile = new File(DATA_PATH + "Contacts.json");
+        if(!contactsFile.exists())
+            contactsFile.createNewFile();
+        writeToFile(DATA_PATH + "Contacts.json", new JSONArray().toString(), false);
     }
 
     public static void deleteFolder(File file){

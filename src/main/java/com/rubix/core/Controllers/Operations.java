@@ -1,31 +1,24 @@
 package com.rubix.core.Controllers;
 
-import com.opencsv.CSVWriter;
 import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
 import com.rubix.core.Fractionalisation.FractionChooser;
 import com.rubix.core.Resources.RequestModel;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
-import static com.rubix.Resources.IntegrityCheck.didIntegrity;
-import static com.rubix.Resources.IntegrityCheck.message;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Controllers.Basics.start;
 import static com.rubix.core.Resources.CallerFunctions.*;
 
+@CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Operations {
 //    static  int count = 0;
@@ -56,12 +49,22 @@ public class Operations {
         String recDID = requestModel.getReceiver();
         int tokenCount = requestModel.getTokenCount();
         String comments = requestModel.getComment();
-        
+        int type = requestModel.getType();
+
+        if(!recDID.startsWith("Qm")){
+            String contactsTable = Functions.readFile(Functions.DATA_PATH + "Contacts.json");
+            JSONArray contactsArray = new JSONArray(contactsTable);
+            for (int i = 0; i < contactsArray.length(); ++i) {
+                if(contactsArray.getJSONObject(i).getString("nickname").equals(recDID))
+                    recDID = contactsArray.getJSONObject(i).getString("did");
+            }
+        }
         JSONArray tokens = FractionChooser.calculate(tokenCount);
         JSONObject objectSend = new JSONObject();
         objectSend.put("tokens", tokens);
-        objectSend.put("recDID", recDID);
-        objectSend.put("comments", comments);
+        objectSend.put("receiverDidIpfsHash", recDID);
+        objectSend.put("type", type);
+        objectSend.put("comment", comments);
         objectSend.put("amount", tokenCount);
         objectSend.put("tokenHeader", FractionChooser.tokenHeader);
         JSONObject resultObject = send(objectSend.toString());

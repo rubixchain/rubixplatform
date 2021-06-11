@@ -23,6 +23,7 @@ public class RequestModel {
     private String did;
     private int startRange;
     private int endRange;
+    private int type;
 
 
 
@@ -35,6 +36,7 @@ public class RequestModel {
     public int getTokenCount(){ return tokenCount; }
     public String getTransactionID(){return transactionID;}
     public int getTxnCount(){return txnCount;}
+    public int getType(){return type;}
     public String getReceiver(){
         return receiver;
     }
