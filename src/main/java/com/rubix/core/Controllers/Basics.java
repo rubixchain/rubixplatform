@@ -42,90 +42,17 @@ public class Basics {
             pathSet();
 
 
-            QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT,0);
+            QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT);
             Thread alpha1Thread = new Thread(alpha1);
             alpha1Thread.start();
 
-            QuorumConsensus alpha2 = new QuorumConsensus("alpha",QUORUM_PORT+1,1);
-            Thread alpha2Thread = new Thread(alpha2);
-            alpha2Thread.start();
-
-            QuorumConsensus alpha3 = new QuorumConsensus("alpha",QUORUM_PORT+2,2);
-            Thread alpha3Thread = new Thread(alpha3);
-            alpha3Thread.start();
-
-            QuorumConsensus alpha4 = new QuorumConsensus("alpha",QUORUM_PORT+3,3);
-            Thread alpha4Thread = new Thread(alpha4);
-            alpha4Thread.start();
-
-            QuorumConsensus alpha5 = new QuorumConsensus("alpha",QUORUM_PORT+4,4);
-            Thread alpha5Thread = new Thread(alpha5);
-            alpha5Thread.start();
-
-            QuorumConsensus alpha6 = new QuorumConsensus("alpha",QUORUM_PORT+5,5);
-            Thread alpha6Thread = new Thread(alpha6);
-            alpha6Thread.start();
-
-            QuorumConsensus alpha7 = new QuorumConsensus("alpha",QUORUM_PORT+6,6);
-            Thread alpha7Thread = new Thread(alpha7);
-            alpha7Thread.start();
-
-            QuorumConsensus beta1 = new QuorumConsensus("beta",QUORUM_PORT+7,0);
+            QuorumConsensus beta1 = new QuorumConsensus("beta",QUORUM_PORT+1);
             Thread beta1Thread = new Thread(beta1);
             beta1Thread.start();
 
-            QuorumConsensus beta2 = new QuorumConsensus("beta",QUORUM_PORT+8,1);
-            Thread beta2Thread = new Thread(beta2);
-            beta2Thread.start();
-
-            QuorumConsensus beta3 = new QuorumConsensus("beta",QUORUM_PORT+9,2);
-            Thread beta3Thread = new Thread(beta3);
-            beta3Thread.start();
-
-            QuorumConsensus beta4 = new QuorumConsensus("beta",QUORUM_PORT+10,3);
-            Thread beta4Thread = new Thread(beta4);
-            beta4Thread.start();
-
-            QuorumConsensus beta5 = new QuorumConsensus("beta",QUORUM_PORT+11,4);
-            Thread beta5Thread = new Thread(beta5);
-            beta5Thread.start();
-
-            QuorumConsensus beta6 = new QuorumConsensus("beta",QUORUM_PORT+12,5);
-            Thread beta6Thread = new Thread(beta6);
-            beta6Thread.start();
-
-            QuorumConsensus beta7 = new QuorumConsensus("beta",QUORUM_PORT+13,6);
-            Thread beta7Thread = new Thread(beta7);
-            beta7Thread.start();
-
-            QuorumConsensus gamma1 = new QuorumConsensus("gamma",QUORUM_PORT+14,0);
+            QuorumConsensus gamma1 = new QuorumConsensus("gamma",QUORUM_PORT+2);
             Thread gamma1Thread = new Thread(gamma1);
             gamma1Thread.start();
-
-            QuorumConsensus gamma2 = new QuorumConsensus("gamma",QUORUM_PORT+15,1);
-            Thread gamma2Thread = new Thread(gamma2);
-            gamma2Thread.start();
-
-            QuorumConsensus gamma3 = new QuorumConsensus("gamma",QUORUM_PORT+16,2);
-            Thread gamma3Thread = new Thread(gamma3);
-            gamma3Thread.start();
-
-            QuorumConsensus gamma4 = new QuorumConsensus("gamma",QUORUM_PORT+17,3);
-            Thread gamma4Thread = new Thread(gamma4);
-            gamma4Thread.start();
-
-            QuorumConsensus gamma5 = new QuorumConsensus("gamma",QUORUM_PORT+18,4);
-            Thread gamma5Thread = new Thread(gamma5);
-            gamma5Thread.start();
-
-            QuorumConsensus gamma6 = new QuorumConsensus("gamma",QUORUM_PORT+19,5);
-            Thread gamma6Thread = new Thread(gamma6);
-            gamma6Thread.start();
-
-            QuorumConsensus gamma7 = new QuorumConsensus("gamma",QUORUM_PORT+20,6);
-            Thread gamma7Thread = new Thread(gamma7);
-            gamma7Thread.start();
-
 
             Receiver receiver = new Receiver();
             Thread receiverThread = new Thread(receiver);

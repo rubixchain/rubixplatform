@@ -9,7 +9,12 @@ import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.util.Base64;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
@@ -123,6 +128,44 @@ public class Operations {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", didResult);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/generate", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+    public String generate() {
+        int width = 256;
+        int height = 256;
+        String src = null;
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        //File f;
+        for(int y = 0; y < height; y++){
+            for(int x = 0; x < width; x++){
+                int a = (int)(Math.random()*256); //alpha
+                int r = (int)(Math.random()*256); //red
+                int g = (int)(Math.random()*256); //green
+                int b = (int)(Math.random()*256); //blue
+
+                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel
+                img.setRGB(x, y, p);
+            }
+        }
+        try{
+            ByteArrayOutputStream f = new ByteArrayOutputStream();
+            ImageIO.write(img, "png", f);
+            byte[] bytes = f.toByteArray();
+            String base64bytes = Base64.getEncoder().encodeToString(bytes);
+            src = "data:image/png;base64," + base64bytes;
+            System.out.println(src);
+        }catch(IOException e){
+            System.out.println("Error: " + e);
+        }
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", src);
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
