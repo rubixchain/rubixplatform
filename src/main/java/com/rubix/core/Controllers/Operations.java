@@ -109,7 +109,7 @@ public class Operations {
             return checkRubixDir();
         if(!Basics.mutex)
             start();
-        return APIHandler.create().toString();
+        return APIHandler.create(1).toString();
 
     }
 

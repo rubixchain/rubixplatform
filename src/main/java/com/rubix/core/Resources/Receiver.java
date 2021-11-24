@@ -35,7 +35,7 @@ public class Receiver implements Runnable {
                     }
                 }
 
-            } catch (JSONException | IOException | ParseException e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
