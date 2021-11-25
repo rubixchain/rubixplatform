@@ -21,16 +21,14 @@ public class Receiver implements Runnable {
                 JSONObject tokenResult = new JSONObject(result);
                 if (tokenResult.getString("status").contains("Success")) {
                     JSONArray tokens = tokenResult.getJSONArray("tokens");
-                    JSONArray tokenHeader = tokenResult.getJSONArray("tokenHeader");
 
                     for (int i = 0; i < tokens.length(); i++) {
-                        String bank = tokenHeader.getString(i);
-                        String bankFile = readFile(Basics.location + bank + ".json");
+                        String bankFile = readFile(Basics.location + "BNK00.json");
                         JSONArray bankArray = new JSONArray(bankFile);
                         JSONObject tokenObject = new JSONObject();
                         tokenObject.put("tokenHash", tokens.getString(i));
                         bankArray.put(tokenObject);
-                        Functions.writeToFile(Basics.location + bank + ".json", bankArray.toString(), false);
+                        Functions.writeToFile(Basics.location + "BNK00.json", bankArray.toString(), false);
 
                     }
                 }

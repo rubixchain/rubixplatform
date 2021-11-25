@@ -2,14 +2,19 @@ package com.rubix.core.Controllers;
 
 
 import com.rubix.Resources.Functions;
+import io.ipfs.api.Peer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.rubix.Resources.APIHandler.*;
 import static com.rubix.Resources.Functions.*;
@@ -53,12 +58,15 @@ public class Wallet {
 
         JSONArray contactsObject = contacts();
         int contactsCount = contactsObject.length();
+        System.out.println(contactsCount);
 
         JSONArray accountInfo = accountInformation();
         JSONObject accountObject = accountInfo.getJSONObject(0);
+        System.out.println(accountObject);
 
         JSONArray dateTxn = txnPerDay();
         JSONObject dateTxnObject = dateTxn.getJSONObject(0);
+        System.out.println(dateTxnObject);
 
         //To display the Mine Count of the wallet - Reading from QuorumSignedTransactions
         String content = readFile(WALLET_DATA_PATH.concat("QuorumSignedTransactions.json"));
@@ -68,6 +76,7 @@ public class Wallet {
             if (!contentArray.getJSONObject(j).getBoolean("minestatus"))
                 finalArray.put(contentArray.getJSONObject(j));
         }
+        System.out.println(finalArray);
 
 
         int totalTxn = accountObject.getInt("senderTxn") + accountObject.getInt("receiverTxn");

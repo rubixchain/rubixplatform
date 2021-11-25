@@ -1,21 +1,26 @@
 package com.rubix.core.Controllers;
 
+import static com.rubix.Resources.APIHandler.*;
+import static com.rubix.Resources.Functions.*;
+import static com.rubix.core.Resources.CallerFunctions.mainDir;
+
+import java.io.File;
+import java.io.IOException;
+
 import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Resources.IPFSNetwork;
+import com.rubix.core.RubixApplication;
 import com.rubix.core.Resources.Receiver;
-import io.ipfs.api.IPFS;
-import org.apache.log4j.PropertyConfigurator;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;
-
-import static com.rubix.Resources.APIHandler.*;
-import static com.rubix.Resources.Functions.*;
-import static com.rubix.Resources.IPFSNetwork.executeIPFSCommands;
-import static com.rubix.core.Resources.CallerFunctions.mainDir;
+import io.ipfs.api.IPFS;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
@@ -41,7 +46,6 @@ public class Basics {
             launch();
             pathSet();
 
-
             QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT);
             Thread alpha1Thread = new Thread(alpha1);
             alpha1Thread.start();
@@ -57,6 +61,8 @@ public class Basics {
             Receiver receiver = new Receiver();
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
+
+            System.out.println(repo());
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -150,6 +156,11 @@ public class Basics {
         return result.toString();
     }
 
+    @RequestMapping(value = "/restart", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
+    public void restart() {
+        RubixApplication.restart();
+    }
+
     @RequestMapping(value = "/p2pClose", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public String p2pClose() throws JSONException, IOException {
@@ -171,6 +182,14 @@ public class Basics {
         IPFSNetwork.executeIPFSCommands("ipfs shutdown");
         System.exit(0);
         return "Shutting down";
+    }
+
+    @RequestMapping(value = "/repo", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+    public static String repo() {
+        IPFS ipfs = new IPFS("/ip4/127.0.0.1/tcp/" + IPFS_PORT);
+        IPFSNetwork.repo(ipfs);
+        return "Garbage Collected";
     }
 }
 

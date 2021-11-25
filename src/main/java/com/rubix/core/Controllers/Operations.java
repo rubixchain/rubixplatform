@@ -72,6 +72,8 @@ public class Operations {
         objectSend.put("comment", comments);
         objectSend.put("amount", tokenCount);
         objectSend.put("tokenHeader", FractionChooser.tokenHeader);
+
+
         JSONObject resultObject = send(objectSend.toString());
 
         if (resultObject.getString("status").equals("Success")) {
@@ -104,12 +106,12 @@ public class Operations {
 
     @RequestMapping(value = "/mine", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public static String mine() throws Exception {
+    public static String mine(int type) throws Exception {
         if (!mainDir())
             return checkRubixDir();
         if(!Basics.mutex)
             start();
-        return APIHandler.create(1).toString();
+        return APIHandler.create(type).toString();
 
     }
 
