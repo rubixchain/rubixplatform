@@ -5,7 +5,6 @@ import com.rubix.Resources.Functions;
 import com.rubix.core.Fractionalisation.FractionChooser;
 import com.rubix.core.Resources.RequestModel;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -139,7 +138,7 @@ public class Operations {
 
     @RequestMapping(value = "/generate", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String generate() throws JSONException {
+    public String generate() {
         int width = 256;
         int height = 256;
         String src = null;

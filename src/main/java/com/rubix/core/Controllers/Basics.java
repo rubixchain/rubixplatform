@@ -1,9 +1,7 @@
 package com.rubix.core.Controllers;
 
-import static com.rubix.Constants.IPFSConstants.bootstrap;
 import static com.rubix.Resources.APIHandler.*;
 import static com.rubix.Resources.Functions.*;
-import static com.rubix.Resources.IPFSNetwork.executeIPFSCommandsResponse;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
 import java.io.File;
@@ -11,16 +9,15 @@ import java.io.IOException;
 
 import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Resources.IPFSNetwork;
+import com.rubix.core.RubixApplication;
 import com.rubix.core.Resources.Receiver;
 
-import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.ipfs.api.IPFS;
@@ -29,18 +26,12 @@ import io.ipfs.api.IPFS;
 @RestController
 public class Basics {
 
-    public static Logger APILogger = Logger.getLogger(String.valueOf(Basics.class));
-
-
     public static String location = "";
     public static boolean mutex = false;
 
     @RequestMapping(value = "/start", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public static String start() throws JSONException, IOException {
-
-        // push publicshare and DID to IPFS and pin it
-        
         if(mutex){
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -53,7 +44,6 @@ public class Basics {
         if(mainDir()){
             mutex = true;
             launch();
-
             pathSet();
 
             QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT);
@@ -73,8 +63,6 @@ public class Basics {
             receiverThread.start();
 
             System.out.println(repo());
-
-            addPublicData();
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -168,77 +156,9 @@ public class Basics {
         return result.toString();
     }
 
-    @RequestMapping(value = "/bootstrap", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
-    public String getBootstrap() throws IOException, JSONException {
-
-
-        String command = bootstrap + "list";
-
-        // String response = executeIPFSCommandsResponse(command);
-        boolean configMatching = true;
-
-        JSONObject result = new JSONObject();
-        result.put("response", "Bootstrap List");
-        // result.put("message", "Bootstrap added: " + bootstrapId);
-        result.put("message", BOOTSTRAPS.toString().replace(",", "") // remove the commas
-                .replace("[", "") // remove the right bracket
-                .replace("]", "") // remove the left bracket
-                .trim());
-        result.put("ipfs-config-sync", configMatching);
-        return result.toString();
-    }
-
-    @RequestMapping(value = "/bootstrap", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public String addBootstrap(@RequestParam("id") String bootstrapId) throws JSONException, IOException {
-
-        String command = "ipfs bootstrap add " + bootstrapId;
-
-        String response = executeIPFSCommandsResponse(command);
-
-        String configPath = dirPath.concat("config.json");
-        String configFileContent = readFile(configPath);
-        JSONArray pathsArray = new JSONArray(configFileContent);
-
-        BOOTSTRAPS = pathsArray.getJSONArray(5);
-        BOOTSTRAPS.put(bootstrapId);
-        writeToFile(configPath, pathsArray.toString(), false);
-
-        JSONObject result = new JSONObject();
-        result.put("response", "Bootstrap Node Added");
-        // result.put("message", "Bootstrap added: " + bootstrapId);
-        result.put("message", response);
-        result.put("status", "true");
-        return result.toString();
-    }
-
-    @RequestMapping(value = "/bootstrap", method = RequestMethod.DELETE, produces = { "application/json",
-            "application/xml" })
-    public String removeBootstrap(@RequestParam("id") String bootstrapId) throws JSONException, IOException {
-
-        String command = "ipfs bootstrap rm " + bootstrapId;
-
-        String response = executeIPFSCommandsResponse(command);
-
-        String configPath = dirPath.concat("config.json");
-        String configFileContent = readFile(configPath);
-        JSONArray pathsArray = new JSONArray(configFileContent);
-        BOOTSTRAPS = pathsArray.getJSONArray(5);
-        
-        for(int i = 0; i < BOOTSTRAPS.length(); i++){
-            if(BOOTSTRAPS.getString(i).equals(bootstrapId)){
-                pathsArray.getJSONArray(5).remove(i);
-                break;
-            }
-        }
-        writeToFile(configPath, pathsArray.toString(), false);
-
-        JSONObject result = new JSONObject();
-        result.put("response", "Bootstrap Node Removed");
-        // result.put("message", "Bootstrap added: " + bootstrapId);
-        result.put("message", response);
-        result.put("status", "true");
-        return result.toString();
+    @RequestMapping(value = "/restart", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
+    public void restart() {
+        RubixApplication.restart();
     }
 
     @RequestMapping(value = "/p2pClose", method = RequestMethod.GET,
