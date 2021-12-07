@@ -11,29 +11,23 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 @SpringBootApplication
 public class RubixApplication {
 
-	private static ConfigurableApplicationContext context;
 
-	public static void main(String[] args) throws ParseException {
-
-		context = SpringApplication.run(RubixApplication.class, args);
+	public static void main(String[] args) {
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args);
 
-	}
-
-	public static void restart() {
-		ApplicationArguments args = context.getBean(ApplicationArguments.class);
-
-		Thread thread = new Thread(() -> {
-			context.close();
-			context = SpringApplication.run(RubixApplication.class, args.getSourceArgs());
-		});
-
-		thread.setDaemon(false);
-		thread.start();
 	}
 
 //	//Adding CORS - Desktop Applications
