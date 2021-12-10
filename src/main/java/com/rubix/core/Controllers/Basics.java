@@ -162,10 +162,10 @@ public class Basics {
         return result.toString();
     }
 
-    @RequestMapping(value = "/restart", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
+    /* @RequestMapping(value = "/restart", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
     public void restart() {
         RubixApplication.restart();
-    }
+    } */
 
     @RequestMapping(value = "/p2pClose", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})

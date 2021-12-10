@@ -5,26 +5,21 @@ import java.text.ParseException;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
 @SpringBootApplication
 public class RubixApplication {
 
-	private static ConfigurableApplicationContext context;
 
 	public static void main(String[] args) throws ParseException {
 
-		context = SpringApplication.run(RubixApplication.class, args);
 		System.setProperty("server.port", String.valueOf(1898));
-		SpringApplication.run(RubixApplication.class, args);
+		SpringApplication.run(com.rubix.core.RubixApplication.class, args);
 
 	}
 
-	public static void restart() {
+	/* public static void restart() {
 		ApplicationArguments args = context.getBean(ApplicationArguments.class);
 
 		Thread thread = new Thread(() -> {
@@ -34,7 +29,7 @@ public class RubixApplication {
 
 		thread.setDaemon(false);
 		thread.start();
-	}
+	} */
 
 //	//Adding CORS - Desktop Applications
 //	@Bean
@@ -63,7 +58,7 @@ public class RubixApplication {
 	//Adding CORS - All Origins
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurerAdapter() {
+		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
