@@ -26,7 +26,7 @@ public class RequestModel {
     private int type;
     private String buyer;
     private int amount;
-
+    private String nftToken;
 
 
     public RequestModel(){}
@@ -57,5 +57,6 @@ public class RequestModel {
     public String getPeerid(){return peerid;}
     public String getBuyer() {return this.buyer;}
     public int getAmount() {return this.amount;}
+    public String getNftToken() {return this.nftToken;}
 
 }
