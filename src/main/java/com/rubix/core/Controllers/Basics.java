@@ -3,6 +3,7 @@ package com.rubix.core.Controllers;
 import static com.rubix.Resources.APIHandler.*;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
+import static com.rubix.core.Resources.NFTReceiver.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,6 +62,10 @@ public class Basics {
             Receiver receiver = new Receiver();
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
+
+            NFTReceiver buyer = new NFTReceiver();
+            Thread buyerThread = new Thread((Runnable)buyer);
+            buyerThread.start();
 
             System.out.println(repo());
 
