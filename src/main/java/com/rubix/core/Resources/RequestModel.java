@@ -24,6 +24,8 @@ public class RequestModel {
     private int startRange;
     private int endRange;
     private int type;
+    private String buyer;
+    private int amount;
 
 
 
@@ -53,5 +55,7 @@ public class RequestModel {
     public int getStartRange(){return startRange;}
     public int getEndRange(){return endRange; }
     public String getPeerid(){return peerid;}
+    public String getBuyer() {return this.buyer;}
+    public int getAmount() {return this.amount;}
 
 }
