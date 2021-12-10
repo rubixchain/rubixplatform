@@ -2,13 +2,11 @@ package com.rubix.core.Resources;
 
 import org.json.JSONArray;
 
-import static com.rubix.Resources.Functions.getOsName;
-import static com.rubix.Resources.Functions.getSystemUser;
-
 public class RequestModel {
     private String peerid;
     private int value;
     private String receiver;
+    private String blockHash;
     private String sender;
     private JSONArray quorum;
     private int tokenCount;
@@ -39,6 +37,9 @@ public class RequestModel {
     public int getType(){return type;}
     public String getReceiver(){
         return receiver;
+    }
+    public String getBlockHash(){
+        return blockHash;
     }
     public String getSender(){
         return sender;

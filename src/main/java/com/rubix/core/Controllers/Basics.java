@@ -1,7 +1,15 @@
 package com.rubix.core.Controllers;
 
-import static com.rubix.Resources.APIHandler.*;
-import static com.rubix.Resources.Functions.*;
+import static com.rubix.Resources.APIHandler.closeStreams;
+import static com.rubix.Resources.APIHandler.networkInfo;
+import static com.rubix.Resources.Functions.DATA_PATH;
+import static com.rubix.Resources.Functions.IPFS_PORT;
+import static com.rubix.Resources.Functions.QUORUM_PORT;
+import static com.rubix.Resources.Functions.checkDirectory;
+import static com.rubix.Resources.Functions.dirPath;
+import static com.rubix.Resources.Functions.launch;
+import static com.rubix.Resources.Functions.pathSet;
+import static com.rubix.Resources.Functions.writeToFile;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
 import java.io.File;
@@ -9,7 +17,6 @@ import java.io.IOException;
 
 import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Resources.IPFSNetwork;
-import com.rubix.core.RubixApplication;
 import com.rubix.core.Resources.Receiver;
 
 import org.json.JSONArray;
@@ -156,10 +163,10 @@ public class Basics {
         return result.toString();
     }
 
-    @RequestMapping(value = "/restart", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
-    public void restart() {
-        RubixApplication.restart();
-    }
+    // @RequestMapping(value = "/restart", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
+    // public void restart() {
+    //     RubixApplication.restart();
+    // }
 
     @RequestMapping(value = "/p2pClose", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
