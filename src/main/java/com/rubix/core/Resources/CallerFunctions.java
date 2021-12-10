@@ -105,4 +105,16 @@ public class CallerFunctions {
 
         return balance;
     }
+
+    public static int getNftCount() throws JSONException {
+        int nftCount = 0;
+        try {
+            DirectoryStream<Path> nftTokenFolderStream = Files.newDirectoryStream(Paths.get(NFT_TOKENS_PATH, new String[0]));
+            for (Path path : nftTokenFolderStream)
+                nftCount++;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return nftCount;
+    }
 }
