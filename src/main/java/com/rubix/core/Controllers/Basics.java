@@ -11,6 +11,7 @@ import java.io.IOException;
 import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.RubixApplication;
+import com.rubix.core.Resources.NFTReceiver;
 import com.rubix.core.Resources.Receiver;
 
 import org.json.JSONArray;

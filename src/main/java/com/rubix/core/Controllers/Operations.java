@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
-import static com.rubix.Resources.APIHandler.send;
+import static com.rubix.Resources.APIHandler.*;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Controllers.Basics.start;

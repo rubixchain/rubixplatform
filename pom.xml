@@ -22,12 +22,12 @@
 		<dependency>
 			<groupId>com.did.core</groupId>
 			<artifactId>did</artifactId>
-			<version>6.3</version>
+			<version>9.0</version><!-- nft added core version-->
 		</dependency>
 		<dependency>
 			<groupId>com.rubix.core</groupId>
 			<artifactId>rubix</artifactId>
-			<version>9.9</version><!-- 9.1 -21 version-->
+			<version>10.0</version><!-- nft added core version-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
