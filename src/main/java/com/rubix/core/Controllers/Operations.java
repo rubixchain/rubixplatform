@@ -181,6 +181,45 @@ public class Operations {
 
     }
 
+    @RequestMapping(value = "/verifyBlock", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public static String verifyBlock(@RequestBody RequestModel requestModel) throws Exception {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            start();
+
+        String blockHash = requestModel.getBlockHash();
+
+        JSONObject resultObject = getBatchPins(blockHash);
+
+        if (resultObject.getString("status").equals("Success")) {
+
+            JSONObject result = new JSONObject();
+            JSONObject contentObject = new JSONObject();
+            contentObject.put("response", resultObject);
+            result.put("data", contentObject);
+            result.put("message", "");
+            result.put("status", "true");
+            // Instant end = Instant.now();
+            // Duration timeElapsed = Duration.between(start, end);
+            // count++;
+            // String[] data = {String.valueOf(count),
+            // String.valueOf((timeElapsed.getSeconds()))};
+            // writeDataLineByLine(data);
+            return result.toString();
+        } else {
+            JSONObject result = new JSONObject();
+            JSONObject contentObject = new JSONObject();
+            contentObject.put("response", resultObject);
+            result.put("data", contentObject);
+            result.put("message", "");
+            result.put("status", "true");
+            return result.toString();
+        }
+
+    }
+
     @RequestMapping(value = "/mine", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public static String mine(int type) throws Exception {
