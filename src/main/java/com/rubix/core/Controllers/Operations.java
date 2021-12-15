@@ -1,6 +1,7 @@
 package com.rubix.core.Controllers;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
+import static com.rubix.Resources.APIHandler.getBatchPins;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.dirPath;
 import static com.rubix.Resources.Functions.setDir;
