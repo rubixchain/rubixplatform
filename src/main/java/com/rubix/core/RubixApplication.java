@@ -1,6 +1,9 @@
 package com.rubix.core;
 
+import java.io.IOException;
 import java.text.ParseException;
+
+import com.rubix.LevelDb.DataBase;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
@@ -16,15 +19,24 @@ public class RubixApplication {
 
 	private static ConfigurableApplicationContext context;
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) {
 
-		context = SpringApplication.run(RubixApplication.class, args);
+		/* context = SpringApplication.run(RubixApplication.class, args);
 		System.setProperty("server.port", String.valueOf(1898));
-		SpringApplication.run(RubixApplication.class, args);
+		SpringApplication.run(RubixApplication.class, args); */
+		System.setProperty("server.port", String.valueOf(1898));
+		SpringApplication.run(com.rubix.core.RubixApplication.class, args);
+		try {
+			DataBase.createOrOpenDB();
+			DataBase.pushTxnFiletoDB();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
-	public static void restart() {
+	/* public static void restart() {
 		ApplicationArguments args = context.getBean(ApplicationArguments.class);
 
 		Thread thread = new Thread(() -> {
@@ -34,7 +46,7 @@ public class RubixApplication {
 
 		thread.setDaemon(false);
 		thread.start();
-	}
+	} */
 
 //	//Adding CORS - Desktop Applications
 //	@Bean
