@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.rubix.Consensus.QuorumConsensus;
+import com.rubix.LevelDb.DataBase;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.RubixApplication;
 import com.rubix.core.Resources.Receiver;
@@ -61,6 +62,9 @@ public class Basics {
             Receiver receiver = new Receiver();
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
+
+            /* DataBase.createOrOpenDB();
+            DataBase.pushTxnFiletoDB(); */
 
             System.out.println(repo());
 
