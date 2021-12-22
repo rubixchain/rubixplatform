@@ -1,26 +1,39 @@
 package com.rubix.core.Controllers;
 
-import com.rubix.core.Resources.RequestModel;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.web.bind.annotation.*;
+import static com.rubix.Resources.APIHandler.transactionDetails;
+import static com.rubix.Resources.APIHandler.transactionsByComment;
+import static com.rubix.Resources.APIHandler.transactionsByCount;
+import static com.rubix.Resources.APIHandler.transactionsByDID;
+import static com.rubix.Resources.APIHandler.transactionsByDate;
+import static com.rubix.Resources.APIHandler.transactionsByRange;
+import static com.rubix.Resources.Functions.WALLET_DATA_PATH;
+import static com.rubix.Resources.Functions.mutex;
+import static com.rubix.Resources.Functions.readFile;
+import static com.rubix.Resources.IntegrityCheck.dateIntegrity;
+import static com.rubix.Resources.IntegrityCheck.didIntegrity;
+import static com.rubix.Resources.IntegrityCheck.message;
+import static com.rubix.Resources.IntegrityCheck.rangeIntegrity;
+import static com.rubix.Resources.IntegrityCheck.txnIdIntegrity;
+import static com.rubix.core.Controllers.Basics.checkRubixDir;
+import static com.rubix.core.Controllers.Basics.start;
+import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
 
-import static com.rubix.Resources.APIHandler.*;
+import com.rubix.core.Resources.RequestModel;
 
-import static com.rubix.Resources.Functions.*;
-import static com.rubix.Resources.IntegrityCheck.*;
-import static com.rubix.core.Controllers.Basics.checkRubixDir;
-import static com.rubix.core.Controllers.Basics.start;
-import static com.rubix.core.Resources.CallerFunctions.mainDir;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
@@ -229,7 +242,7 @@ public class Transactions {
         return result.toString();
     }
 
-    private String noTxnError(){
+    private String noTxnError() throws JSONException{
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("message", "No transactions found!");

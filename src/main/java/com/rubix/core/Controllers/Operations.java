@@ -1,27 +1,39 @@
 package com.rubix.core.Controllers;
 
-import com.rubix.Resources.APIHandler;
-import com.rubix.Resources.Functions;
-import com.rubix.core.Fractionalisation.FractionChooser;
-import com.rubix.core.Resources.RequestModel;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import static RubixDID.DIDCreation.DIDimage.createDID;
+import static com.rubix.Resources.APIHandler.send;
+import static com.rubix.Resources.Functions.dirPath;
+import static com.rubix.Resources.Functions.setDir;
+import static com.rubix.core.Controllers.Basics.checkRubixDir;
+import static com.rubix.core.Controllers.Basics.location;
+import static com.rubix.core.Controllers.Basics.start;
+import static com.rubix.core.Resources.CallerFunctions.createWorkingDirectory;
+import static com.rubix.core.Resources.CallerFunctions.deleteFolder;
+import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
-import static RubixDID.DIDCreation.DIDimage.createDID;
-import static com.rubix.Resources.APIHandler.send;
-import static com.rubix.Resources.Functions.*;
-import static com.rubix.core.Controllers.Basics.*;
-import static com.rubix.core.Controllers.Basics.start;
-import static com.rubix.core.Resources.CallerFunctions.*;
+import javax.imageio.ImageIO;
+
+import com.rubix.Resources.APIHandler;
+import com.rubix.Resources.Functions;
+import com.rubix.core.Fractionalisation.FractionChooser;
+import com.rubix.core.Resources.RequestModel;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
@@ -118,12 +130,13 @@ public class Operations {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value) throws Exception {
+    public String Create(@RequestParam("image") MultipartFile imageFile) throws Exception {
         setDir();
         File RubixFolder = new File(dirPath);
         if(RubixFolder.exists())
             deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(value, imageFile.getInputStream());
+            
+        JSONObject didResult = createDID(imageFile.getInputStream());
         if(didResult.getString("Status").contains("Success"))
             createWorkingDirectory();
 
@@ -138,7 +151,7 @@ public class Operations {
 
     @RequestMapping(value = "/generate", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String generate() {
+    public String generate() throws JSONException {
         int width = 256;
         int height = 256;
         String src = null;
