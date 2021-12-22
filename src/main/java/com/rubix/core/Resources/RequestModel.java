@@ -54,5 +54,4 @@ public class RequestModel {
     public int getStartRange(){return startRange;}
     public int getEndRange(){return endRange; }
     public String getPeerid(){return peerid;}
-
 }

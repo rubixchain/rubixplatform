@@ -117,9 +117,9 @@ public class Operations {
 
     }
 
-    @RequestMapping(value = "/blockCommit", method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value = "/commitBlock", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public static String blockCommit(@RequestBody RequestModel requestModel) throws Exception {
+    public static String commitBlock(@RequestBody RequestModel requestModel) throws Exception {
         // Instant start = Instant.now();
         if (!mainDir())
             return checkRubixDir();
