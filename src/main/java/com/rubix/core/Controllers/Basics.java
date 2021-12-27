@@ -210,6 +210,15 @@ public class Basics {
             start();
          networkInfo();
 
+        if(DataBase.checkTransactionHistoryDBEmpty()==0)
+        {
+            DataBase.pushTxnFiletoDB();
+        }
+        if(DataBase.checkQuorumSignedTxnDBEmpty()==0)
+        {
+            DataBase.pushQstDatatoDB();
+        }
+
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", "Network Nodes Synced");
