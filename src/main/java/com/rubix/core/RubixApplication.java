@@ -27,7 +27,7 @@ public class RubixApplication {
 		SpringApplication.run(RubixApplication.class, args); */
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(com.rubix.core.RubixApplication.class, args);
-		Basics.sync();
+		//Basics.sync();
 		DataBase.createOrOpenDB();
 		//DataBase.pushTxnFiletoDB();
 
