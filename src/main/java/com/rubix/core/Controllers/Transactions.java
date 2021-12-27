@@ -1,5 +1,6 @@
 package com.rubix.core.Controllers;
 
+import com.rubix.LevelDb.DataBase;
 import com.rubix.core.Resources.RequestModel;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -249,19 +250,22 @@ public class Transactions {
         if(!mutex)
             start();
 
-        String txnPath = WALLET_DATA_PATH.concat("TransactionHistory.json");
+        //String txnPath = WALLET_DATA_PATH.concat("TransactionHistory.json");
         String quorumPath = WALLET_DATA_PATH.concat("QuorumSignedTransactions.json");
 
-        File txnFile = new File(txnPath);
+        //File txnFile = new File(txnPath);
         File quorumFile = new File(quorumPath);
 
         int txnCount = 0;
-        if(txnFile.exists()){
+        /* if(txnFile.exists()){
             String transactionFile = readFile(WALLET_DATA_PATH.concat("TransactionHistory.json"));
             JSONArray txnArray = new JSONArray(transactionFile);
             txnCount = txnArray.length();
 
-        }
+        } */
+        String transactionHistory= DataBase.sortedTxnDetails();
+        JSONArray txnArray = new JSONArray(transactionHistory);
+        txnCount = txnArray.length();
         int maxCredits = 0;
         int spentCredits = 0;
         int unspentCredits = 0;
