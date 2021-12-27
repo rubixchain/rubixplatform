@@ -203,7 +203,7 @@ public class Basics {
 
     @RequestMapping(value = "/sync", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String sync() throws IOException, JSONException {
+    public static String sync() throws IOException, JSONException {
         if (!mainDir())
             return checkRubixDir();
         if(!mutex)
