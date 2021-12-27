@@ -111,7 +111,7 @@ public class Basics {
 
     }
 
-    @RequestMapping(value = "/putTxnHisToDB", method = RequestMethod.GET,
+    @RequestMapping(value = "/putQstToDB", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public static String putQstToDB()
     {
