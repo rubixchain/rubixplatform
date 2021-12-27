@@ -242,6 +242,7 @@ public class Basics {
     @RequestMapping(value = "/shutdown", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public String shutdown() {
+        DataBase.closeDB();
         IPFSNetwork.executeIPFSCommands("ipfs shutdown");
         System.exit(0);
         return "Shutting down";
