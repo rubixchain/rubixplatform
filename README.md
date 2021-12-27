@@ -29,3 +29,15 @@ mvn install:install-file \
    -DgeneratePom=true
    
 ```
+
+In rubixplatform repo:
+
+```
+mvn clean
+```
+
+and
+
+```
+mvn package
+```
