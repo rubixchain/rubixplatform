@@ -210,11 +210,11 @@ public class Basics {
             start();
          networkInfo();
 
-        if(DataBase.checkTransactionHistoryDBEmpty()==0)
+        if(DataBase.getTxnHisDBLength()==0 && DataBase.getEssShareDBLength()==0)
         {
             DataBase.pushTxnFiletoDB();
         }
-        if(DataBase.checkQuorumSignedTxnDBEmpty()==0)
+        if(DataBase.getQstDBLength()==0 && DataBase.getQsDBLength()==0)
         {
             DataBase.pushQstDatatoDB();
         }
