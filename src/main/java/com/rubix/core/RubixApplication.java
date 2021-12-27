@@ -19,20 +19,15 @@ public class RubixApplication {
 
 	private static ConfigurableApplicationContext context;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 		/* context = SpringApplication.run(RubixApplication.class, args);
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args); */
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(com.rubix.core.RubixApplication.class, args);
-		try {
-			DataBase.createOrOpenDB();
-			DataBase.pushTxnFiletoDB();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		DataBase.createOrOpenDB();
+		//DataBase.pushTxnFiletoDB();
 
 	}
 
