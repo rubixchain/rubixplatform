@@ -1,39 +1,33 @@
 package com.rubix.core;
 
-import java.text.ParseException;
-
-import org.springframework.boot.ApplicationArguments;
+import com.rubix.core.Controllers.Basics;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 @SpringBootApplication
 public class RubixApplication {
 
-	private static ConfigurableApplicationContext context;
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) throws ParseException, IOException {
 
-		context = SpringApplication.run(RubixApplication.class, args);
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args);
+		Basics.start();
 
-	}
-
-	public static void restart() {
-		ApplicationArguments args = context.getBean(ApplicationArguments.class);
-
-		Thread thread = new Thread(() -> {
-			context.close();
-			context = SpringApplication.run(RubixApplication.class, args.getSourceArgs());
-		});
-
-		thread.setDaemon(false);
-		thread.start();
 	}
 
 //	//Adding CORS - Desktop Applications

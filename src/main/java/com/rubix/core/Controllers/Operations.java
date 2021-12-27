@@ -1,39 +1,30 @@
 package com.rubix.core.Controllers;
 
-import static RubixDID.DIDCreation.DIDimage.createDID;
-import static com.rubix.Resources.APIHandler.send;
-import static com.rubix.Resources.Functions.dirPath;
-import static com.rubix.Resources.Functions.setDir;
-import static com.rubix.core.Controllers.Basics.checkRubixDir;
-import static com.rubix.core.Controllers.Basics.location;
-import static com.rubix.core.Controllers.Basics.start;
-import static com.rubix.core.Resources.CallerFunctions.createWorkingDirectory;
-import static com.rubix.core.Resources.CallerFunctions.deleteFolder;
-import static com.rubix.core.Resources.CallerFunctions.mainDir;
+import com.rubix.Resources.APIHandler;
+import com.rubix.Resources.Functions;
+import com.rubix.TokenTransfer.TokenSender;
+import com.rubix.core.Fractionalisation.FractionChooser;
+import com.rubix.core.Resources.RequestModel;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.Base64;
 
-import javax.imageio.ImageIO;
-
-import com.rubix.Resources.APIHandler;
-import com.rubix.Resources.Functions;
-import com.rubix.core.Fractionalisation.FractionChooser;
-import com.rubix.core.Resources.RequestModel;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+import static RubixDID.DIDCreation.DIDimage.createDID;
+import static com.rubix.Resources.APIHandler.send;
+import static com.rubix.Resources.Functions.*;
+import static com.rubix.core.Controllers.Basics.*;
+import static com.rubix.core.Controllers.Basics.start;
+import static com.rubix.core.Resources.CallerFunctions.*;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
@@ -85,35 +76,33 @@ public class Operations {
         objectSend.put("amount", tokenCount);
         objectSend.put("tokenHeader", FractionChooser.tokenHeader);
 
+    	 JSONObject resultObject = send(objectSend.toString());
 
-        JSONObject resultObject = send(objectSend.toString());
-
-        if (resultObject.getString("status").equals("Success")) {
-            for (int i = 0; i < tokens.length(); i++) {
-                Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json", tokens.getString(i));
-            }
-            JSONObject result = new JSONObject();
-            JSONObject contentObject = new JSONObject();
-            contentObject.put("response", resultObject);
-            result.put("data", contentObject);
-            result.put("message", "");
-            result.put("status", "true");
-//            Instant end = Instant.now();
-//            Duration timeElapsed = Duration.between(start, end);
-//            count++;
-//            String[] data = {String.valueOf(count), String.valueOf((timeElapsed.getSeconds()))};
-//            writeDataLineByLine(data);
-            return result.toString();
-        }else{
-            JSONObject result = new JSONObject();
-            JSONObject contentObject = new JSONObject();
-            contentObject.put("response", resultObject);
-            result.put("data", contentObject);
-            result.put("message", "");
-            result.put("status", "true");
-            return result.toString();
-        }
-
+         if (resultObject.getString("status").equals("Success")) {
+             for (int i = 0; i < tokens.length(); i++) {
+                 Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json", tokens.getString(i));
+             }
+             JSONObject result = new JSONObject();
+             JSONObject contentObject = new JSONObject();
+             contentObject.put("response", resultObject);
+             result.put("data", contentObject);
+             result.put("message", "");
+             result.put("status", "true");
+//                 Instant end = Instant.now();
+//                 Duration timeElapsed = Duration.between(start, end);
+//                 count++;
+//                 String[] data = {String.valueOf(count), String.valueOf((timeElapsed.getSeconds()))};
+//                 writeDataLineByLine(data);
+             return result.toString();
+         }else{
+             JSONObject result = new JSONObject();
+             JSONObject contentObject = new JSONObject();
+             contentObject.put("response", resultObject);
+             result.put("data", contentObject);
+             result.put("message", "");
+             result.put("status", "true");
+             return result.toString();
+         }
     }
 
     @RequestMapping(value = "/mine", method = RequestMethod.GET,
@@ -130,13 +119,12 @@ public class Operations {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public String Create(@RequestParam("image") MultipartFile imageFile) throws Exception {
+    public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value) throws Exception {
         setDir();
         File RubixFolder = new File(dirPath);
         if(RubixFolder.exists())
             deleteFolder(RubixFolder);
-            
-        JSONObject didResult = createDID(imageFile.getInputStream());
+        JSONObject didResult = createDID(value, imageFile.getInputStream());
         if(didResult.getString("Status").contains("Success"))
             createWorkingDirectory();
 
