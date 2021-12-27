@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 import com.rubix.LevelDb.DataBase;
+import com.rubix.core.Controllers.Basics;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
@@ -26,6 +27,7 @@ public class RubixApplication {
 		SpringApplication.run(RubixApplication.class, args); */
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(com.rubix.core.RubixApplication.class, args);
+		Basics.sync();
 		DataBase.createOrOpenDB();
 		//DataBase.pushTxnFiletoDB();
 
