@@ -1,6 +1,9 @@
 package com.rubix.core;
 
+import java.io.IOException;
 import java.text.ParseException;
+
+import com.rubix.LevelDb.DataBase;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
@@ -12,7 +15,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class RubixApplication {
 
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) {
+
 
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(com.rubix.core.RubixApplication.class, args);

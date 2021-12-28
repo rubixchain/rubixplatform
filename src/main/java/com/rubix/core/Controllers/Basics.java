@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.rubix.Consensus.QuorumConsensus;
+import com.rubix.LevelDb.DataBase;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.RubixApplication;
 import com.rubix.core.Resources.NFTReceiver;
@@ -68,6 +69,7 @@ public class Basics {
             Thread buyerThread = new Thread((Runnable)buyer);
             buyerThread.start();
 
+
             System.out.println(repo());
 
             JSONObject result = new JSONObject();
@@ -81,6 +83,36 @@ public class Basics {
         else{
             return checkRubixDir();
         }
+    }
+
+
+    @RequestMapping(value = "/putTxnHisToDB", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+    public static String putTxnHisToDB()
+    {
+        String folders=checkDirectory();
+        JSONObject folderStatus= new JSONObject(folders);
+        if(!folderStatus.getString("status").contains("Success"))
+        {
+            JSONObject result = new JSONObject();
+            JSONObject contentObject = new JSONObject();
+            contentObject.put("response", folderStatus);
+            result.put("data", contentObject);
+            result.put("message", "");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        DataBase.pushTxnFiletoDB();
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", "Data from JSON file moved to transactionHistory and essentialShare DB");
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+
+
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET,
