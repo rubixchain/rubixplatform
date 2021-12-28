@@ -8,31 +8,18 @@ import com.rubix.LevelDb.DataBase;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-
 @SpringBootApplication
 public class RubixApplication {
 
-	private static ConfigurableApplicationContext context;
 
 	public static void main(String[] args) {
 
-		/* context = SpringApplication.run(RubixApplication.class, args);
-		System.setProperty("server.port", String.valueOf(1898));
-		SpringApplication.run(RubixApplication.class, args); */
+
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(com.rubix.core.RubixApplication.class, args);
-		try {
-			DataBase.createOrOpenDB();
-			DataBase.pushTxnFiletoDB();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 	}
 
@@ -75,7 +62,7 @@ public class RubixApplication {
 	//Adding CORS - All Origins
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurerAdapter() {
+		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")

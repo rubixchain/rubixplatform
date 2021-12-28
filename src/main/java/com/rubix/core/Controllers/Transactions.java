@@ -1,11 +1,16 @@
 package com.rubix.core.Controllers;
 
-import com.rubix.LevelDb.DataBase;
+
+import com.rubix.Resources.IntegrityCheck;
+
+
 import com.rubix.core.Resources.RequestModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
+
+import netscape.javascript.JSException;
 
 import java.io.File;
 import java.io.IOException;
@@ -60,6 +65,34 @@ public class Transactions {
         return result.toString();
     }
 
+    @RequestMapping(value = {"/getNftTxnDetails"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
+    public String getNftTxnDetails(@RequestBody RequestModel requestModel) throws JSONException, IOException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        String txnId = requestModel.getTransactionID();
+        if (!IntegrityCheck.txnIdIntegrity(txnId)) {
+            JSONObject jSONObject1 = new JSONObject();
+            JSONObject jSONObject2 = new JSONObject();
+            jSONObject2.put("message", IntegrityCheck.message);
+            jSONObject1.put("data", jSONObject2);
+            jSONObject1.put("message", "");
+            jSONObject1.put("status", "false");
+            jSONObject1.put("error_code", 1311);
+            return jSONObject1.toString();
+        }
+        if (nftTransactionDetails(txnId).has("Message"))
+            return noTxnError();
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", nftTransactionDetails(txnId));
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
     @RequestMapping(value = "/getTxnByDate", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
     public String getTxnByDate(@RequestBody RequestModel requestModel) throws JSONException, IOException, ParseException {
@@ -107,6 +140,45 @@ public class Transactions {
     }
 
 
+    @RequestMapping(value = {"/getNftTxnByDate"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
+    public String getNftTxnByDate(@RequestBody RequestModel requestModel) throws JSONException, IOException, ParseException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        String s = requestModel.getsDate();
+        String e = requestModel.geteDate();
+        String strDateFormat = "yyyy-MM-dd";
+        SimpleDateFormat objSDF = new SimpleDateFormat(strDateFormat);
+        Date date1 = (new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy")).parse(s);
+        Date date2 = (new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy")).parse(e);
+        String start = objSDF.format(date1);
+        String end = objSDF.format(date2);
+        if (!dateIntegrity(start, end)) {
+            JSONObject jSONObject1 = new JSONObject();
+            JSONObject jSONObject2 = new JSONObject();
+            jSONObject2.put("response", message);
+            jSONObject1.put("data", jSONObject2);
+            jSONObject1.put("message", "");
+            jSONObject1.put("status", "false");
+            jSONObject1.put("error_code", 1311);
+            return jSONObject1.toString();
+        }
+        JSONArray nftTransactions = new JSONArray();
+        nftTransactions = nftTransactionsByDate(s, e);
+        if (nftTransactions.length() == 0)
+            return noTxnError();
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", nftTransactions);
+        contentObject.put("count", nftTransactions.length());
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+
     @RequestMapping(value = "/getTxnByComment", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
     public String getTxnByComment(@RequestBody RequestModel requestModel) throws JSONException, IOException {
@@ -131,6 +203,26 @@ public class Transactions {
         result.put("status", "true");
         return result.toString();
     }
+
+    @RequestMapping(value = {"/getNftTxnByComment"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
+    public String getNftTxnByComment(@RequestBody RequestModel requestModel) throws JSONException, IOException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        String comment = requestModel.getComment();
+        if (nftTransactionsByComment(comment).length() == 0)
+            return noTxnError();
+        JSONObject contentObject = new JSONObject();
+        JSONObject result = new JSONObject();
+        contentObject.put("response", nftTransactionsByComment(comment));
+        contentObject.put("count", nftTransactionsByComment(comment).length());
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
 
     @RequestMapping(value = "/getTxnByCount", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
@@ -162,6 +254,34 @@ public class Transactions {
         return result.toString();
 
     }
+
+    @RequestMapping(value = {"/getNftTxnByCount"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
+    public String getNftTxnByCount(@RequestBody RequestModel requestModel) throws JSONException, IOException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        int n = requestModel.getTxnCount();
+        if (n < 1) {
+            JSONObject jSONObject1 = new JSONObject();
+            JSONObject jSONObject2 = new JSONObject();
+            jSONObject2.put("response", "Call Bounds Less Than 1");
+            jSONObject1.put("data", jSONObject2);
+            jSONObject1.put("message", "");
+            jSONObject1.put("status", "false");
+            jSONObject1.put("error_code", 1311);
+            return jSONObject1.toString();
+        }
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", nftTransactionsByCount(n));
+        contentObject.put("count", nftTransactionsByCount(n).length());
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
 
     @RequestMapping(value = "/getTxnByDID", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
@@ -195,6 +315,36 @@ public class Transactions {
         result.put("status", "true");
         return result.toString();
     }
+
+    @RequestMapping(value = {"/getNftTxnByDID"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
+    public String getNftTxnByDID(@RequestBody RequestModel requestModel) throws JSONException, IOException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        String did = requestModel.getDid();
+        if (!didIntegrity(did)) {
+            JSONObject jSONObject1 = new JSONObject();
+            JSONObject jSONObject2 = new JSONObject();
+            jSONObject2.put("response", IntegrityCheck.message);
+            jSONObject1.put("data", jSONObject2);
+            jSONObject1.put("message", "");
+            jSONObject1.put("status", "false");
+            jSONObject1.put("error_code", 1311);
+            return jSONObject1.toString();
+        }
+        if (transactionsByDID(did).length() == 0)
+            return noTxnError();
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", nftTransactionsByDID(did));
+        contentObject.put("count", nftTransactionsByDID(did).length());
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
 
     @RequestMapping(value = "/getTxnByRange", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
@@ -230,7 +380,37 @@ public class Transactions {
         return result.toString();
     }
 
-    private String noTxnError(){
+    @RequestMapping(value = {"/getNftTxnByRange"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
+    public String getNftTxnByRange(@RequestBody RequestModel requestModel) throws JSONException, IOException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        int start = requestModel.getStartRange();
+        int end = requestModel.getEndRange();
+        if (!rangeIntegrity(start, end)) {
+            JSONObject jSONObject1 = new JSONObject();
+            JSONObject jSONObject2 = new JSONObject();
+            jSONObject2.put("response", IntegrityCheck.message);
+            jSONObject1.put("data", jSONObject2);
+            jSONObject1.put("message", "");
+            jSONObject1.put("status", "false");
+            jSONObject1.put("error_code", 1311);
+            return jSONObject1.toString();
+        }
+        if (nftTransactionsByRange(start, end).length() == 0)
+            return noTxnError();
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", nftTransactionsByRange(start, end));
+        contentObject.put("count", nftTransactionsByRange(start, end).length());
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    private String noTxnError() throws JSONException{
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("message", "No transactions found!");

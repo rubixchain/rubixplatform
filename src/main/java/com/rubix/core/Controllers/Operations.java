@@ -17,6 +17,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
+import static RubixDID.DIDCreation.DIDimage.createDID;
+import static com.rubix.Resources.APIHandler.*;
+import static com.rubix.Resources.Functions.*;
+import static com.rubix.core.Controllers.Basics.*;
+import static com.rubix.core.Controllers.Basics.start;
+import static com.rubix.core.Resources.CallerFunctions.*;
+import static com.rubix.core.Resources.NFTReceiver.*;
+import static com.rubix.core.Resources.Receiver.*;
+
 import javax.imageio.ImageIO;
 
 import com.rubix.Resources.APIHandler;
@@ -34,6 +43,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
@@ -117,7 +127,56 @@ public class Operations {
 
     }
 
+
+    @RequestMapping(value = {"/initiateNftTransaction"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
+    public static String initiateNftTransaction(@RequestBody RequestModel requestModel) throws Exception {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            start();
+        String buyerDID = requestModel.getBuyer();
+        String nftTokenIpfsHash = requestModel.getNftToken();
+        int amount = requestModel.getAmount();
+        String comments = requestModel.getComment();
+        int type = requestModel.getType();
+        if (!buyerDID.startsWith("Qm")) {
+            String contactsTable =readFile(DATA_PATH + "Contacts.json");
+            JSONArray contactsArray = new JSONArray(contactsTable);
+            for (int i = 0; i < contactsArray.length(); i++) {
+                if (contactsArray.getJSONObject(i).getString("nickname").equals(buyerDID))
+                    buyerDID = contactsArray.getJSONObject(i).getString("did");
+            }
+        }
+        JSONObject objectSend = new JSONObject();
+        objectSend.put("nftToken", nftTokenIpfsHash);
+        objectSend.put("buyerDidIpfsHash", buyerDID);
+        objectSend.put("type", type);
+        objectSend.put("comment", comments);
+        objectSend.put("amount", amount);
+        JSONObject resultObject = sendNft(objectSend.toString());
+        if (resultObject.getString("status").equals("Success")) {
+            JSONObject jSONObject1 = new JSONObject();
+            JSONObject jSONObject2 = new JSONObject();
+            jSONObject2.put("response", resultObject);
+            jSONObject1.put("data", jSONObject2);
+            jSONObject1.put("message", "");
+            jSONObject1.put("status", "true");
+            return jSONObject1.toString();
+        }
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", resultObject);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/mine", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+
     @RequestMapping(value = "/mine", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
+
     public static String mine(int type) throws Exception {
         if (!mainDir())
             return checkRubixDir();
