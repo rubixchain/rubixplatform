@@ -172,8 +172,7 @@ public class Operations {
         return result.toString();
     }
 
-    @RequestMapping(value = "/mine", method = RequestMethod.GET,
-            produces = {"application/json", "application/xml"})
+
 
     @RequestMapping(value = "/mine", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
 

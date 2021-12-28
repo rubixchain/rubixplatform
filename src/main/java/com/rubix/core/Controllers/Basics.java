@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.rubix.Consensus.QuorumConsensus;
-import com.rubix.LevelDb.DataBase;
+//import com.rubix.LevelDb.DataBase;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.RubixApplication;
 import com.rubix.core.Resources.NFTReceiver;
@@ -86,7 +86,7 @@ public class Basics {
     }
 
 
-    @RequestMapping(value = "/putTxnHisToDB", method = RequestMethod.GET,
+    /* @RequestMapping(value = "/putTxnHisToDB", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public static String putTxnHisToDB()
     {
@@ -113,7 +113,7 @@ public class Basics {
         return result.toString();
 
 
-    }
+    } */
 
     @RequestMapping(value = "/check", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
