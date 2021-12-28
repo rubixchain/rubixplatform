@@ -1,6 +1,7 @@
 package com.rubix.core.Controllers;
 
 
+import com.rubix.LevelDb.DataBase;
 import com.rubix.Resources.Functions;
 import io.ipfs.api.Peer;
 import org.json.JSONArray;
@@ -69,7 +70,8 @@ public class Wallet {
         System.out.println(dateTxnObject);
 
         //To display the Mine Count of the wallet - Reading from QuorumSignedTransactions
-        String content = readFile(WALLET_DATA_PATH.concat("QuorumSignedTransactions.json"));
+        //String content = readFile(WALLET_DATA_PATH.concat("QuorumSignedTransactions.json"));
+        String content=DataBase.sortedQstData();
         JSONArray contentArray = new JSONArray(content);
         JSONArray finalArray = new JSONArray();
         for (int j = 0; j < contentArray.length(); j++) {
