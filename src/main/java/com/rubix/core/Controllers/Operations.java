@@ -193,7 +193,7 @@ public class Operations {
         File RubixFolder = new File(dirPath);
         if (RubixFolder.exists())
             deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(imageFile.getInputStream());
+        JSONObject didResult = createDID(value,imageFile.getInputStream());
         if (didResult.getString("Status").contains("Success"))
             createWorkingDirectory();
 
