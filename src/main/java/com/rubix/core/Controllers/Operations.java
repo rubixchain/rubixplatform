@@ -243,4 +243,12 @@ public class Operations {
         result.put("status", "true");
         return result.toString();
     }
+
+    
+    public static String generateNft(@RequestBody RequestModel requestModel)
+    {
+        String result=null;
+
+        return result;
+    }
 }
