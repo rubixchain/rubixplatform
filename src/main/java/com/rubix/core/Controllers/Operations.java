@@ -244,11 +244,24 @@ public class Operations {
         return result.toString();
     }
 
-    
-    public static String generateNft(@RequestBody RequestModel requestModel)
+    @RequestMapping(value = "/generateRac", method = RequestMethod.GET, produces = { "application/json",
+            "application/xml" })
+    public static String generateRac(@RequestBody RequestModel requestModel)
     {
         String result=null;
-
+        JSONObject data= new JSONObject();
+        data.put("racType", requestModel.getRactype());
+        data.put("creatorDid",requestModel.getCreatorDid());
+        data.put("totalSupply",requestModel.getTotalSupply());
+        data.put("tokenNo",requestModel.getTokenNo());
+        data.put("racComment",requestModel.getRacComment());
+        data.put("contentHash",requestModel.getContentHash());
+        if(requestModel.getUrl()!=null)
+        {
+            data.put("url", requestModel.getUrl());
+        }
+        data.put("pvtKey", requestModel.getPvtKey());
+        String racToken;
         return result;
     }
 }
