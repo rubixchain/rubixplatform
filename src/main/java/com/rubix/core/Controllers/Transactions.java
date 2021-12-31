@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.xml.crypto.Data;
+
 import static com.rubix.Resources.APIHandler.*;
 
 import static com.rubix.Resources.Functions.*;
@@ -430,11 +432,11 @@ public class Transactions {
         if(!mutex)
             start();
 
-        String txnPath = WALLET_DATA_PATH.concat("TransactionHistory.json");
-        String quorumPath = WALLET_DATA_PATH.concat("QuorumSignedTransactions.json");
+        //String txnPath = WALLET_DATA_PATH.concat("TransactionHistory.json");
+        //String quorumPath = WALLET_DATA_PATH.concat("QuorumSignedTransactions.json");
 
-        File txnFile = new File(txnPath);
-        File quorumFile = new File(quorumPath);
+        //File txnFile = new File(txnPath);
+        //File quorumFile = new File(quorumPath);
 
         int txnCount = 0;
         if(txnFile.exists()){
@@ -446,7 +448,7 @@ public class Transactions {
         int maxCredits = 0;
         int spentCredits = 0;
         int unspentCredits = 0;
-        if(quorumFile.exists()){
+        /* if(quorumFile.exists()){
             String qFile = readFile(WALLET_DATA_PATH.concat("QuorumSignedTransactions.json"));
             JSONArray qArray = new JSONArray(qFile);
             maxCredits = qArray.length();
@@ -454,6 +456,18 @@ public class Transactions {
                 if(qArray.getJSONObject(i).getBoolean("minestatus"))
                     spentCredits++;
                 else
+                    unspentCredits++;
+            }
+        } */
+        String qstData=DataBase.sortedQstData();
+        JSONArray qArray=new JSONArray(qstData);
+        maxCredits = qArray.length();
+        for(int i = 0; i < qArray.length(); i++){
+            if(qArray.getJSONObject(i).getBoolean("minestatus"))
+            {
+                    spentCredits++;
+            }
+            else{
                     unspentCredits++;
             }
         }
