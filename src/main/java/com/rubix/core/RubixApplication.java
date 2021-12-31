@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 
 import com.rubix.LevelDb.DataBase;
+import com.rubix.core.Controllers.Basics;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.SpringApplication;
@@ -15,11 +16,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class RubixApplication {
 
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 
 
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(com.rubix.core.RubixApplication.class, args);
+		//Basics.sync();
+		DataBase.createOrOpenDB();
+		//DataBase.pushTxnFiletoDB();
+
 
 	}
 

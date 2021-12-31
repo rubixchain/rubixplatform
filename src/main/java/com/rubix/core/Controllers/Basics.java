@@ -115,6 +115,35 @@ public class Basics {
 
     }
 
+    @RequestMapping(value = "/putQstToDB", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+    public static String putQstToDB()
+    {
+        String folders=checkDirectory();
+        JSONObject folderStatus= new JSONObject(folders);
+        if(!folderStatus.getString("status").contains("Success"))
+        {
+            JSONObject result = new JSONObject();
+            JSONObject contentObject = new JSONObject();
+            contentObject.put("response", folderStatus);
+            result.put("data", contentObject);
+            result.put("message", "");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        DataBase.pushQstDatatoDB();
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", "Data from JSON file moved to quorumSignedTransaction and quorumSign DB");
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+
+
+    }
+
     @RequestMapping(value = "/check", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public static String checkRubixDir() throws JSONException, IOException {
@@ -178,12 +207,21 @@ public class Basics {
 
     @RequestMapping(value = "/sync", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String sync() throws IOException, JSONException {
+    public static String sync() throws IOException, JSONException {
         if (!mainDir())
             return checkRubixDir();
         if(!mutex)
             start();
          networkInfo();
+
+        if(DataBase.getTxnHisDBLength()==0 && DataBase.getEssShareDBLength()==0)
+        {
+            DataBase.pushTxnFiletoDB();
+        }
+        if(DataBase.getQstDBLength()==0 && DataBase.getQsDBLength()==0)
+        {
+            DataBase.pushQstDatatoDB();
+        }
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
@@ -217,6 +255,7 @@ public class Basics {
     @RequestMapping(value = "/shutdown", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public String shutdown() {
+        DataBase.closeDB();
         IPFSNetwork.executeIPFSCommands("ipfs shutdown");
         System.exit(0);
         return "Shutting down";
