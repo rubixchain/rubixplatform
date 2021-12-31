@@ -23,11 +23,16 @@
 			<groupId>com.did.core</groupId>
 			<artifactId>did</artifactId>
 			<version>13.0</version>
+
 		</dependency>
 		<dependency>
 			<groupId>com.rubix.core</groupId>
 			<artifactId>rubix</artifactId>
+
 			<version>13.0</version><!-- 9.1 -21 version-->
+
+
+
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -24,6 +24,7 @@ import static com.rubix.core.Controllers.Basics.mutex;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.getBalance;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
+import static com.rubix.core.Resources.CallerFunctions.*;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
@@ -40,6 +41,24 @@ public class Wallet {
         JSONObject accountObject = accountInfo.getJSONObject(0);
         accountObject.put("balance", getBalance());
 
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", accountObject);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = {"/getNftInfo"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
+    public String getNftInfo() throws JSONException, IOException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        JSONArray nftInfo = nftInformation();
+        JSONObject accountObject = nftInfo.getJSONObject(0);
+        accountObject.put("nftCount", getNftCount());
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", accountObject);
@@ -93,6 +112,29 @@ public class Wallet {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", accountObject);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = {"/getNftDashboard"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
+    public String getNftDashboard() throws JSONException, IOException, InterruptedException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        JSONArray nftInfo = nftInformation();
+        JSONObject nftObject = nftInfo.getJSONObject(0);
+        JSONArray dateTxn = nftTxnPerDay();
+        JSONObject dateTxnObject = dateTxn.getJSONObject(0);
+        int totalTxn = nftObject.getInt("sellerTxn") + nftObject.getInt("buyerTxn");
+        nftObject.put("totalNftTxn", totalTxn);
+        nftObject.put("nftTransactionsPerDay", dateTxnObject);
+        nftObject.put("nftCount", getNftCount());
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", nftObject);
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
@@ -191,6 +233,27 @@ public class Wallet {
         result.put("status", "true");
         return result.toString();
 
+    }
+
+    @RequestMapping(value = {"/viewNftTokens"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
+    public String viewNftTokens() throws JSONException, IOException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+        File directoryPath = new File(NFT_TOKENS_PATH);
+        String[] contents = directoryPath.list();
+        JSONArray nftTokens = new JSONArray();
+        for (String content : contents)
+            nftTokens.put(content);
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", nftTokens);
+        contentObject.put("count", nftTokens.length());
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
     }
 
     @RequestMapping(value = "/addNickName", method = RequestMethod.POST,
