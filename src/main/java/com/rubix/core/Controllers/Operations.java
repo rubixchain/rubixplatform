@@ -63,54 +63,44 @@ public class Operations {
         if (!Basics.mutex)
             start();
 
-        JSONObject objectSend = new JSONObject();
-        JSONArray tokens = new JSONArray();
+        /**
+         * TODO Sanity check
+         * 1- check ipfs is working in receiver and in quorums.
+         * 2- Rubix jar is up and running in receiver and quorums
+         * 3- connect to bootstrap nodes.
+         * 4- Get the list of all ports locked by other process. Will show appropriate
+         * msg to the user.
+         */
 
-        if (requestModel.getBlockHash() != null) {
+        String recDID = requestModel.getReceiver();
+        int tokenCount = requestModel.getTokenCount();
+        String comments = requestModel.getComment();
+        int type = requestModel.getType();
 
-            String blockHash = requestModel.getBlockHash();
-            String comments = requestModel.getComment();
-            int type = requestModel.getType();
-
-            objectSend.put("blockHash", blockHash);
-            objectSend.put("type", type);
-            objectSend.put("comment", comments);
-
-        } else {
-            String recDID = requestModel.getReceiver();
-            int tokenCount = requestModel.getTokenCount();
-            String comments = requestModel.getComment();
-            int type = requestModel.getType();
-
-            if (!recDID.startsWith("Qm")) {
-                String contactsTable = Functions.readFile(Functions.DATA_PATH + "Contacts.json");
-                JSONArray contactsArray = new JSONArray(contactsTable);
-                for (int i = 0; i < contactsArray.length(); ++i) {
-                    if (contactsArray.getJSONObject(i).getString("nickname").equals(recDID))
-                        recDID = contactsArray.getJSONObject(i).getString("did");
-                }
+        if (!recDID.startsWith("Qm")) {
+            String contactsTable = Functions.readFile(Functions.DATA_PATH + "Contacts.json");
+            JSONArray contactsArray = new JSONArray(contactsTable);
+            for (int i = 0; i < contactsArray.length(); ++i) {
+                if (contactsArray.getJSONObject(i).getString("nickname").equals(recDID))
+                    recDID = contactsArray.getJSONObject(i).getString("did");
             }
-            tokens = FractionChooser.calculate(tokenCount);
-
-            objectSend.put("tokens", tokens);
-            objectSend.put("receiverDidIpfsHash", recDID);
-            objectSend.put("type", type);
-            objectSend.put("comment", comments);
-            objectSend.put("amount", tokenCount);
-            objectSend.put("tokenHeader", FractionChooser.tokenHeader);
         }
+        JSONArray tokens = FractionChooser.calculate(tokenCount);
+        JSONObject objectSend = new JSONObject();
+        objectSend.put("tokens", tokens);
+        objectSend.put("receiverDidIpfsHash", recDID);
+        objectSend.put("type", type);
+        objectSend.put("comment", comments);
+        objectSend.put("amount", tokenCount);
+        objectSend.put("tokenHeader", FractionChooser.tokenHeader);
 
         JSONObject resultObject = send(objectSend.toString());
 
         if (resultObject.getString("status").equals("Success")) {
-
-            if (tokens.length() != 0) {
-                for (int i = 0; i < tokens.length(); i++) {
-                    Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json",
-                            tokens.getString(i));
-                }
+            for (int i = 0; i < tokens.length(); i++) {
+                Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json",
+                        tokens.getString(i));
             }
-
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
             contentObject.put("response", resultObject);
@@ -147,12 +137,13 @@ public class Operations {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String Create(@RequestParam("image") MultipartFile imageFile) throws Exception {
+    public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value)
+            throws Exception {
         setDir();
         File RubixFolder = new File(dirPath);
         if (RubixFolder.exists())
             deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(imageFile.getInputStream());
+        JSONObject didResult = createDID(value, imageFile.getInputStream());
         if (didResult.getString("Status").contains("Success"))
             createWorkingDirectory();
 
