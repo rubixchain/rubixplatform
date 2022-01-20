@@ -7,12 +7,16 @@ import static com.rubix.Resources.APIHandler.networkInfo;
 import static com.rubix.Resources.Functions.BOOTSTRAPS;
 import static com.rubix.Resources.Functions.DATA_PATH;
 import static com.rubix.Resources.Functions.IPFS_PORT;
+import static com.rubix.Resources.Functions.PAYMENTS_PATH;
 import static com.rubix.Resources.Functions.QUORUM_PORT;
+import static com.rubix.Resources.Functions.TOKENCHAIN_PATH;
+import static com.rubix.Resources.Functions.TOKENS_PATH;
 import static com.rubix.Resources.Functions.checkDirectory;
 import static com.rubix.Resources.Functions.dirPath;
 import static com.rubix.Resources.Functions.launch;
 import static com.rubix.Resources.Functions.pathSet;
 import static com.rubix.Resources.Functions.readFile;
+import static com.rubix.Resources.Functions.tokenBank;
 import static com.rubix.Resources.Functions.writeToFile;
 import static com.rubix.Resources.IPFSNetwork.executeIPFSCommandsResponse;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
@@ -20,10 +24,11 @@ import static com.rubix.core.Resources.CallerFunctions.mainDir;
 import java.io.File;
 import java.io.IOException;
 
-import com.rubix.Mining.MiningQuorum;
 import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Resources.IPFSNetwork;
+import com.rubix.core.Resources.Background;
 import com.rubix.core.Resources.Receiver;
+import com.rubix.core.Resources.ReceiverParts;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,25 +75,39 @@ public class Basics {
             Thread gamma1Thread = new Thread(gamma1);
             gamma1Thread.start();
 
-            MiningQuorum mqAlpha = new MiningQuorum("alpha", QUORUM_PORT + 3);
-            Thread tAlpha = new Thread(mqAlpha);
-            tAlpha.start();
-
-            MiningQuorum mqBeta = new MiningQuorum("beta", QUORUM_PORT + 4);
-            Thread tBeta = new Thread(mqBeta);
-            tBeta.start();
-
-            MiningQuorum mqGamma = new MiningQuorum("gamma", QUORUM_PORT + 5);
-            Thread tGamma = new Thread(mqGamma);
-            tGamma.start();
-
             Receiver receiver = new Receiver();
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
 
+            ReceiverParts receiveParts = new ReceiverParts();
+            Thread receiverPartsThread = new Thread(receiveParts);
+            receiverPartsThread.start();
+
+            tokenBank();
+
             System.out.println(repo());
 
             addPublicData();
+
+            Background background = new Background();
+            Thread backThread = new Thread(background);
+            backThread.start();
+
+            pathSet();
+
+            String PART_TOKEN_CHAIN_PATH = TOKENCHAIN_PATH.concat("PARTS/");
+            String PART_TOKEN_PATH = TOKENS_PATH.concat("PARTS/");
+            File partFolder = new File(PART_TOKEN_PATH);
+            if (!partFolder.exists())
+                partFolder.mkdir();
+            partFolder = new File(PART_TOKEN_CHAIN_PATH);
+            if (!partFolder.exists())
+                partFolder.mkdir();
+            File partTokensFile = new File(PAYMENTS_PATH.concat("PartsToken.json"));
+            if (!partTokensFile.exists()) {
+                partTokensFile.createNewFile();
+                writeToFile(partTokensFile.toString(), "[]", false);
+            }
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -282,4 +301,5 @@ public class Basics {
         IPFSNetwork.repo(ipfs);
         return "Garbage Collected";
     }
+
 }

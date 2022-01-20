@@ -2,7 +2,10 @@ package com.rubix.core.Controllers;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
+import static com.rubix.Resources.APIHandler.sendParts;
+import static com.rubix.Resources.Functions.PAYMENTS_PATH;
 import static com.rubix.Resources.Functions.dirPath;
+import static com.rubix.Resources.Functions.readFile;
 import static com.rubix.Resources.Functions.setDir;
 import static com.rubix.core.Controllers.Basics.checkRubixDir;
 import static com.rubix.core.Controllers.Basics.location;
@@ -15,6 +18,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
@@ -25,7 +30,6 @@ import com.rubix.core.Fractionalisation.FractionChooser;
 import com.rubix.core.Resources.RequestModel;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,44 +42,104 @@ import org.springframework.web.multipart.MultipartFile;
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Operations {
-    // static int count = 0;
-    // public static void writeDataLineByLine(String data[])
-    // {
-    // File file = new File("data.csv");
-    // try {
-    // FileWriter outputfile = new FileWriter(file,true);
-    // CSVWriter writer = new CSVWriter(outputfile);
-    // writer.writeNext(data);
-    // writer.close();
-    // }
-    // catch (IOException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // }
-    // }
 
     @RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public static String initiateTransaction(@RequestBody RequestModel requestModel) throws Exception {
-        // Instant start = Instant.now();
         if (!mainDir())
             return checkRubixDir();
         if (!Basics.mutex)
             start();
 
-        /**
-         * TODO Sanity check
-         * 1- check ipfs is working in receiver and in quorums.
-         * 2- Rubix jar is up and running in receiver and quorums
-         * 3- connect to bootstrap nodes.
-         * 4- Get the list of all ports locked by other process. Will show appropriate
-         * msg to the user.
-         */
+        DecimalFormat df = new DecimalFormat("#.####");
+        df.setRoundingMode(RoundingMode.CEILING);
 
         String recDID = requestModel.getReceiver();
-        int tokenCount = requestModel.getTokenCount();
+        double tokenCount = requestModel.getTokenCount();
         String comments = requestModel.getComment();
         int type = requestModel.getType();
+
+        Number numberFormat = tokenCount;
+        tokenCount = Double.parseDouble(df.format(numberFormat.doubleValue()));
+
+        int intPart = (int) tokenCount;
+        double decimal = tokenCount - intPart;
+        System.out.println("Input Value: " + tokenCount);
+        System.out.println("Integer Part: " + intPart);
+        System.out.println("Decimal Part: " + (tokenCount - intPart));
+        String[] div = String.valueOf(tokenCount).split("\\.");
+        System.out.println("Number of decimals: " + div[1].length());
+
+        if (div[1].length() > 3) {
+            JSONObject result = new JSONObject();
+            result.put("data", "Amount can have only 3 precisions maximum");
+            result.put("message", "");
+            result.put("status", "true");
+
+            return result.toString();
+        }
+
+        double available = Functions.getBalance();
+        if (tokenCount > available) {
+            JSONObject result = new JSONObject();
+            result.put("data", "Amount greater than available");
+            result.put("message", "");
+            result.put("status", "true");
+
+            return result.toString();
+        }
+
+        if (intPart > 0) {
+            File bankFile = new File(PAYMENTS_PATH.concat("BNK00.json"));
+            if (bankFile.exists()) {
+                String bankContent = readFile(PAYMENTS_PATH.concat("BNK00.json"));
+                JSONArray bankArray = new JSONArray(bankContent);
+                if (intPart > bankArray.length()) {
+                    JSONObject result = new JSONObject();
+                    result.put("data", intPart + " whole tokens not available. Please send in parts");
+                    result.put("message", "");
+                    result.put("status", "true");
+
+                    return result.toString();
+                }
+            }
+        } else {
+            if (decimal > 0) {
+                JSONObject objectSendParts = new JSONObject();
+                objectSendParts.put("receiverDidIpfsHash", recDID);
+                objectSendParts.put("type", type);
+                objectSendParts.put("comment", comments);
+                objectSendParts.put("amount", decimal);
+
+                System.out.println("Starting Decimal Amount Transfer...");
+                JSONObject resultObjectParts = sendParts(objectSendParts.toString());
+                if (resultObjectParts.getString("status").equals("Success")) {
+                    JSONObject result = new JSONObject();
+                    JSONObject contentObject = new JSONObject();
+                    contentObject.put("Parts response", resultObjectParts);
+                    result.put("data", contentObject);
+                    result.put("message", "");
+                    result.put("status", "true");
+
+                    return result.toString();
+                } else {
+                    JSONObject result = new JSONObject();
+                    JSONObject contentObject = new JSONObject();
+                    contentObject.put("Parts response", resultObjectParts);
+                    result.put("data", contentObject);
+                    result.put("message", "");
+                    result.put("status", "true");
+                    return result.toString();
+                }
+            } else {
+                JSONObject result = new JSONObject();
+                JSONObject contentObject = new JSONObject();
+                result.put("data", contentObject);
+                result.put("message", "");
+                result.put("status", "true");
+                return result.toString();
+            }
+        }
 
         if (!recDID.startsWith("Qm")) {
             String contactsTable = Functions.readFile(Functions.DATA_PATH + "Contacts.json");
@@ -85,7 +149,8 @@ public class Operations {
                     recDID = contactsArray.getJSONObject(i).getString("did");
             }
         }
-        JSONArray tokens = FractionChooser.calculate(tokenCount);
+
+        JSONArray tokens = FractionChooser.calculate(intPart);
         JSONObject objectSend = new JSONObject();
         objectSend.put("tokens", tokens);
         objectSend.put("receiverDidIpfsHash", recDID);
@@ -94,6 +159,7 @@ public class Operations {
         objectSend.put("amount", tokenCount);
         objectSend.put("tokenHeader", FractionChooser.tokenHeader);
 
+        System.out.println("Starting Whole Amount Transfer...");
         JSONObject resultObject = send(objectSend.toString());
 
         if (resultObject.getString("status").equals("Success")) {
@@ -101,19 +167,46 @@ public class Operations {
                 Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json",
                         tokens.getString(i));
             }
-            JSONObject result = new JSONObject();
-            JSONObject contentObject = new JSONObject();
-            contentObject.put("response", resultObject);
-            result.put("data", contentObject);
-            result.put("message", "");
-            result.put("status", "true");
-            // Instant end = Instant.now();
-            // Duration timeElapsed = Duration.between(start, end);
-            // count++;
-            // String[] data = {String.valueOf(count),
-            // String.valueOf((timeElapsed.getSeconds()))};
-            // writeDataLineByLine(data);
-            return result.toString();
+            System.out.println("Whole Amount Transfer Complete");
+
+            if (decimal > 0) {
+                JSONObject objectSendParts = new JSONObject();
+                objectSendParts.put("receiverDidIpfsHash", recDID);
+                objectSendParts.put("type", type);
+                objectSendParts.put("comment", comments);
+                objectSendParts.put("amount", decimal);
+
+                System.out.println("Starting Decimal Amount Transfer...");
+                JSONObject resultObjectParts = sendParts(objectSendParts.toString());
+                if (resultObjectParts.getString("status").equals("Success")) {
+                    JSONObject result = new JSONObject();
+                    JSONObject contentObject = new JSONObject();
+                    contentObject.put("Parts response", resultObjectParts);
+                    contentObject.put("Whole response", resultObject);
+                    result.put("data", contentObject);
+                    result.put("message", "");
+                    result.put("status", "true");
+
+                    return result.toString();
+                } else {
+                    JSONObject result = new JSONObject();
+                    JSONObject contentObject = new JSONObject();
+                    contentObject.put("Parts response", resultObjectParts);
+                    contentObject.put("Whole response", resultObject);
+                    result.put("data", contentObject);
+                    result.put("message", "");
+                    result.put("status", "true");
+                    return result.toString();
+                }
+            } else {
+                JSONObject result = new JSONObject();
+                JSONObject contentObject = new JSONObject();
+                contentObject.put("response", resultObject);
+                result.put("data", contentObject);
+                result.put("message", "");
+                result.put("status", "true");
+                return result.toString();
+            }
         } else {
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -123,6 +216,7 @@ public class Operations {
             result.put("status", "true");
             return result.toString();
         }
+
     }
 
     @RequestMapping(value = "/mine", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
@@ -137,13 +231,12 @@ public class Operations {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value)
-            throws Exception {
+    public String Create(@RequestParam("image") MultipartFile imageFile) throws Exception {
         setDir();
         File RubixFolder = new File(dirPath);
         if (RubixFolder.exists())
             deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(value, imageFile.getInputStream());
+        JSONObject didResult = createDID(imageFile.getInputStream());
         if (didResult.getString("Status").contains("Success"))
             createWorkingDirectory();
 
@@ -158,7 +251,7 @@ public class Operations {
 
     @RequestMapping(value = "/generate", method = RequestMethod.GET, produces = { "application/json",
             "application/xml" })
-    public String generate() throws JSONException {
+    public String generate() {
         int width = 256;
         int height = 256;
         String src = null;

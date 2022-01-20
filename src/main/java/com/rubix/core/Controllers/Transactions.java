@@ -1,14 +1,13 @@
 package com.rubix.core.Controllers;
 
+import static com.rubix.Resources.APIHandler.creditsInfo;
 import static com.rubix.Resources.APIHandler.transactionDetails;
 import static com.rubix.Resources.APIHandler.transactionsByComment;
 import static com.rubix.Resources.APIHandler.transactionsByCount;
 import static com.rubix.Resources.APIHandler.transactionsByDID;
 import static com.rubix.Resources.APIHandler.transactionsByDate;
 import static com.rubix.Resources.APIHandler.transactionsByRange;
-import static com.rubix.Resources.Functions.WALLET_DATA_PATH;
 import static com.rubix.Resources.Functions.mutex;
-import static com.rubix.Resources.Functions.readFile;
 import static com.rubix.Resources.IntegrityCheck.dateIntegrity;
 import static com.rubix.Resources.IntegrityCheck.didIntegrity;
 import static com.rubix.Resources.IntegrityCheck.message;
@@ -18,7 +17,6 @@ import static com.rubix.core.Controllers.Basics.checkRubixDir;
 import static com.rubix.core.Controllers.Basics.start;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -26,7 +24,6 @@ import java.util.Date;
 
 import com.rubix.core.Resources.RequestModel;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -239,7 +236,7 @@ public class Transactions {
         return result.toString();
     }
 
-    private String noTxnError() throws JSONException {
+    private String noTxnError() {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("message", "No transactions found!");
@@ -254,46 +251,14 @@ public class Transactions {
     // and total no of transactions
     @RequestMapping(value = "/getTransactionHeader", method = RequestMethod.GET, produces = { "application/json",
             "application/xml" })
-    public String getTransactionHeader() throws JSONException, IOException, InterruptedException {
+    public String getTransactionHeader() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
         if (!mutex)
             start();
 
-        String thFile = WALLET_DATA_PATH.concat("TransactionHistory.json");
-        String qstFile = WALLET_DATA_PATH.concat("QuorumSignedTransactions.json");
-        String mineFile = WALLET_DATA_PATH.concat("MinedCreditsHistory.json");
-
-        File txnFile = new File(thFile);
-        File quorumFile = new File(qstFile);
-        File minedFile = new File(mineFile);
-
-        int txnCount = 0;
-        if (txnFile.exists()) {
-            String transactionFile = readFile(WALLET_DATA_PATH.concat("TransactionHistory.json"));
-            JSONArray txnArray = new JSONArray(transactionFile);
-            txnCount = txnArray.length();
-
-        }
-        int spentCredits = 0;
-        int unspentCredits = 0;
-        if (quorumFile.exists()) {
-            String qFile = readFile(qstFile);
-            JSONArray qArray = new JSONArray(qFile);
-            unspentCredits = qArray.length();
-        }
-        if (minedFile.exists()) {
-            String mFile = readFile(mineFile);
-            JSONArray mArray = new JSONArray(mFile);
-            spentCredits = mArray.length();
-        }
-
         JSONObject result = new JSONObject();
-        JSONObject contentObject = new JSONObject();
-        contentObject.put("txnCount", txnCount);
-        contentObject.put("spentCredits", spentCredits);
-        contentObject.put("unspentCredits", unspentCredits);
-        result.put("data", contentObject);
+        result.put("data", creditsInfo());
         result.put("message", "");
         result.put("status", "true");
         return result.toString();
