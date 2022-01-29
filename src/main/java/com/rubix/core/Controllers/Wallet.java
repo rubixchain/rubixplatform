@@ -1,48 +1,39 @@
 package com.rubix.core.Controllers;
 
-import static com.rubix.Resources.APIHandler.accountInformation;
-import static com.rubix.Resources.APIHandler.contacts;
-import static com.rubix.Resources.APIHandler.creditsInfo;
-import static com.rubix.Resources.APIHandler.onlinePeersCount;
-import static com.rubix.Resources.APIHandler.peersOnlineStatus;
-import static com.rubix.Resources.APIHandler.txnPerDay;
-import static com.rubix.Resources.Functions.DATA_PATH;
-import static com.rubix.Resources.Functions.TOKENS_PATH;
-import static com.rubix.Resources.Functions.WALLET_DATA_PATH;
-import static com.rubix.Resources.Functions.checkTokenPartBalance;
-import static com.rubix.Resources.Functions.pathSet;
-import static com.rubix.Resources.Functions.readFile;
-import static com.rubix.Resources.Functions.writeToFile;
-import static com.rubix.core.Controllers.Basics.checkRubixDir;
-import static com.rubix.core.Controllers.Basics.mutex;
-import static com.rubix.core.Controllers.Basics.start;
-import static com.rubix.core.Resources.CallerFunctions.getBalance;
-import static com.rubix.core.Resources.CallerFunctions.mainDir;
-
-import java.io.File;
-import java.io.IOException;
 
 import com.rubix.Resources.Functions;
-
+import io.ipfs.api.Peer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.rubix.Resources.APIHandler.*;
+import static com.rubix.Resources.Functions.*;
+import static com.rubix.Resources.Functions.dirPath;
+import static com.rubix.core.Controllers.Basics.mutex;
+import static com.rubix.core.Controllers.Basics.*;
+import static com.rubix.core.Resources.CallerFunctions.getBalance;
+import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Wallet {
 
-    @RequestMapping(value = "/getAccountInfo", method = RequestMethod.GET, produces = { "application/json",
-            "application/xml" })
+    @RequestMapping(value = "/getAccountInfo", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
     public String getAccountInfo() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
-        if (!mutex)
+        if(!mutex)
             start();
         JSONArray accountInfo = accountInformation();
         JSONObject accountObject = accountInfo.getJSONObject(0);
@@ -58,12 +49,12 @@ public class Wallet {
         return result.toString();
     }
 
-    @RequestMapping(value = "/getDashboard", method = RequestMethod.GET, produces = { "application/json",
-            "application/xml" })
+    @RequestMapping(value = "/getDashboard", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
     public String getDashboard() throws JSONException, IOException, InterruptedException {
         if (!mainDir())
             return checkRubixDir();
-        if (!mutex)
+        if(!mutex)
             start();
 
         JSONArray contactsObject = contacts();
@@ -78,20 +69,21 @@ public class Wallet {
         JSONObject dateTxnObject = dateTxn.getJSONObject(0);
         System.out.println(dateTxnObject);
 
-        // To display the Mine Count of the wallet - Reading from
-        // QuorumSignedTransactions
+        //To display the Mine Count of the wallet - Reading from QuorumSignedTransactions
         String content = readFile(WALLET_DATA_PATH.concat("QuorumSignedTransactions.json"));
         JSONArray contentArray = new JSONArray(content);
         JSONArray finalArray = new JSONArray();
         for (int j = 0; j < contentArray.length(); j++) {
-            if (contentArray.getJSONObject(j).has("minestatus")) {
+            if(contentArray.getJSONObject(j).has("minestatus")) {
                 if (!contentArray.getJSONObject(j).getBoolean("minestatus"))
                     finalArray.put(contentArray.getJSONObject(j));
-            } else
+            }
+            else
                 finalArray.put(contentArray.getJSONObject(j));
 
         }
         System.out.println(finalArray);
+
 
         int totalTxn = accountObject.getInt("senderTxn") + accountObject.getInt("receiverTxn");
         accountObject.put("totalTxn", totalTxn);
@@ -100,6 +92,7 @@ public class Wallet {
         accountObject.put("transactionsPerDay", dateTxnObject);
         accountObject.put("balance", getBalance());
         accountObject.put("proofCredits", finalArray.length());
+
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
@@ -110,8 +103,8 @@ public class Wallet {
         return result.toString();
     }
 
-    @RequestMapping(value = "/getOnlinePeers", method = RequestMethod.GET, produces = { "application/json",
-            "application/xml" })
+    @RequestMapping(value = "/getOnlinePeers", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
     public String getOnlinePeers() throws IOException, JSONException, InterruptedException {
         if (!mainDir())
             return checkRubixDir();
@@ -129,8 +122,8 @@ public class Wallet {
         return result.toString();
     }
 
-    @RequestMapping(value = "/getContactsList", method = RequestMethod.GET, produces = { "application/json",
-            "application/xml" })
+    @RequestMapping(value = "/getContactsList", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
     public String getContactsList() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
@@ -145,8 +138,8 @@ public class Wallet {
         String myDID = didArray.getJSONObject(0).getString("didHash");
         JSONArray finalArray = new JSONArray();
 
-        for (int i = 0; i < contactsArray.length(); i++) {
-            if (!(contactsArray.getJSONObject(i).getString("did").equals(myDID)))
+        for(int i = 0; i < contactsArray.length(); i++){
+            if(!(contactsArray.getJSONObject(i).getString("did").equals(myDID)))
                 finalArray.put(contactsArray.getJSONObject(i));
         }
 
@@ -160,8 +153,8 @@ public class Wallet {
         return result.toString();
     }
 
-    @RequestMapping(value = "/getNetworkNodes", method = RequestMethod.GET, produces = { "application/json",
-            "application/xml" })
+    @RequestMapping(value = "/getNetworkNodes", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
     public String getNetworkNodes() throws JSONException, IOException, InterruptedException {
         if (!mainDir())
             return checkRubixDir();
@@ -178,8 +171,8 @@ public class Wallet {
         return result.toString();
     }
 
-    @RequestMapping(value = "/viewTokens", method = RequestMethod.GET, produces = { "application/json",
-            "application/xml" })
+    @RequestMapping(value = "/viewTokens", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
     public String viewTokens() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
@@ -204,13 +197,14 @@ public class Wallet {
 
     }
 
-    @RequestMapping(value = "/checkPartBalance", method = RequestMethod.GET, produces = { "application/json",
-            "application/xml" })
+    @RequestMapping(value = "/checkPartBalance", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
     public String checkPartBalance(@RequestParam("token") String token) throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
         if (!mutex)
             start();
+
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
@@ -222,14 +216,14 @@ public class Wallet {
 
     }
 
-    @RequestMapping(value = "/addNickName", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public static String addNickName(@RequestParam("did") String did, @RequestParam("nickname") String nickname)
-            throws JSONException, IOException, InterruptedException {
+    @RequestMapping(value = "/addNickName", method = RequestMethod.POST,
+            produces = {"application/json", "application/xml"})
+    public static String addNickName(@RequestParam("did") String did, @RequestParam("nickname") String nickname) throws JSONException, IOException, InterruptedException {
         if (!mainDir())
             return checkRubixDir();
         if (!mutex)
             start();
+
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();

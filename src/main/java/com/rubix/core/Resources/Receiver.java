@@ -7,9 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.text.ParseException;
-
 import static com.rubix.Resources.Functions.readFile;
 
 public class Receiver implements Runnable {

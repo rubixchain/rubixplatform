@@ -1,16 +1,16 @@
 package com.rubix.core.Fractionalisation;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import com.rubix.Resources.Functions;
 import com.rubix.core.Controllers.Basics;
-
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 
 public class FractionChooser {
     public static String output;
@@ -18,7 +18,7 @@ public class FractionChooser {
 
     public static Logger FractionChooserLogger = Logger.getLogger(FractionChooser.class);
 
-    public static JSONArray calculate(int amount) {
+    public static JSONArray calculate(int amount){
         JSONArray tokensList = new JSONArray();
         tokenHeader = new JSONArray();
         JSONObject tknmap = new JSONObject();
@@ -43,8 +43,8 @@ public class FractionChooser {
                 tempJsonObject = mapList.getJSONObject(i);
                 type = tempJsonObject.getString("type");
                 valueInt = tempJsonObject.getInt("value");
-                tknmap.put(String.valueOf(valueInt), type);
-                lists = Functions.readFile(Basics.location + type + ".json");
+                tknmap.put(String.valueOf(valueInt),type);
+                lists = Functions.readFile( Basics.location + type + ".json");
                 tempJsonArray = new JSONArray(lists);
                 bnk.add(i, tempJsonArray);
                 size = tempJsonArray.length();
@@ -52,6 +52,7 @@ public class FractionChooser {
                 usedmap.put(valueInt, 0);
 
             }
+
 
             List<Integer> keyList = new ArrayList<Integer>(map.keySet());
             for (i = map.size() - 1; i > 0; i--) {

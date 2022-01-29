@@ -1,15 +1,9 @@
 package com.rubix.core.Resources;
 
-import static com.rubix.Resources.Functions.DATA_PATH;
-import static com.rubix.Resources.Functions.PAYMENTS_PATH;
-import static com.rubix.Resources.Functions.TOKENCHAIN_PATH;
-import static com.rubix.Resources.Functions.dirPath;
-import static com.rubix.Resources.Functions.pathSet;
-import static com.rubix.Resources.Functions.readFile;
-import static com.rubix.Resources.Functions.setDir;
-import static com.rubix.Resources.Functions.writeToFile;
-import static com.rubix.core.Controllers.Basics.checkRubixDir;
-import static com.rubix.core.Controllers.Basics.location;
+import com.rubix.core.Controllers.Basics;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,11 +12,9 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import com.rubix.core.Controllers.Basics;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import static com.rubix.Resources.Functions.*;
+import static com.rubix.core.Controllers.Basics.checkRubixDir;
+import static com.rubix.core.Controllers.Basics.location;
 
 public class CallerFunctions {
 
@@ -83,6 +75,7 @@ public class CallerFunctions {
         tokenWriter.write(tokenMapArray.toString());
         tokenWriter.close();
 
+
         File contactsFile = new File(DATA_PATH + "Contacts.json");
         if (!contactsFile.exists())
             contactsFile.createNewFile();
@@ -139,12 +132,11 @@ public class CallerFunctions {
 
                     double availableParts = 0, senderCount = 0, receiverCount = 0;
                     for (int k = 0; k < tokenChainArray.length(); k++) {
-                        if (tokenChainArray.getJSONObject(k).has("role")) {
-                            if (tokenChainArray.getJSONObject(k).getString("role").equals("Sender")
-                                    && tokenChainArray.getJSONObject(k).getString("sender").equals(myDID)) {
+                        if(tokenChainArray.getJSONObject(k).has("role")) {
+                            if (tokenChainArray.getJSONObject(k).getString("role").equals("Sender") && tokenChainArray.getJSONObject(k).getString("sender").equals(myDID)){
                                 senderCount += tokenChainArray.getJSONObject(k).getDouble("amount");
-                            } else if (tokenChainArray.getJSONObject(k).getString("role").equals("Receiver")
-                                    && tokenChainArray.getJSONObject(k).getString("receiver").equals(myDID)) {
+                            }
+                            else if (tokenChainArray.getJSONObject(k).getString("role").equals("Receiver") && tokenChainArray.getJSONObject(k).getString("receiver").equals(myDID)){
                                 receiverCount += tokenChainArray.getJSONObject(k).getDouble("amount");
                             }
                         }
@@ -154,8 +146,9 @@ public class CallerFunctions {
 
                 }
             }
-            parts = ((parts * 1e4) / 1e4);
+            parts = ((parts*1e4)/1e4);
             balance = balance + parts;
+
 
             int count = 0;
             File shiftedFile = new File(PAYMENTS_PATH.concat("ShiftedTokens.json"));
@@ -163,14 +156,15 @@ public class CallerFunctions {
                 String shiftedContent = readFile(PAYMENTS_PATH.concat("ShiftedTokens.json"));
                 JSONArray shiftedArray = new JSONArray(shiftedContent);
                 ArrayList<String> arrayTokens = new ArrayList<>();
-                for (int i = 0; i < shiftedArray.length(); i++)
+                for(int i = 0; i < shiftedArray.length(); i++)
                     arrayTokens.add(shiftedArray.getString(i));
 
-                for (int i = 0; i < partTokensArray.length(); i++) {
-                    if (!arrayTokens.contains(partTokensArray.getJSONObject(i).getString("tokenHash")))
+
+                for(int i = 0; i < partTokensArray.length(); i++){
+                    if(!arrayTokens.contains(partTokensArray.getJSONObject(i).getString("tokenHash")))
                         count++;
                 }
-            } else
+            }else
                 count = partTokensArray.length();
 
             balance = balance - count;
