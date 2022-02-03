@@ -1,33 +1,28 @@
 package com.rubix.core.Controllers;
 
-import static com.rubix.Resources.APIHandler.*;
-import static com.rubix.Resources.Functions.*;
-import static com.rubix.core.Resources.CallerFunctions.mainDir;
-import static com.rubix.core.Resources.NFTReceiver.*;
-
-import java.io.File;
-import java.io.IOException;
-
 import com.rubix.Consensus.QuorumConsensus;
+import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
-import com.rubix.core.RubixApplication;
-import com.rubix.core.Resources.NFTReceiver;
+import com.rubix.core.Resources.Background;
 import com.rubix.core.Resources.Receiver;
-
+import com.rubix.core.Resources.ReceiverParts;
+import io.ipfs.api.IPFS;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import static com.rubix.Constants.IPFSConstants.bootstrap;
 
-import io.ipfs.api.IPFS;
+import java.io.*;
+
+import static com.rubix.Resources.APIHandler.*;
+import static com.rubix.Resources.Functions.*;
+import static com.rubix.Resources.IPFSNetwork.executeIPFSCommandsResponse;
+import static com.rubix.core.Resources.CallerFunctions.mainDir;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Basics {
-
     public static String location = "";
     public static boolean mutex = false;
 
@@ -64,11 +59,34 @@ public class Basics {
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
 
-            NFTReceiver buyer = new NFTReceiver();
-            Thread buyerThread = new Thread((Runnable)buyer);
-            buyerThread.start();
+            ReceiverParts receiveParts = new ReceiverParts();
+            Thread receiverPartsThread = new Thread(receiveParts);
+            receiverPartsThread.start();
+
+            tokenBank();
 
             System.out.println(repo());
+
+            addPublicData();
+            pathSet();
+
+            String PART_TOKEN_CHAIN_PATH = TOKENCHAIN_PATH.concat("PARTS/");
+            String PART_TOKEN_PATH = TOKENS_PATH.concat("PARTS/");
+            File partFolder = new File(PART_TOKEN_PATH);
+            if (!partFolder.exists())
+                partFolder.mkdir();
+            partFolder = new File(PART_TOKEN_CHAIN_PATH);
+            if (!partFolder.exists())
+                partFolder.mkdir();
+            File partTokensFile = new File(PAYMENTS_PATH.concat("PartsToken.json"));
+            if (!partTokensFile.exists()) {
+                partTokensFile.createNewFile();
+                writeToFile(partTokensFile.toString(), "[]", false);
+            }
+
+            Background background = new Background();
+            Thread backThread = new Thread(background);
+            backThread.start();
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -162,10 +180,78 @@ public class Basics {
         return result.toString();
     }
 
-    /* @RequestMapping(value = "/restart", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
-    public void restart() {
-        RubixApplication.restart();
-    } */
+    @RequestMapping(value = "/bootstrap", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
+    public String getBootstrap() throws IOException, JSONException {
+
+
+        String command = bootstrap + "list";
+
+        // String response = executeIPFSCommandsResponse(command);
+        boolean configMatching = true;
+
+        JSONObject result = new JSONObject();
+        result.put("response", "Bootstrap List");
+        // result.put("message", "Bootstrap added: " + bootstrapId);
+        result.put("message", BOOTSTRAPS.toString().replace(",", "") // remove the commas
+                .replace("[", "") // remove the right bracket
+                .replace("]", "") // remove the left bracket
+                .trim());
+        result.put("ipfs-config-sync", configMatching);
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/bootstrap", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String addBootstrap(@RequestParam("id") String bootstrapId) throws JSONException, IOException {
+
+        String command = "ipfs bootstrap add " + bootstrapId;
+
+        String response = executeIPFSCommandsResponse(command);
+
+        String configPath = dirPath.concat("config.json");
+        String configFileContent = readFile(configPath);
+        JSONArray pathsArray = new JSONArray(configFileContent);
+
+        BOOTSTRAPS = pathsArray.getJSONArray(5);
+        BOOTSTRAPS.put(bootstrapId);
+        writeToFile(configPath, pathsArray.toString(), false);
+
+        JSONObject result = new JSONObject();
+        result.put("response", "Bootstrap Node Added");
+        // result.put("message", "Bootstrap added: " + bootstrapId);
+        result.put("message", response);
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/bootstrap", method = RequestMethod.DELETE, produces = { "application/json",
+            "application/xml" })
+    public String removeBootstrap(@RequestParam("id") String bootstrapId) throws JSONException, IOException {
+
+        String command = "ipfs bootstrap rm " + bootstrapId;
+
+        String response = executeIPFSCommandsResponse(command);
+
+        String configPath = dirPath.concat("config.json");
+        String configFileContent = readFile(configPath);
+        JSONArray pathsArray = new JSONArray(configFileContent);
+        BOOTSTRAPS = pathsArray.getJSONArray(5);
+
+        for(int i = 0; i < BOOTSTRAPS.length(); i++){
+            if(BOOTSTRAPS.getString(i).equals(bootstrapId)){
+                pathsArray.getJSONArray(5).remove(i);
+                break;
+            }
+        }
+        writeToFile(configPath, pathsArray.toString(), false);
+
+        JSONObject result = new JSONObject();
+        result.put("response", "Bootstrap Node Removed");
+        // result.put("message", "Bootstrap added: " + bootstrapId);
+        result.put("message", response);
+        result.put("status", "true");
+        return result.toString();
+    }
 
     @RequestMapping(value = "/p2pClose", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
@@ -197,5 +283,38 @@ public class Basics {
         IPFSNetwork.repo(ipfs);
         return "Garbage Collected";
     }
+    @RequestMapping(value = "/tokenParts", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+    public static Double tokenParts(@RequestParam("token") String tokenHash) {
+        return Functions.partTokenBalance(tokenHash);
+
+    }
+
+    @RequestMapping(value = "/validateReceiver", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+    public String validateReceiver(@RequestParam("receiverDID") String receiverDID) throws IOException{
+        System.out.println(receiverDID);
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        if(getValues(DATA_PATH + "DataTable.json", "didHash", "didHash", receiverDID)=="") {
+            sync();
+            if(getValues(DATA_PATH + "DataTable.json", receiverDID, "didHash", receiverDID)=="") {
+                contentObject.put("response", "Invalid "+receiverDID);
+                result.put("data",contentObject);
+                result.put("message", "Invalid "+receiverDID);
+                result.put("status", "true");
+            }
+
+        }else
+        {
+            contentObject.put("response", receiverDID+" is valid");
+            result.put("data",contentObject);
+            result.put("message", receiverDID+" is valid");
+            result.put("status", "true");
+        }
+        System.out.println(result.toString());
+        return result.toString();
+    }
+
 }
 

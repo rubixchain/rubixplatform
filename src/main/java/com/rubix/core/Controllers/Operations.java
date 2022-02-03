@@ -17,137 +17,175 @@ import java.io.IOException;
 import java.util.Base64;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
-import static com.rubix.Resources.APIHandler.*;
+import static com.rubix.Resources.APIHandler.send;
+import static com.rubix.Resources.APIHandler.sendParts;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.core.Controllers.Basics.*;
-import static com.rubix.core.Controllers.Basics.start;
 import static com.rubix.core.Resources.CallerFunctions.*;
-import static com.rubix.core.Resources.NFTReceiver.*;
-import static com.rubix.core.Resources.Receiver.*;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Operations {
-//    static  int count = 0;
-//    public static void writeDataLineByLine(String data[])
-//    {
-//        File file = new File("data.csv");
-//        try {
-//            FileWriter outputfile = new FileWriter(file,true);
-//            CSVWriter writer = new CSVWriter(outputfile);
-//            writer.writeNext(data);
-//            writer.close();
-//        }
-//        catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//    }
 
     @RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
     public static String initiateTransaction(@RequestBody RequestModel requestModel) throws Exception {
-//        Instant start = Instant.now();
-        if (!mainDir())
-            return checkRubixDir();
-        if(!Basics.mutex)
-            start();
-
-        String recDID = requestModel.getReceiver();
-        int tokenCount = requestModel.getTokenCount();
-        String comments = requestModel.getComment();
-        int type = requestModel.getType();
-
-        if(!recDID.startsWith("Qm")){
-            String contactsTable = Functions.readFile(Functions.DATA_PATH + "Contacts.json");
-            JSONArray contactsArray = new JSONArray(contactsTable);
-            for (int i = 0; i < contactsArray.length(); ++i) {
-                if(contactsArray.getJSONObject(i).getString("nickname").equals(recDID))
-                    recDID = contactsArray.getJSONObject(i).getString("did");
-            }
-        }
-        JSONArray tokens = FractionChooser.calculate(tokenCount);
-        JSONObject objectSend = new JSONObject();
-        objectSend.put("tokens", tokens);
-        objectSend.put("receiverDidIpfsHash", recDID);
-        objectSend.put("type", type);
-        objectSend.put("comment", comments);
-        objectSend.put("amount", tokenCount);
-        objectSend.put("tokenHeader", FractionChooser.tokenHeader);
-
-
-        JSONObject resultObject = send(objectSend.toString());
-
-        if (resultObject.getString("status").equals("Success")) {
-            for (int i = 0; i < tokens.length(); i++) {
-                Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json", tokens.getString(i));
-            }
-            JSONObject result = new JSONObject();
-            JSONObject contentObject = new JSONObject();
-            contentObject.put("response", resultObject);
-            result.put("data", contentObject);
-            result.put("message", "");
-            result.put("status", "true");
-//            Instant end = Instant.now();
-//            Duration timeElapsed = Duration.between(start, end);
-//            count++;
-//            String[] data = {String.valueOf(count), String.valueOf((timeElapsed.getSeconds()))};
-//            writeDataLineByLine(data);
-            return result.toString();
-        }else{
-            JSONObject result = new JSONObject();
-            JSONObject contentObject = new JSONObject();
-            contentObject.put("response", resultObject);
-            result.put("data", contentObject);
-            result.put("message", "");
-            result.put("status", "true");
-            return result.toString();
-        }
-
-    }
-
-    @RequestMapping(value = {"/initiateNftTransaction"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
-    public static String initiateNftTransaction(@RequestBody RequestModel requestModel) throws Exception {
         if (!mainDir())
             return checkRubixDir();
         if (!Basics.mutex)
             start();
-        String buyerDID = requestModel.getBuyer();
-        String nftTokenIpfsHash = requestModel.getNftToken();
-        int amount = requestModel.getAmount();
+
+        String recDID = requestModel.getReceiver();
+        double tokenCount = requestModel.getTokenCount();
         String comments = requestModel.getComment();
         int type = requestModel.getType();
-        if (!buyerDID.startsWith("Qm")) {
-            String contactsTable =readFile(DATA_PATH + "Contacts.json");
-            JSONArray contactsArray = new JSONArray(contactsTable);
-            for (int i = 0; i < contactsArray.length(); i++) {
-                if (contactsArray.getJSONObject(i).getString("nickname").equals(buyerDID))
-                    buyerDID = contactsArray.getJSONObject(i).getString("did");
+
+
+        int intPart = (int) tokenCount;
+        double decimal = tokenCount - intPart;
+        decimal = formatAmount(decimal);
+        System.out.println("Input Value: " + tokenCount);
+        System.out.println("Integer Part: " + intPart);
+        System.out.println("Decimal Part: " + decimal);
+
+        String[] div = String.valueOf(tokenCount).split("\\.");
+        System.out.println("Number of decimals: " + div[1].length());
+
+        if (div[1].length() > 3) {
+            System.out.println("Amount can have only 3 precisions maximum");
+            JSONObject resultObject = new JSONObject();
+            resultObject.put("did", "");
+            resultObject.put("tid", "null");
+            resultObject.put("status", "Failed");
+            resultObject.put("message", "Amount can have only 3 precisions maximum");
+
+            JSONObject result = new JSONObject();
+            JSONObject contentObject = new JSONObject();
+            contentObject.put("response", resultObject);
+            result.put("data", contentObject);
+            result.put("message", "");
+            result.put("status", "true");
+            return result.toString();
+
+        }
+
+
+        Double available = Functions.getBalance();
+        if (tokenCount > available) {
+            System.out.println("Amount greater than available");
+            JSONObject resultObject = new JSONObject();
+            resultObject.put("did", "");
+            resultObject.put("tid", "null");
+            resultObject.put("status", "Failed");
+            resultObject.put("message", "Amount greater than available");
+
+            JSONObject result = new JSONObject();
+            JSONObject contentObject = new JSONObject();
+            contentObject.put("response", resultObject);
+            result.put("data", contentObject);
+            result.put("message", "");
+            result.put("status", "true");
+            return result.toString();
+        }
+
+
+        JSONObject wholeTransferResult = new JSONObject();
+        if (intPart > 0) {
+            File bankFile = new File(PAYMENTS_PATH.concat("BNK00.json"));
+            if (bankFile.exists()) {
+                String bankContent = readFile(PAYMENTS_PATH.concat("BNK00.json"));
+                JSONArray bankArray = new JSONArray(bankContent);
+
+                if (intPart > bankArray.length()) {
+                    if(bankArray.length() > 0){
+                        JSONArray tokens = FractionChooser.calculate(bankArray.length());
+                        JSONObject objectSend = new JSONObject();
+                        objectSend.put("tokens", tokens);
+                        objectSend.put("receiverDidIpfsHash", recDID);
+                        objectSend.put("type", type);
+                        objectSend.put("comment", comments);
+                        objectSend.put("amount", tokenCount);
+                        objectSend.put("tokenHeader", FractionChooser.tokenHeader);
+
+                        System.out.println("Starting Whole Amount Transfer...");
+                        wholeTransferResult = send(objectSend.toString());
+
+                        if (wholeTransferResult.getString("status").equals("Success")) {
+                            for (int i = 0; i < tokens.length(); i++) {
+                                Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json", tokens.getString(i));
+                            }
+                            System.out.println("Whole Amount Transfer Complete");
+                        }
+                    }
+
+                    JSONObject objectSendParts = new JSONObject();
+                    objectSendParts.put("receiverDidIpfsHash", recDID);
+                    objectSendParts.put("type", type);
+                    objectSendParts.put("comment", comments);
+                    objectSendParts.put("amount", tokenCount-bankArray.length());
+
+                    System.out.println("Starting Decimal Amount Transfer...");
+                    wholeTransferResult = sendParts(objectSendParts.toString());
+                    JSONObject result = new JSONObject();
+                    JSONObject contentObject = new JSONObject();
+                    contentObject.put("response", wholeTransferResult);
+                    result.put("data", contentObject);
+                    result.put("message", "");
+                    result.put("status", "true");
+                    return result.toString();
+
+                } else {
+                    JSONArray tokens = FractionChooser.calculate(intPart);
+                    JSONObject objectSend = new JSONObject();
+                    objectSend.put("tokens", tokens);
+                    objectSend.put("receiverDidIpfsHash", recDID);
+                    objectSend.put("type", type);
+                    objectSend.put("comment", comments);
+                    objectSend.put("amount", tokenCount);
+                    objectSend.put("tokenHeader", FractionChooser.tokenHeader);
+
+                    System.out.println("Starting Whole Amount Transfer...");
+                    wholeTransferResult = send(objectSend.toString());
+
+                    if (wholeTransferResult.getString("status").equals("Success")) {
+                        for (int i = 0; i < tokens.length(); i++) {
+                            Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json", tokens.getString(i));
+                        }
+                        System.out.println("Whole Amount Transfer Complete");
+                    }
+                }
             }
         }
-        JSONObject objectSend = new JSONObject();
-        objectSend.put("nftToken", nftTokenIpfsHash);
-        objectSend.put("buyerDidIpfsHash", buyerDID);
-        objectSend.put("type", type);
-        objectSend.put("comment", comments);
-        objectSend.put("amount", amount);
-        JSONObject resultObject = sendNft(objectSend.toString());
-        if (resultObject.getString("status").equals("Success")) {
-            JSONObject jSONObject1 = new JSONObject();
-            JSONObject jSONObject2 = new JSONObject();
-            jSONObject2.put("response", resultObject);
-            jSONObject1.put("data", jSONObject2);
-            jSONObject1.put("message", "");
-            jSONObject1.put("status", "true");
-            return jSONObject1.toString();
+        JSONObject partsTransferResult = new JSONObject();
+        if (decimal > 0) {
+            JSONObject objectSendParts = new JSONObject();
+            objectSendParts.put("receiverDidIpfsHash", recDID);
+            objectSendParts.put("type", type);
+            objectSendParts.put("comment", comments);
+            objectSendParts.put("amount", decimal);
+
+            System.out.println("Starting Decimal Amount Transfer...");
+            partsTransferResult = sendParts(objectSendParts.toString());
+            JSONObject result = new JSONObject();
+            JSONObject contentObject = new JSONObject();
+            contentObject.put("response", partsTransferResult);
+            result.put("data", contentObject);
+            result.put("message", "");
+            result.put("status", "true");
+            return result.toString();
         }
+
         JSONObject result = new JSONObject();
+        JSONObject combinedResult = new JSONObject();
+        combinedResult.put("Parts response", partsTransferResult);
+        combinedResult.put("Whole response", wholeTransferResult);
         JSONObject contentObject = new JSONObject();
-        contentObject.put("response", resultObject);
+        contentObject.put("response", combinedResult);
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
         return result.toString();
+
     }
 
     @RequestMapping(value = "/mine", method = RequestMethod.GET,
@@ -155,7 +193,7 @@ public class Operations {
     public static String mine(int type) throws Exception {
         if (!mainDir())
             return checkRubixDir();
-        if(!Basics.mutex)
+        if (!Basics.mutex)
             start();
         return APIHandler.create(type).toString();
 
@@ -164,15 +202,16 @@ public class Operations {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value) throws Exception {
+    public String Create(@RequestParam("image") MultipartFile imageFile) throws Exception {
         setDir();
         File RubixFolder = new File(dirPath);
-        if(RubixFolder.exists())
+        if (RubixFolder.exists())
             deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(value, imageFile.getInputStream());
-        if(didResult.getString("Status").contains("Success"))
+        JSONObject didResult = createDID(imageFile.getInputStream());
+        if (didResult.getString("Status").contains("Success"))
             createWorkingDirectory();
 
+        start();
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", didResult);
@@ -190,25 +229,25 @@ public class Operations {
         String src = null;
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         //File f;
-        for(int y = 0; y < height; y++){
-            for(int x = 0; x < width; x++){
-                int a = (int)(Math.random()*256); //alpha
-                int r = (int)(Math.random()*256); //red
-                int g = (int)(Math.random()*256); //green
-                int b = (int)(Math.random()*256); //blue
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int a = (int) (Math.random() * 256); //alpha
+                int r = (int) (Math.random() * 256); //red
+                int g = (int) (Math.random() * 256); //green
+                int b = (int) (Math.random() * 256); //blue
 
-                int p = (a<<24) | (r<<16) | (g<<8) | b; //pixel
+                int p = (a << 24) | (r << 16) | (g << 8) | b; //pixel
                 img.setRGB(x, y, p);
             }
         }
-        try{
+        try {
             ByteArrayOutputStream f = new ByteArrayOutputStream();
             ImageIO.write(img, "png", f);
             byte[] bytes = f.toByteArray();
             String base64bytes = Base64.getEncoder().encodeToString(bytes);
             src = "data:image/png;base64," + base64bytes;
             System.out.println(src);
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Error: " + e);
         }
         JSONObject result = new JSONObject();

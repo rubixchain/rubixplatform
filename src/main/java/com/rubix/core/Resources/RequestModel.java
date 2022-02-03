@@ -11,7 +11,8 @@ public class RequestModel {
     private String receiver;
     private String sender;
     private JSONArray quorum;
-    private int tokenCount;
+    private double tokenCount;
+    private double amount;
     private String transactionID;
     private String threadExt;
     private String comment;
@@ -24,9 +25,7 @@ public class RequestModel {
     private int startRange;
     private int endRange;
     private int type;
-    private String buyer;
-    private int amount;
-    private String nftToken;
+
 
 
     public RequestModel(){}
@@ -35,7 +34,8 @@ public class RequestModel {
     public String getToken(){return token;}
     public String getThreadExt(){ return threadExt;}
     public String getComment(){return comment;}
-    public int getTokenCount(){ return tokenCount; }
+    public double getTokenCount(){ return tokenCount; }
+    public double getAmount(){ return amount; }
     public String getTransactionID(){return transactionID;}
     public int getTxnCount(){return txnCount;}
     public int getType(){return type;}
@@ -55,8 +55,5 @@ public class RequestModel {
     public int getStartRange(){return startRange;}
     public int getEndRange(){return endRange; }
     public String getPeerid(){return peerid;}
-    public String getBuyer() {return this.buyer;}
-    public int getAmount() {return this.amount;}
-    public String getNftToken() {return this.nftToken;}
 
 }

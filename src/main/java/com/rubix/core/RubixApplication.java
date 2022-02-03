@@ -1,35 +1,39 @@
 package com.rubix.core;
 
-import java.text.ParseException;
-
-import org.springframework.boot.ApplicationArguments;
+import com.rubix.core.Controllers.Basics;
+import org.json.JSONArray;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
+import static com.rubix.Resources.Functions.readFile;
+
 @SpringBootApplication
 public class RubixApplication {
 
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) throws ParseException, IOException {
 
 		System.setProperty("server.port", String.valueOf(1898));
-		SpringApplication.run(com.rubix.core.RubixApplication.class, args);
+		SpringApplication.run(RubixApplication.class, args);
+		System.out.println("Build Version: d1d14edb4090edfcced0932306185548");
+		Basics.start();
+
 
 	}
-
-	/* public static void restart() {
-		ApplicationArguments args = context.getBean(ApplicationArguments.class);
-
-		Thread thread = new Thread(() -> {
-			context.close();
-			context = SpringApplication.run(RubixApplication.class, args.getSourceArgs());
-		});
-
-		thread.setDaemon(false);
-		thread.start();
-	} */
 
 //	//Adding CORS - Desktop Applications
 //	@Bean
@@ -58,7 +62,7 @@ public class RubixApplication {
 	//Adding CORS - All Origins
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
+		return new WebMvcConfigurerAdapter() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
