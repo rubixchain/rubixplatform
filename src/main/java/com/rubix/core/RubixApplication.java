@@ -29,7 +29,7 @@ public class RubixApplication {
 
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args);
-		System.out.println("Build Version: d1d14edb4090edfcced0932306185548");
+		System.out.println("Build Version: adbf4246d98717f06b501b5524166be9");
 		Basics.start();
 
 

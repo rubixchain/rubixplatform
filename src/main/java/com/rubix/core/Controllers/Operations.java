@@ -2,9 +2,7 @@ package com.rubix.core.Controllers;
 
 import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
-import com.rubix.core.Fractionalisation.FractionChooser;
 import com.rubix.core.Resources.RequestModel;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +16,6 @@ import java.util.Base64;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
-import static com.rubix.Resources.APIHandler.sendParts;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.*;
@@ -89,98 +86,18 @@ public class Operations {
         }
 
 
-        JSONObject wholeTransferResult = new JSONObject();
-        if (intPart > 0) {
-            File bankFile = new File(PAYMENTS_PATH.concat("BNK00.json"));
-            if (bankFile.exists()) {
-                String bankContent = readFile(PAYMENTS_PATH.concat("BNK00.json"));
-                JSONArray bankArray = new JSONArray(bankContent);
+        JSONObject objectSend = new JSONObject();
+        objectSend.put("receiverDidIpfsHash", recDID);
+        objectSend.put("type", type);
+        objectSend.put("comment", comments);
+        objectSend.put("amount", tokenCount);
 
-                if (intPart > bankArray.length()) {
-                    if(bankArray.length() > 0){
-                        JSONArray tokens = FractionChooser.calculate(bankArray.length());
-                        JSONObject objectSend = new JSONObject();
-                        objectSend.put("tokens", tokens);
-                        objectSend.put("receiverDidIpfsHash", recDID);
-                        objectSend.put("type", type);
-                        objectSend.put("comment", comments);
-                        objectSend.put("amount", tokenCount);
-                        objectSend.put("tokenHeader", FractionChooser.tokenHeader);
-
-                        System.out.println("Starting Whole Amount Transfer...");
-                        wholeTransferResult = send(objectSend.toString());
-
-                        if (wholeTransferResult.getString("status").equals("Success")) {
-                            for (int i = 0; i < tokens.length(); i++) {
-                                Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json", tokens.getString(i));
-                            }
-                            System.out.println("Whole Amount Transfer Complete");
-                        }
-                    }
-
-                    JSONObject objectSendParts = new JSONObject();
-                    objectSendParts.put("receiverDidIpfsHash", recDID);
-                    objectSendParts.put("type", type);
-                    objectSendParts.put("comment", comments);
-                    objectSendParts.put("amount", tokenCount-bankArray.length());
-
-                    System.out.println("Starting Decimal Amount Transfer...");
-                    wholeTransferResult = sendParts(objectSendParts.toString());
-                    JSONObject result = new JSONObject();
-                    JSONObject contentObject = new JSONObject();
-                    contentObject.put("response", wholeTransferResult);
-                    result.put("data", contentObject);
-                    result.put("message", "");
-                    result.put("status", "true");
-                    return result.toString();
-
-                } else {
-                    JSONArray tokens = FractionChooser.calculate(intPart);
-                    JSONObject objectSend = new JSONObject();
-                    objectSend.put("tokens", tokens);
-                    objectSend.put("receiverDidIpfsHash", recDID);
-                    objectSend.put("type", type);
-                    objectSend.put("comment", comments);
-                    objectSend.put("amount", tokenCount);
-                    objectSend.put("tokenHeader", FractionChooser.tokenHeader);
-
-                    System.out.println("Starting Whole Amount Transfer...");
-                    wholeTransferResult = send(objectSend.toString());
-
-                    if (wholeTransferResult.getString("status").equals("Success")) {
-                        for (int i = 0; i < tokens.length(); i++) {
-                            Functions.updateJSON("remove", location + FractionChooser.tokenHeader.get(i).toString() + ".json", tokens.getString(i));
-                        }
-                        System.out.println("Whole Amount Transfer Complete");
-                    }
-                }
-            }
-        }
-        JSONObject partsTransferResult = new JSONObject();
-        if (decimal > 0) {
-            JSONObject objectSendParts = new JSONObject();
-            objectSendParts.put("receiverDidIpfsHash", recDID);
-            objectSendParts.put("type", type);
-            objectSendParts.put("comment", comments);
-            objectSendParts.put("amount", decimal);
-
-            System.out.println("Starting Decimal Amount Transfer...");
-            partsTransferResult = sendParts(objectSendParts.toString());
-            JSONObject result = new JSONObject();
-            JSONObject contentObject = new JSONObject();
-            contentObject.put("response", partsTransferResult);
-            result.put("data", contentObject);
-            result.put("message", "");
-            result.put("status", "true");
-            return result.toString();
-        }
+        System.out.println("Starting Whole Amount Transfer...");
+        JSONObject wholeTransferResult = send(objectSend.toString());
 
         JSONObject result = new JSONObject();
-        JSONObject combinedResult = new JSONObject();
-        combinedResult.put("Parts response", partsTransferResult);
-        combinedResult.put("Whole response", wholeTransferResult);
         JSONObject contentObject = new JSONObject();
-        contentObject.put("response", combinedResult);
+        contentObject.put("response", wholeTransferResult);
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");

@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.rubix.core</groupId>
 			<artifactId>rubix</artifactId>
-			<version>10.0</version>
+			<version>11.23-pledge</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

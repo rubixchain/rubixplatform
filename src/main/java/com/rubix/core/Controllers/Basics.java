@@ -5,7 +5,6 @@ import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.Resources.Background;
 import com.rubix.core.Resources.Receiver;
-import com.rubix.core.Resources.ReceiverParts;
 import io.ipfs.api.IPFS;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,10 +57,6 @@ public class Basics {
             Receiver receiver = new Receiver();
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
-
-            ReceiverParts receiveParts = new ReceiverParts();
-            Thread receiverPartsThread = new Thread(receiveParts);
-            receiverPartsThread.start();
 
             tokenBank();
 
