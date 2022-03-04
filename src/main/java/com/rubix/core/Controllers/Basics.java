@@ -1,10 +1,14 @@
 package com.rubix.core.Controllers;
 
 import com.rubix.Consensus.QuorumConsensus;
+import com.rubix.Ping.PingReceive;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.Resources.Background;
+import com.rubix.core.Resources.QuorumPingReceiveThread;
 import com.rubix.core.Resources.Receiver;
+import com.rubix.core.Resources.ReceiverPingReceive;
+
 import io.ipfs.api.IPFS;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,6 +62,14 @@ public class Basics {
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
 
+            ReceiverPingReceive pingReceive = new ReceiverPingReceive();
+            Thread pingReciverThread = new Thread(pingReceive);
+            pingReciverThread.start();
+
+            QuorumPingReceiveThread quorumPingReceive = new QuorumPingReceiveThread();
+            Thread quorumThread = new Thread(quorumPingReceive);
+            quorumThread.start();
+
             tokenBank();
 
             System.out.println(repo());
@@ -79,9 +91,9 @@ public class Basics {
                 writeToFile(partTokensFile.toString(), "[]", false);
             }
 
-            Background background = new Background();
+            /* Background background = new Background();
             Thread backThread = new Thread(background);
-            backThread.start();
+            backThread.start(); */
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
