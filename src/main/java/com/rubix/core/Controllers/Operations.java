@@ -112,6 +112,9 @@ public class Operations {
             return checkRubixDir();
         if (!Basics.mutex)
             start();
+        if (type == 0) {
+            type = 1;
+        }
         return APIHandler.create(type).toString();
 
     }
@@ -119,7 +122,7 @@ public class Operations {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public String Create(@RequestParam("image") MultipartFile imageFile) throws Exception {
+    public String Create(@RequestParam("image") MultipartFile imageFile) throws IOException {
         setDir();
         File RubixFolder = new File(dirPath);
         if (RubixFolder.exists())

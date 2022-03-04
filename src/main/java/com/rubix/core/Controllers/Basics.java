@@ -280,14 +280,14 @@ public class Basics {
     }
     @RequestMapping(value = "/tokenParts", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public static Double tokenParts(@RequestParam("token") String tokenHash) {
+    public static Double tokenParts(@RequestParam("token") String tokenHash) throws JSONException {
         return Functions.partTokenBalance(tokenHash);
 
     }
 
     @RequestMapping(value = "/validateReceiver", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String validateReceiver(@RequestParam("receiverDID") String receiverDID) throws IOException{
+    public String validateReceiver(@RequestParam("receiverDID") String receiverDID) throws IOException, JSONException {
         System.out.println(receiverDID);
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
