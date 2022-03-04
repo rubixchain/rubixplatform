@@ -1,7 +1,7 @@
 package com.rubix.core;
 
 import com.rubix.core.Controllers.Basics;
-import org.json.*;
+import org.json.JSONArray;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -25,11 +25,11 @@ import static com.rubix.Resources.Functions.readFile;
 public class RubixApplication {
 
 
-	public static void main(String[] args) throws ParseException, IOException, JSONException {
+	public static void main(String[] args) throws ParseException, IOException {
 
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args);
-		System.out.println("Build Version: adbf4246d98717f06b501b5524166be9");
+		System.out.println("Build Version: c8f0ec79c56ee46a2bfc7276eb8897ef");
 		Basics.start();
 
 

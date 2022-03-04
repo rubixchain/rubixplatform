@@ -14,9 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
-import org.json.JSONException;
-import java.lang.InterruptedException;
-
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
@@ -115,9 +112,6 @@ public class Operations {
             return checkRubixDir();
         if (!Basics.mutex)
             start();
-        if (type == 0) {
-            type = 1;
-        }
         return APIHandler.create(type).toString();
 
     }
