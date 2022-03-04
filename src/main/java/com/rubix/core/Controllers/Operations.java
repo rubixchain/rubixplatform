@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
+import org.json.JSONException;
+import java.lang.InterruptedException;
+
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
@@ -122,12 +125,12 @@ public class Operations {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public String Create(@RequestParam("image") MultipartFile imageFile) throws IOException {
+    public String Create(@RequestParam("image") MultipartFile imageFile) throws IOException, JSONException, InterruptedException {
         setDir();
         File RubixFolder = new File(dirPath);
         if (RubixFolder.exists())
             deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(imageFile.getInputStream());
+        JSONObject didResult = createDID("",imageFile.getInputStream());
         if (didResult.getString("Status").contains("Success"))
             createWorkingDirectory();
 
@@ -143,7 +146,7 @@ public class Operations {
 
     @RequestMapping(value = "/generate", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String generate() {
+    public String generate() throws JSONException {
         int width = 256;
         int height = 256;
         String src = null;
