@@ -229,7 +229,7 @@ public class Transactions {
         return result.toString();
     }
 
-    private String noTxnError(){
+    private String noTxnError() throws JSONException {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("message", "No transactions found!");
