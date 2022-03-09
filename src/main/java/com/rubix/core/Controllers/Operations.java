@@ -3,7 +3,7 @@ package com.rubix.core.Controllers;
 import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
 import com.rubix.core.Resources.RequestModel;
-import org.json.*;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -119,12 +119,12 @@ public class Operations {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public String Create(@RequestParam("image") MultipartFile imageFile) throws IOException, JSONException, InterruptedException {
+    public String Create(@RequestParam("image") MultipartFile imageFile) throws Exception {
         setDir();
         File RubixFolder = new File(dirPath);
         if (RubixFolder.exists())
             deleteFolder(RubixFolder);
-        JSONObject didResult = createDID("",imageFile.getInputStream());
+        JSONObject didResult = createDID(imageFile.getInputStream());
         if (didResult.getString("Status").contains("Success"))
             createWorkingDirectory();
 
@@ -140,7 +140,7 @@ public class Operations {
 
     @RequestMapping(value = "/generate", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String generate() throws JSONException {
+    public String generate() {
         int width = 256;
         int height = 256;
         String src = null;

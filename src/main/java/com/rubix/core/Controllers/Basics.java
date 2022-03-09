@@ -92,9 +92,9 @@ public class Basics {
                 writeToFile(partTokensFile.toString(), "[]", false);
             }
 
-            Background background = new Background();
-            Thread backThread = new Thread(background);
-            backThread.start();
+//            Background background = new Background();
+//            Thread backThread = new Thread(background);
+//            backThread.start();
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -293,42 +293,38 @@ public class Basics {
     }
     @RequestMapping(value = "/tokenParts", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public static Double tokenParts(@RequestParam("token") String tokenHash) throws JSONException {
+    public static Double tokenParts(@RequestParam("token") String tokenHash) {
         return Functions.partTokenBalance(tokenHash);
 
     }
 
-    @RequestMapping(value = "/validateReceiver", method = RequestMethod.GET,
-            produces = {"application/json", "application/xml"})
-    public String validateReceiver(@RequestParam("receiverDID") String receiverDID) throws IOException, JSONException {
+    @RequestMapping(value = {"/validateReceiver"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
+    public String validateReceiver(@RequestParam("receiverDID") String receiverDID) throws IOException {
         System.out.println(receiverDID);
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        String receiverPeerId = getValues(DATA_PATH + "DataTable.json", "peerid", "didHash", receiverDID);
-       
-        if(getValues(DATA_PATH + "DataTable.json", "didHash", "didHash", receiverDID)=="") {
+        String receiverPeerId = Functions.getValues(Functions.DATA_PATH + "DataTable.json", "peerid", "didHash", receiverDID);
+        if (Functions.getValues(Functions.DATA_PATH + "DataTable.json", "didHash", "didHash", receiverDID) == "") {
             sync();
-            if(getValues(DATA_PATH + "DataTable.json", receiverDID, "didHash", receiverDID)=="") {
-                contentObject.put("response", "Invalid "+receiverDID);
-                result.put("data",contentObject);
-                result.put("message", "Invalid "+receiverDID);
+            if (Functions.getValues(Functions.DATA_PATH + "DataTable.json", receiverDID, "didHash", receiverDID) == "") {
+                contentObject.put("response", "Invalid " + receiverDID);
+                result.put("data", contentObject);
+                result.put("message", "Invalid " + receiverDID);
                 result.put("status", "true");
             }
-
-        }
-        else {
-            boolean sanityCheck = sanityCheck(receiverPeerId, ipfs, SEND_PORT+10);
-            if(!sanityCheck){
-                contentObject.put("response", sanityMessage);
-                result.put("data",contentObject);
+        } else {
+            boolean sanityCheck = Functions.sanityCheck(receiverPeerId, ipfs, Functions.SEND_PORT + 10);
+            if (!sanityCheck) {
+                contentObject.put("response", Functions.sanityMessage);
+                result.put("data", contentObject);
                 result.put("status", "Failed");
                 result.put("message", "");
-                System.out.println(sanityMessage);
+                System.out.println(Functions.sanityMessage);
                 return result.toString();
             }
-            contentObject.put("response", receiverDID+" is valid");
-            result.put("data",contentObject);
-            result.put("message", receiverDID+" is valid");
+            contentObject.put("response", receiverDID + " is valid");
+            result.put("data", contentObject);
+            result.put("message", receiverDID + " is valid");
             result.put("status", "true");
         }
         System.out.println(result.toString());

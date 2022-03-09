@@ -8,7 +8,7 @@ public class Receiver implements Runnable {
         while (true) {
             try {
                 TokenReceiver.receive();
-            } catch (Exception e) {
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
