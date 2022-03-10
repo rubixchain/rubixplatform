@@ -1,4 +1,5 @@
 package com.rubix.core.Resources;
+
 import com.rubix.TokenTransfer.TokenReceiver;
 import org.json.JSONException;
 public class Receiver implements Runnable {
