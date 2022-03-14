@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import static com.rubix.Resources.Functions.buildVersion;
-import static com.rubix.Resources.Functions.initHash;
 
 @SpringBootApplication
 public class RubixApplication {
@@ -31,8 +30,7 @@ public class RubixApplication {
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args);
 		System.out.println("Build Version: " + buildVersion());
-		System.out.println("Build Version 2: " + initHash());
-		System.out.println("Jar started: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+		System.out.println("Jar started on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " UTC");
 		Basics.start();
 
 	}
