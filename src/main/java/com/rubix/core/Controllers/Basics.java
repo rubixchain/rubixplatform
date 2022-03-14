@@ -1,13 +1,10 @@
 package com.rubix.core.Controllers;
 
 import com.rubix.Consensus.QuorumConsensus;
-import com.rubix.Ping.PingReceive;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.Resources.Background;
-import com.rubix.core.Resources.QuorumPingReceiveThread;
-import com.rubix.core.Resources.Receiver;
-import com.rubix.core.Resources.ReceiverPingReceive;
+
 
 import io.ipfs.api.IPFS;
 import org.json.JSONArray;
@@ -62,13 +59,13 @@ public class Basics {
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
 
-            ReceiverPingReceive pingReceive = new ReceiverPingReceive();
-            Thread pingReciverThread = new Thread(pingReceive);
-            pingReciverThread.start();
+            // ReceiverPingReceive pingReceive = new ReceiverPingReceive();
+            // Thread pingReciverThread = new Thread(pingReceive);
+            // pingReciverThread.start();
 
-            QuorumPingReceiveThread quorumPingReceive = new QuorumPingReceiveThread();
-            Thread quorumThread = new Thread(quorumPingReceive);
-            quorumThread.start();
+            // QuorumPingReceiveThread quorumPingReceive = new QuorumPingReceiveThread();
+            // Thread quorumThread = new Thread(quorumPingReceive);
+            // quorumThread.start();
 
             tokenBank();
 
