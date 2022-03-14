@@ -30,36 +30,16 @@ public class RubixApplication {
 
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args);
+<<<<<<< HEAD
 		System.out.println("Build Version: " + buildVersion());
 		System.out.println("Build Version 2: " + initHash());
 		System.out.println("Jar started: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+=======
+		System.out.println("Build Version: c8f0ec79c56ee46a2bfc7276eb8897ef");
+>>>>>>> 98a4f33b82b19afd36f8a647446d5bc27fd46f30
 		Basics.start();
 
 	}
-
-//	//Adding CORS - Desktop Applications
-//	@Bean
-//	public WebMvcConfigurer corsConfigurer() {
-//		return new WebMvcConfigurerAdapter() {
-//			@Override
-//			public void addCorsMappings(CorsRegistry registry) {
-//				registry.addMapping("/**")
-//						.allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH").allowedOrigins("app://.");
-//			}
-//		};
-//	}
-
-//	//Adding CORS - LocalHost
-//	@Bean
-//	public WebMvcConfigurer corsConfigurer() {
-//		return new WebMvcConfigurerAdapter() {
-//			@Override
-//			public void addCorsMappings(CorsRegistry registry) {
-//				registry.addMapping("/**")
-//						.allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH").allowedOrigins("http://localhost:8081");
-//			}
-//		};
-//	}
 
 	//Adding CORS - All Origins
 	@Bean
