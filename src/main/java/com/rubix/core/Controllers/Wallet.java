@@ -49,7 +49,7 @@ public class Wallet {
         return result.toString();
     }
 
-    @RequestMapping(value = {"/getNftInfo"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
+    /* @RequestMapping(value = {"/getNftInfo"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
     public String getNftInfo() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
@@ -65,7 +65,7 @@ public class Wallet {
         result.put("message", "");
         result.put("status", "true");
         return result.toString();
-    }
+    } */
 
     @RequestMapping(value = "/getDashboard", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
@@ -116,7 +116,7 @@ public class Wallet {
         return result.toString();
     }
 
-    @RequestMapping(value = {"/getNftDashboard"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
+    /* @RequestMapping(value = {"/getNftDashboard"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
     public String getNftDashboard() throws JSONException, IOException, InterruptedException {
         if (!mainDir())
             return checkRubixDir();
@@ -138,7 +138,7 @@ public class Wallet {
         result.put("status", "true");
         return result.toString();
     }
-
+ */
     @RequestMapping(value = "/getOnlinePeers", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public String getOnlinePeers() throws IOException, JSONException, InterruptedException {
@@ -233,7 +233,7 @@ public class Wallet {
 
     }
 
-    @RequestMapping(value = {"/viewNftTokens"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
+    /* @RequestMapping(value = {"/viewNftTokens"}, method = {RequestMethod.GET}, produces = {"application/json", "application/xml"})
     public String viewNftTokens() throws JSONException, IOException {
         if (!mainDir())
             return checkRubixDir();
@@ -252,7 +252,7 @@ public class Wallet {
         result.put("message", "");
         result.put("status", "true");
         return result.toString();
-    }
+    } */
 
     @RequestMapping(value = "/addNickName", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})

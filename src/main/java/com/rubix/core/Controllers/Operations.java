@@ -22,7 +22,7 @@ import static com.rubix.Resources.Functions.*;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Controllers.Basics.start;
 import static com.rubix.core.Resources.CallerFunctions.*;
-import static com.rubix.core.Resources.NFTReceiver.*;
+
 import static com.rubix.core.Resources.Receiver.*;
 
 @CrossOrigin(origins = "http://localhost:1898")
@@ -106,7 +106,7 @@ public class Operations {
 
     }
 
-    @RequestMapping(value = {"/initiateNftTransaction"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
+    /* @RequestMapping(value = {"/initiateNftTransaction"}, method = {RequestMethod.POST}, produces = {"application/json", "application/xml"})
     public static String initiateNftTransaction(@RequestBody RequestModel requestModel) throws Exception {
         if (!mainDir())
             return checkRubixDir();
@@ -149,7 +149,7 @@ public class Operations {
         result.put("status", "true");
         return result.toString();
     }
-
+ */
     @RequestMapping(value = "/mine", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public static String mine(int type) throws Exception {
