@@ -3,7 +3,7 @@ package com.rubix.core.Controllers;
 import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
 import com.rubix.core.Resources.RequestModel;
-import org.json.*;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,6 +13,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
+
+import org.json.JSONException;
+import java.lang.InterruptedException;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
@@ -112,6 +115,9 @@ public class Operations {
             return checkRubixDir();
         if (!Basics.mutex)
             start();
+        if (type == 0) {
+            type = 1;
+        }
         return APIHandler.create(type).toString();
 
     }

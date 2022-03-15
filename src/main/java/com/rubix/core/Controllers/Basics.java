@@ -1,20 +1,16 @@
 package com.rubix.core.Controllers;
 
 import com.rubix.Consensus.QuorumConsensus;
-import com.rubix.Ping.PingCheck;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.Resources.Background;
-import com.rubix.core.Resources.QuorumPingReceiveThread;
-import com.rubix.core.Resources.Receiver;
-import com.rubix.core.Resources.ReceiverPingReceive;
+
+
 import io.ipfs.api.IPFS;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
 import static com.rubix.Constants.IPFSConstants.bootstrap;
 
 import java.io.*;
@@ -59,17 +55,17 @@ public class Basics {
             Thread gamma1Thread = new Thread(gamma1);
             gamma1Thread.start();
 
-            Receiver receiver = new Receiver();
-            Thread receiverThread = new Thread(receiver);
-            receiverThread.start();
+            // Receiver receiver = new Receiver();
+            // Thread receiverThread = new Thread(receiver);
+            // receiverThread.start();
 
-            ReceiverPingReceive receiverPingReceive = new ReceiverPingReceive();
-            Thread receiverPingThread = new Thread(receiverPingReceive);
-            receiverPingThread.start();
+            // ReceiverPingReceive pingReceive = new ReceiverPingReceive();
+            // Thread pingReciverThread = new Thread(pingReceive);
+            // pingReciverThread.start();
 
-            QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
-            Thread quorumPingThread = new Thread(quorumPingReceiveThread);
-            quorumPingThread.start();
+            // QuorumPingReceiveThread quorumPingReceive = new QuorumPingReceiveThread();
+            // Thread quorumThread = new Thread(quorumPingReceive);
+            // quorumThread.start();
 
             tokenBank();
 
@@ -92,9 +88,9 @@ public class Basics {
                 writeToFile(partTokensFile.toString(), "[]", false);
             }
 
-            Background background = new Background();
+            /* Background background = new Background();
             Thread backThread = new Thread(background);
-            backThread.start();
+            backThread.start(); */
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -304,8 +300,6 @@ public class Basics {
         System.out.println(receiverDID);
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        String receiverPeerId = getValues(DATA_PATH + "DataTable.json", "peerid", "didHash", receiverDID);
-       
         if(getValues(DATA_PATH + "DataTable.json", "didHash", "didHash", receiverDID)=="") {
             sync();
             if(getValues(DATA_PATH + "DataTable.json", receiverDID, "didHash", receiverDID)=="") {
@@ -315,17 +309,8 @@ public class Basics {
                 result.put("status", "true");
             }
 
-        }
-        else {
-            boolean sanityCheck = sanityCheck(receiverPeerId, ipfs, SEND_PORT+10);
-            if(!sanityCheck){
-                contentObject.put("response", sanityMessage);
-                result.put("data",contentObject);
-                result.put("status", "Failed");
-                result.put("message", "");
-                System.out.println(sanityMessage);
-                return result.toString();
-            }
+        }else
+        {
             contentObject.put("response", receiverDID+" is valid");
             result.put("data",contentObject);
             result.put("message", receiverDID+" is valid");
