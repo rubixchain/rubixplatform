@@ -55,17 +55,17 @@ public class Basics {
             Thread gamma1Thread = new Thread(gamma1);
             gamma1Thread.start();
 
-            // Receiver receiver = new Receiver();
-            // Thread receiverThread = new Thread(receiver);
-            // receiverThread.start();
+            Receiver receiver = new Receiver();
+            Thread receiverThread = new Thread(receiver);
+            receiverThread.start();
 
-            // ReceiverPingReceive pingReceive = new ReceiverPingReceive();
-            // Thread pingReciverThread = new Thread(pingReceive);
-            // pingReciverThread.start();
+            ReceiverPingReceive pingReceive = new ReceiverPingReceive();
+            Thread pingReciverThread = new Thread(pingReceive);
+            pingReciverThread.start();
 
-            // QuorumPingReceiveThread quorumPingReceive = new QuorumPingReceiveThread();
-            // Thread quorumThread = new Thread(quorumPingReceive);
-            // quorumThread.start();
+            QuorumPingReceiveThread quorumPingReceive = new QuorumPingReceiveThread();
+            Thread quorumThread = new Thread(quorumPingReceive);
+            quorumThread.start();
 
             tokenBank();
 
