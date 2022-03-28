@@ -13,17 +13,17 @@ public class Background implements Runnable {
     public void run() {
         while (true) {
 
-//            try {
-//                Functions.tokenBank();
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                Functions.tokenBank();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-//            try {
-//                Functions.clearParts();
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                Functions.clearParts();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             repo();
 
