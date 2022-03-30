@@ -92,6 +92,11 @@ public class Basics {
                 writeToFile(partTokensFile.toString(), "[]", false);
             }
 
+            String STAKE_PATH = WALLET_DATA_PATH.concat("Stake/");
+            File stakeFolder = new File(STAKE_PATH);
+            if (!stakeFolder.exists())
+              stakeFolder.mkdir();
+
             Background background = new Background();
             Thread backThread = new Thread(background);
             backThread.start();
