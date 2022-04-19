@@ -310,7 +310,7 @@ public class Basics {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         String receiverPeerId = getValues(DATA_PATH + "DataTable.json", "peerid", "didHash", receiverDID);
-        boolean sanityCheck = sanityCheck(receiverPeerId, ipfs, SEND_PORT+10);
+        boolean sanityCheck = sanityCheck("Receiver",receiverPeerId, ipfs, SEND_PORT+10);
         if(!sanityCheck){
             contentObject.put("response", sanityMessage);
             result.put("data",contentObject);
