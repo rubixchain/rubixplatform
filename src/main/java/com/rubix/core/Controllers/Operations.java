@@ -23,6 +23,7 @@ import static com.rubix.Resources.Functions.*;
 import static com.rubix.Mining.HashChain.*;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.*;
+import static com.rubix.Mining.HashChain.*;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
