@@ -20,6 +20,7 @@ import java.lang.InterruptedException;
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
+import static com.rubix.Mining.HashChain.*;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.*;
 
@@ -139,6 +140,19 @@ public class Operations {
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", didResult);
         result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/hashchain", method = RequestMethod.POST,
+            produces = {"application/json", "application/xml"})
+    public String Create(@RequestParam("tid") String tid, @RequestParam("DIDs") String[] DIDs) {
+
+        String hash = newHashChain(tid, DIDs);
+
+        JSONObject result = new JSONObject();
+        result.put("data", hash);
         result.put("message", "");
         result.put("status", "true");
         return result.toString();
