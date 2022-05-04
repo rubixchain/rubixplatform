@@ -1,42 +1,35 @@
+
 package com.rubix.core.Controllers;
 
-import static RubixDID.DIDCreation.DIDimage.createDID;
-import static com.rubix.Resources.APIHandler.send;
-import static com.rubix.Resources.Functions.*;
-import static com.rubix.core.Controllers.Basics.checkRubixDir;
-import static com.rubix.core.Controllers.Basics.start;
-import static com.rubix.core.Resources.CallerFunctions.createWorkingDirectory;
-import static com.rubix.core.Resources.CallerFunctions.deleteFolder;
-import static com.rubix.core.Resources.CallerFunctions.mainDir;
+import com.rubix.Resources.APIHandler;
+import com.rubix.Resources.Functions;
+import com.rubix.core.Resources.RequestModel;
+import org.json.JSONObject;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
-import javax.imageio.ImageIO;
-
-import com.rubix.Resources.APIHandler;
-import com.rubix.core.Resources.RequestModel;
-
-import org.apache.commons.lang3.Functions;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+import java.lang.InterruptedException;
+
+import static RubixDID.DIDCreation.DIDimage.createDID;
+import static com.rubix.Resources.APIHandler.send;
+import static com.rubix.Resources.Functions.*;
+import static com.rubix.core.Controllers.Basics.*;
+import static com.rubix.core.Resources.CallerFunctions.*;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Operations {
 
-    @RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
+	@RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST,
+            produces = {"application/json", "application/xml"})
     public static String initiateTransaction(@RequestBody RequestModel requestModel) throws Exception {
         if (!mainDir())
             return checkRubixDir();
@@ -47,6 +40,7 @@ public class Operations {
         double tokenCount = requestModel.getTokenCount();
         String comments = requestModel.getComment();
         int type = requestModel.getType();
+
 
         int intPart = (int) tokenCount;
         double decimal = tokenCount - intPart;
@@ -76,7 +70,8 @@ public class Operations {
 
         }
 
-        Double available = Functions.getBalance();
+
+        Double available = com.rubix.Resources.Functions.getBalance();
         if (tokenCount > available) {
             System.out.println("Amount greater than available");
             JSONObject resultObject = new JSONObject();
@@ -93,6 +88,7 @@ public class Operations {
             result.put("status", "true");
             return result.toString();
         }
+
 
         JSONObject objectSend = new JSONObject();
         objectSend.put("receiverDidIpfsHash", recDID);
@@ -127,26 +123,26 @@ public class Operations {
     }
 
     @RequestMapping(value = "/create", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public String Create(@RequestParam("image") MultipartFile imageFile)
-            throws IOException, JSONException, InterruptedException {
-        setDir();
-        File RubixFolder = new File(dirPath);
-        if (RubixFolder.exists())
-            deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(imageFile.getInputStream());
-        if (didResult.getString("Status").contains("Success"))
-            createWorkingDirectory();
+    "application/xml" })
+public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value)
+    throws Exception {
+setDir();
+File RubixFolder = new File(dirPath);
+if (RubixFolder.exists())
+    deleteFolder(RubixFolder);
+JSONObject didResult = createDID(imageFile.getInputStream());
+if (didResult.getString("Status").contains("Success"))
+    createWorkingDirectory();
 
-        start();
-        JSONObject result = new JSONObject();
-        JSONObject contentObject = new JSONObject();
-        contentObject.put("response", didResult);
-        result.put("data", contentObject);
-        result.put("message", "");
-        result.put("status", "true");
-        return result.toString();
-    }
+JSONObject result = new JSONObject();
+JSONObject contentObject = new JSONObject();
+contentObject.put("response", didResult);
+result.put("data", contentObject);
+result.put("message", "");
+result.put("status", "true");
+return result.toString();
+}
+
 
     @RequestMapping(value = "/generate", method = RequestMethod.GET, produces = { "application/json",
             "application/xml" })
@@ -220,11 +216,48 @@ public class Operations {
         System.out.println("Opertaions - commitBlockObject " + commitBlockObject.toString());
         System.out.println("Opertaions - contentObject " + contentObject.toString());
         result.put("data", contentObject);
-        result.put("message", "");
+        //result.put("message", "");
         result.put("status", "true");
         System.out.println("result " + result.toString());
 
         return result.toString();
 
     }
+    
+    
+    @RequestMapping(value = "/verifyCommit", method = RequestMethod.POST, produces = { "application/json",
+    "application/xml" })
+    public static String verifyCommit(@RequestBody RequestModel requestModel) throws Exception {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            start();
+
+        String blockHash = requestModel.getBlockHash();
+        
+
+        System.out.println("Opertaions - blockHash " + blockHash);
+
+        JSONObject objectSend = new JSONObject();
+        objectSend.put("blockHash", blockHash);
+
+        System.out.println("Opertaions - objectsend is " + objectSend.toString());
+        JSONObject commitBlockObject = verifySpecificCommit(blockHash);
+        // System.out.println("Block commit status is "+
+        // commitBlockObject.getString("status").toLowerCase());
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", commitBlockObject);
+        System.out.println("Opertaions - commitBlockObject " + commitBlockObject.toString());
+        System.out.println("Opertaions - contentObject " + contentObject.toString());
+        result.put("data", contentObject);
+        //result.put("message", "");
+        result.put("status", "true");
+        System.out.println("result " + result.toString());
+
+        return result.toString();
+
+    }
+    
 }

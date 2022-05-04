@@ -25,7 +25,7 @@ public class RequestModel {
     private int startRange;
     private int endRange;
     private int type;
-
+    private String blockHash;
 
 
     public RequestModel(){}
@@ -55,5 +55,8 @@ public class RequestModel {
     public int getStartRange(){return startRange;}
     public int getEndRange(){return endRange; }
     public String getPeerid(){return peerid;}
+    public String getBlockHash(){
+        return blockHash;
+    }
 
 }
