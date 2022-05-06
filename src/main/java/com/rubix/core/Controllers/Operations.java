@@ -66,7 +66,6 @@ public class Operations {
             contentObject.put("response", resultObject);
             result.put("data", contentObject);
             result.put("message", "");
-            result.put("status", "true");
             return result.toString();
 
         }
@@ -86,7 +85,6 @@ public class Operations {
             contentObject.put("response", resultObject);
             result.put("data", contentObject);
             result.put("message", "");
-            result.put("status", "true");
             return result.toString();
         }
 
