@@ -95,7 +95,7 @@ public class NftOperations {
                 contentObject.put("response", resultObject);
                 result.put("data", contentObject);
                 result.put("message", "");
-                result.put("status", "true");
+                result.put("status", "false");
                 return result.toString();
 
             }
@@ -114,7 +114,7 @@ public class NftOperations {
                 contentObject.put("response", resultObject);
                 result.put("data", contentObject);
                 result.put("message", "");
-                result.put("status", "true");
+                result.put("status", "false");
                 return result.toString();
             }
 
