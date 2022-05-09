@@ -12,7 +12,7 @@ public class ReceiverPingReceive implements Runnable {
         while (true) {
             try {
                 pathSet();
-                PingReceive.receive(RECEIVER_PORT+10);
+                PingReceive.receive("RECEIVER",RECEIVER_PORT+10);
             } catch (JSONException e) {
                 e.printStackTrace();
             }

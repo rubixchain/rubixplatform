@@ -45,7 +45,8 @@ public class Transactions {
             return result.toString();
         }
 
-        if(transactionDetails(txnId).length()==0) {
+        JSONArray transactionDetails = transactionDetails(txnId);
+        if(transactionDetails.length()==0) {
             return noTxnError();
         }
 
@@ -89,15 +90,16 @@ public class Transactions {
             return result.toString();
         }
 
-        if(transactionsByDate(s, e).length()==0) {
+        JSONArray transactionsByDate = transactionsByDate(s, e);
+        if(transactionsByDate.length()==0) {
             return noTxnError();
         }
 
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        contentObject.put("response", transactionsByDate(s, e));
-        contentObject.put("count", transactionsByDate(s, e).length());
+        contentObject.put("response", transactionsByDate);
+        contentObject.put("count", transactionsByDate.length());
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
@@ -116,15 +118,17 @@ public class Transactions {
 
         String comment = requestModel.getComment();
 
-        if(transactionsByComment(comment).length()==0) {
+        JSONArray transactionsByComment = transactionsByComment(comment);
+
+        if(transactionsByComment.length()==0) {
             return noTxnError();
         }
 
 
         JSONObject contentObject = new JSONObject();
         JSONObject result = new JSONObject();
-        contentObject.put("response", transactionsByComment(comment));
-        contentObject.put("count", transactionsByComment(comment).length());
+        contentObject.put("response", transactionsByComment);
+        contentObject.put("count", transactionsByComment.length());
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
@@ -153,8 +157,9 @@ public class Transactions {
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        contentObject.put("response", transactionsByCount(n));
-        contentObject.put("count", transactionsByCount(n).length());
+        JSONArray transactionsByCount = transactionsByCount(n);
+        contentObject.put("response", transactionsByCount);
+        contentObject.put("count", transactionsByCount.length());
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
@@ -181,14 +186,15 @@ public class Transactions {
             return result.toString();
         }
 
-        if(transactionsByDID(did).length()==0) {
+        JSONArray transactionsByDID = transactionsByDID(did);
+        if(transactionsByDID.length()==0) {
             return noTxnError();
         }
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        contentObject.put("response", transactionsByDID(did));
-        contentObject.put("count", transactionsByDID(did).length());
+        contentObject.put("response", transactionsByDID);
+        contentObject.put("count", transactionsByDID.length());
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
@@ -215,14 +221,15 @@ public class Transactions {
             return result.toString();
         }
 
-        if(transactionsByRange(start, end).length()==0) {
+        JSONArray transactionsByRange = transactionsByRange(start, end);
+        if(transactionsByRange.length()==0) {
             return noTxnError();
         }
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        contentObject.put("response", transactionsByRange(start, end));
-        contentObject.put("count", transactionsByRange(start, end).length());
+        contentObject.put("response", transactionsByRange);
+        contentObject.put("count", transactionsByRange.length());
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
