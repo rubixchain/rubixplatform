@@ -146,9 +146,9 @@ public class Operations {
 
     @RequestMapping(value = "/hashchain", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public String Create(@RequestParam("tid") String tid, @RequestParam("DIDs") String[] DIDs) {
+    public String Create(@RequestParam("tid") String tid, @RequestParam("DIDs") String[] DIDs, @RequestParam("matchRule") int matchRule) throws IOException, JSONException, InterruptedException {
 
-        String hash = newHashChain(tid, DIDs);
+        String hash = newHashChain(tid, DIDs, matchRule);
 
         JSONObject result = new JSONObject();
         result.put("data", hash);
