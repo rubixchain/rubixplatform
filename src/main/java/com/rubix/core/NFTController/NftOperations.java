@@ -101,6 +101,7 @@ public class NftOperations{
         objectSend.put("type", type);
         objectSend.put("comment", comments);
         objectSend.put("p2pFlag", p2pFlag);
+        objectSend.put("userHash", requestModel.getUserHash());
 
         if (p2pFlag == 0) {
             if (requestModel.getSellerPubKeyIpfsHash().isBlank()) {
