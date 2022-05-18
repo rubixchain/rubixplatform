@@ -30,6 +30,7 @@ public class NftRequestModel {
     private int endRange;
     private String did;
     private int p2pFlag;
+    private String userHash;
 
     public NftRequestModel() {
     }
@@ -140,5 +141,9 @@ public class NftRequestModel {
 
     public int getP2pFlag() {
         return this.p2pFlag;
+    }
+
+    public String getUserHash() {
+        return this.userHash;
     }
 }
