@@ -39,39 +39,117 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
-public class NftOperations {
+public class NftOperations{
     @RequestMapping(value = { "/initiateNftTransfer" }, method = { RequestMethod.POST }, produces = {
             "application/json", "application/xml" })
     public static String initiateNftTransaction(@RequestBody NftRequestModel requestModel) throws Exception {
+
+        String sellerDid, nftTokenIpfsHash, comments, sellerPubKeyIpfsHash, saleContractIpfsHash, buyerPubKeyIpfsHash="",
+                pvtKey, pvtKeyPass;
+        int type;
+        double tokenCount;
         if (!mainDir())
             return checkRubixDir();
         if (!Basics.mutex)
             start();
 
-        String buyerPubKeyIpfsHash=null;
         JSONObject objectSend = new JSONObject();
+        JSONObject result = new JSONObject();
         String buyerPeerID = getPeerID(DATA_PATH + "DID.json");
         String buyerDID = getValues(DATA_PATH + "DataTable.json", "didHash", "peerid", buyerPeerID);
+        int p2pFlag = requestModel.getP2pFlag();
+        /* if (p2pFlag != 0 || p2pFlag != 1) {
+            result.put("data", "");
+            result.put("message", "p2pFlag value shouldbe either 0 0r 1");
+            result.put("status", "false");
 
-        String sellerDid = requestModel.getSellerDid();
-        String nftTokenIpfsHash = requestModel.getNftToken();
-        int type = requestModel.getType();
-        String comments = requestModel.getComment();
+            return result.toString();
+        }
+ */
+        if (requestModel.getSellerDid().isBlank()) {
+            result.put("data", "");
+            result.put("message", "Seller DID cannot be Empty");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        if (requestModel.getNftToken().isBlank()) {
+            result.put("data", "");
+            result.put("message", "NFT TOken value cannot be Empty");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        /* if (requestModel.getType() != 1 || requestModel.getType() != 2) {
+            result.put("data", "");
+            result.put("message", "Wrong value of type for quorum selction. Choose either 1 or 2");
+            result.put("status", "false");
+
+            return result.toString();
+        } */
+
+        sellerDid = requestModel.getSellerDid();
+        nftTokenIpfsHash = requestModel.getNftToken();
+        type = requestModel.getType();
+        comments = requestModel.getComment();
 
         objectSend.put("nftToken", nftTokenIpfsHash);
         objectSend.put("buyerDidIpfsHash", buyerDID);
         objectSend.put("sellerDidIpfsHash", sellerDid);
         objectSend.put("type", type);
         objectSend.put("comment", comments);
+        objectSend.put("p2pFlag", p2pFlag);
 
-        int p2pFlag = requestModel.getP2pFlag();
         if (p2pFlag == 0) {
-            String sellerPubKeyIpfsHash = requestModel.getSellerPubKeyIpfsHash();
-            String saleContractIpfsHash = requestModel.getSaleContractIpfsHash();
+            if (requestModel.getSellerPubKeyIpfsHash().isBlank()) {
+                result.put("data", "");
+                result.put("message", "Seller Public Key Ipfs Hash cannot be Empty");
+                result.put("status", "false");
+
+                return result.toString();
+            }
+
+            if (requestModel.getBuyerPubKeyIpfsHash().isBlank()) {
+                result.put("data", "");
+                result.put("message", "Buyer Public Key Ipfs Hash cannot be Empty");
+                result.put("status", "false");
+
+                return result.toString();
+            }
+
+            if (requestModel.getSaleContractIpfsHash().isBlank()) {
+                result.put("data", "");
+                result.put("message", "Sale Contract Ipfs Hash cannot be Empty");
+                result.put("status", "false");
+
+                return result.toString();
+            }
+
+            if (requestModel.getPvtKey().isBlank()) {
+                result.put("data", "");
+                result.put("message", "Private Key cannot be Empty");
+                result.put("status", "false");
+
+                return result.toString();
+            }
+
+            if (requestModel.getPvtKeyPass().isBlank()) {
+                result.put("data", "");
+                result.put("message", "Private Key password cannot be Empty");
+                result.put("status", "false");
+
+                return result.toString();
+            }
+
+            sellerPubKeyIpfsHash = requestModel.getSellerPubKeyIpfsHash();
             buyerPubKeyIpfsHash = requestModel.getBuyerPubKeyIpfsHash();
-            String pvtKeyString = requestModel.getPvtKey();
-            String pvtKeyPass = requestModel.getPvtKeyPass();
-            double tokenCount = requestModel.getAmount();
+            saleContractIpfsHash = requestModel.getSaleContractIpfsHash();
+            pvtKey = requestModel.getPvtKey();
+            pvtKeyPass = requestModel.getPvtKeyPass();
+
+            tokenCount = requestModel.getAmount();
             int intPart = (int) tokenCount;
             double decimal = tokenCount - intPart;
             decimal = formatAmount(decimal);
@@ -90,7 +168,6 @@ public class NftOperations {
                 resultObject.put("status", "Failed");
                 resultObject.put("message", "Amount can have only 3 precisions maximum");
 
-                JSONObject result = new JSONObject();
                 JSONObject contentObject = new JSONObject();
                 contentObject.put("response", resultObject);
                 result.put("data", contentObject);
@@ -109,7 +186,6 @@ public class NftOperations {
                 resultObject.put("status", "Failed");
                 resultObject.put("message", "Amount greater than available");
 
-                JSONObject result = new JSONObject();
                 JSONObject contentObject = new JSONObject();
                 contentObject.put("response", resultObject);
                 result.put("data", contentObject);
@@ -120,18 +196,13 @@ public class NftOperations {
 
             objectSend.put("sellerPubKeyIpfsHash", sellerPubKeyIpfsHash);
             objectSend.put("saleContractIpfsHash", saleContractIpfsHash);
-            // objectSend.put("buyerPubKeyIpfsHash", buyerPubKeyIpfsHash);
-            objectSend.put("buyerPvtKey", pvtKeyString);
+            objectSend.put("buyerPubKeyIpfsHash", buyerPubKeyIpfsHash);
+            objectSend.put("buyerPvtKey", pvtKey);
             objectSend.put("buyerPvtKeyPass", pvtKeyPass);
             objectSend.put("amount", tokenCount);
+        } else {
+            objectSend.put(buyerPubKeyIpfsHash, getPubKeyIpfsHash());
         }
-        else{
-            buyerPubKeyIpfsHash = getPubKeyIpfsHash();
-        }
-
-        
-        objectSend.put("buyerPubKeyIpfsHash", buyerPubKeyIpfsHash);
-        objectSend.put("p2pFlag", p2pFlag);
 
         JSONObject resultObject = sendNft(objectSend.toString());
         if (resultObject.getString("status").equals("Success")) {
@@ -143,13 +214,13 @@ public class NftOperations {
             jSONObject1.put("status", "true");
             return jSONObject1.toString();
         }
-        JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", resultObject);
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "false");
         return result.toString();
+
     }
 
     @RequestMapping(value = "/generateRac", method = RequestMethod.POST, produces = { "application/json",
@@ -190,7 +261,7 @@ public class NftOperations {
             }
 
             data.put("pvtKeyPass", requestModel.getPvtKeyPass());
-            
+
             result = generateRacToken(data.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -202,9 +273,27 @@ public class NftOperations {
             "application/xml" })
     public static String generateRsaKeys(@RequestBody NftRequestModel nftRequestModel) {
 
+        JSONObject response = new JSONObject();
+        if (nftRequestModel.getPvtKeyPass().isBlank()) {
+            response.put("data", "");
+            response.put("message", "Private Key password cannot be Empty");
+            response.put("status", "false");
+
+            return response.toString();
+        }
+
+        if (nftRequestModel.getReturnKey()!=0 || nftRequestModel.getReturnKey()!=1) {
+            response.put("data", "");
+            response.put("message", "Return Key flag should be either 0 or 1");
+            response.put("status", "false");
+
+            return response.toString();
+        }
+
+
         String password = nftRequestModel.getPvtKeyPass();
         int returnKey = nftRequestModel.getReturnKey();
-        JSONObject response = new JSONObject();
+        
 
         try {
             if (!mainDir()) {
@@ -284,6 +373,33 @@ public class NftOperations {
     @RequestMapping(value = "/createNftSaleContract", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public static String nftSaleContract(@RequestBody NftRequestModel nftRequestModel) {
+        JSONObject response = new JSONObject();
+
+        if (nftRequestModel.getSellerDid().isBlank()) {
+            response.put("contractIpfsHash", "");            
+            response.put("message", "Seller DID cannot be Empty");
+            response.put("status", "false");
+
+            return response.toString();
+        }
+
+        if(nftRequestModel.getNftToken().isBlank())
+        {
+            response.put("contractIpfsHash", "");            
+            response.put("message", "NFT TOken value cannot be Empty");
+            response.put("status", "false");
+
+            return response.toString();
+        }
+
+        if(nftRequestModel.getPvtKeyPass().isBlank())
+        {
+            response.put("contractIpfsHash", "");            
+            response.put("message", "Private Key password cannot be Empty");
+            response.put("status", "false");
+
+            return response.toString();
+        }
         String sellerDid = nftRequestModel.getSellerDid();
         String nftToken = nftRequestModel.getNftToken();
         Double rbtAmunt = nftRequestModel.getAmount();
@@ -295,6 +411,13 @@ public class NftOperations {
             sellerPvtKey = nftRequestModel.getPvtKey();
             data.put("sellerPvtKey", sellerPvtKey);
         }
+        else{
+            response.put("contractIpfsHash", "");            
+            response.put("message", "Private Key cannot be Empty");
+            response.put("status", "false");
+
+            return response.toString();
+        }
 
         data.put("sellerDID", sellerDid);
         data.put("nftToken", nftToken);
@@ -305,7 +428,6 @@ public class NftOperations {
 
         JSONObject responseObj = new JSONObject(result);
 
-        JSONObject response = new JSONObject();
 
         if (responseObj.getString("status").equals("Failed")) {
             response.put("message", responseObj.getString("message"));
@@ -422,32 +544,4 @@ public class NftOperations {
 
     }
 
-    @RequestMapping(value = "/testVerifySaleContract", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public String testVerifySaleContract(@RequestBody NftRequestModel nftRequestModel) {
-        String saleContracthash = nftRequestModel.getSaleContractIpfsHash();
-        String pubkeyipfs = nftRequestModel.getSellerPubKeyIpfsHash();
-       
-        String sellerDid = nftRequestModel.getSellerDid();
-        String nfttoken= nftRequestModel.getNftToken();
-        Double requestedAmount = nftRequestModel.getAmount();
-        JSONObject reConObj = new JSONObject();
-        reConObj.put("sellerDID", sellerDid);
-        reConObj.put("nftToken", nfttoken);
-        reConObj.put("rbtAmount", requestedAmount);
-
-        //PublicKey publicKey= getPubKeyFromStr(get(pubkeyipfs, io.ipfs.api.IPFS));
-
-
-
-        return NFTAPIHandler.testsalevery(reConObj.toString(),saleContracthash,pubkeyipfs);
-    }
-
-
-    /* @RequestMapping(value = "/testVerifySaleContract", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public String hashOfContent(@RequestBody NftRequestModel nftRequestModel) 
-    {
-
-    } */
 }
