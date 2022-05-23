@@ -283,15 +283,6 @@ public class NftOperations{
             return response.toString();
         }
 
-        if (nftRequestModel.getReturnKey()!=0 || nftRequestModel.getReturnKey()!=1) {
-            response.put("data", "");
-            response.put("message", "Return Key flag should be either 0 or 1");
-            response.put("status", "false");
-
-            return response.toString();
-        }
-
-
         String password = nftRequestModel.getPvtKeyPass();
         int returnKey = nftRequestModel.getReturnKey();
         
