@@ -58,14 +58,6 @@ public class NftOperations{
         String buyerPeerID = getPeerID(DATA_PATH + "DID.json");
         String buyerDID = getValues(DATA_PATH + "DataTable.json", "didHash", "peerid", buyerPeerID);
         int p2pFlag = requestModel.getP2pFlag();
-        /* if (p2pFlag != 0 || p2pFlag != 1) {
-            result.put("data", "");
-            result.put("message", "p2pFlag value shouldbe either 0 0r 1");
-            result.put("status", "false");
-
-            return result.toString();
-        }
- */
         if (requestModel.getSellerDid().isBlank()) {
             result.put("data", "");
             result.put("message", "Seller DID cannot be Empty");
@@ -81,14 +73,6 @@ public class NftOperations{
 
             return result.toString();
         }
-
-        /* if (requestModel.getType() != 1 || requestModel.getType() != 2) {
-            result.put("data", "");
-            result.put("message", "Wrong value of type for quorum selction. Choose either 1 or 2");
-            result.put("status", "false");
-
-            return result.toString();
-        } */
 
         sellerDid = requestModel.getSellerDid();
         nftTokenIpfsHash = requestModel.getNftToken();
