@@ -210,7 +210,15 @@ public class Basics {
     	System.out.println("mainDir "+mainDir()+" mutex is "+mutex);
         JSONArray result = new JSONArray();
         System.out.println("Received generateHashtable request");
-        result.put(tokenHashTableGeneration());
+        try {
+			result.put(tokenHashTableGeneration());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         return result.toString();
     }
