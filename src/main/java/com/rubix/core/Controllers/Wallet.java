@@ -292,22 +292,15 @@ public class Wallet {
         if (stakedtokensfile.exists()) {
             for ( File file : filesList) {
                 String sFile = file.getName();
-                System.out.println("filenme "+ sFile);
+               
                 String k =  stakedtokens+sFile;
-                System.out.println("filename concat with path"+ k);
                 String contactsFile = Functions.readFile(k);
-                System.out.println(contactsFile);
                 JSONObject js = new JSONObject(contactsFile);
-                System.out.println(js);
                 JSONObject stakedata = js.getJSONObject("stakeData");
                 String staked_mineid = stakedata.getString("stakedToken");
-                 System.out.println("staked token"+ staked_mineid);
                  
                  returnTokens.put(staked_mineid);               
                  ++counter;
-                 System.out.println("no of staked tokens "+counter);
-                
-                
                 
             }
         }
