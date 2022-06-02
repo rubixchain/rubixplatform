@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import java.lang.InterruptedException;
 
@@ -194,4 +195,27 @@ public class Operations {
         result.put("status", "true");
         return result.toString();
     }
+
+    @RequestMapping(value = "/ownerIdentity", method = RequestMethod.POST,
+            produces = {"application/json", "application/xml"})
+    public String ownerIdentity(@RequestParam("tokens") JSONArray tokensArray) throws IOException, JSONException, InterruptedException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            start();
+            
+        Functions.pathSet();
+        String didFile = readFile(DATA_PATH.concat("DID.json"));
+        JSONArray didArray = new JSONArray(didFile);
+        String did = didArray.getJSONObject(0).getString("didHash");
+        Functions.ownerIdentity(tokensArray, did);
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", "Successfully Updated");
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
 }
