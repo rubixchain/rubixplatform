@@ -28,7 +28,7 @@ public class Transactions {
 
     @RequestMapping(value = "/getTxnDetails", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public String getTxnDetails(@RequestBody RequestModel requestModel) throws JSONException, IOException {
+    public String getTxnDetails(@RequestBody RequestModel requestModel) throws JSONException, IOException, InterruptedException {
         if (!mainDir())
             return checkRubixDir();
         if(!mutex)
