@@ -122,28 +122,35 @@ public class Operations {
         return APIHandler.create(type).toString();
 
     }
-
-
+ 
     @RequestMapping(value = "/create", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
     public String Create(@RequestParam("image") MultipartFile imageFile) throws IOException, JSONException, InterruptedException {
         setDir();
         File RubixFolder = new File(dirPath);
-        if (RubixFolder.exists())
-            deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(imageFile.getInputStream());
-        if (didResult.getString("Status").contains("Success"))
-            createWorkingDirectory();
-
-        start();
+        
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        contentObject.put("response", didResult);
+        
+        if (RubixFolder.exists()) {
+        	 contentObject.put("response", "Rubix Wallet already exists!");        	
+        }else {
+        	// deleteFolder(RubixFolder);
+            JSONObject didResult = createDID(imageFile.getInputStream());
+            if (didResult.getString("Status").contains("Success"))
+                createWorkingDirectory();
+
+            start();
+            
+            contentObject.put("response", didResult);
+        }
+        APIHandler.networkInfo();
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
         return result.toString();
     }
+
 
     @RequestMapping(value = "/hashchain", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})

@@ -1,6 +1,7 @@
 package com.rubix.core.Controllers;
 
 
+import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
 import io.ipfs.api.Peer;
 import org.json.JSONArray;
@@ -39,6 +40,11 @@ public class Wallet {
         accountObject.put("balance", getBalance());
         accountObject.put("credits", creditsInfo());
 
+        //changes are made
+        accountObject.put("staked token", APIHandler.stakedTokencount()); 
+        accountObject.put("available balance", APIHandler.getAvailableBalance());
+
+        
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", accountObject);
@@ -266,5 +272,50 @@ public class Wallet {
         result.put("status", "true");
         return result.toString();
 
+    }
+    
+    @RequestMapping(value = { "/getStakedTokens" }, method = { RequestMethod.POST }, produces = { "application/json", "application/xml" })
+    public String getStakedTokens() throws Exception, IOException {
+
+    	if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        JSONArray returnTokens = new JSONArray();
+        int counter = 0;
+        String stakedtokens = Functions.WALLET_DATA_PATH.concat("Stake/");
+        File stakedtokensfile = new File(stakedtokens);
+        File[] filesList = stakedtokensfile.listFiles();
+        if (stakedtokensfile.exists()) {
+            for ( File file : filesList) {
+                String sFile = file.getName();
+                System.out.println("filenme "+ sFile);
+                String k =  stakedtokens+sFile;
+                System.out.println("filename concat with path"+ k);
+                String contactsFile = Functions.readFile(k);
+                System.out.println(contactsFile);
+                JSONObject js = new JSONObject(contactsFile);
+                System.out.println(js);
+                JSONObject stakedata = js.getJSONObject("stakeData");
+                String staked_mineid = stakedata.getString("stakedToken");
+                 System.out.println("staked token"+ staked_mineid);
+                 
+                 returnTokens.put(staked_mineid);               
+                 ++counter;
+                 System.out.println("no of staked tokens "+counter);
+                
+                
+                
+            }
+        }
+        contentObject.put("response", returnTokens);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true"); 
+       
+      return result.toString();   
     }
 }
