@@ -97,13 +97,15 @@ public class Basics {
             File stakeFolder = new File(STAKE_PATH);
             if (!stakeFolder.exists()) {
               stakeFolder.mkdir();
-              generateHashtableBG();
             }
             
             String DATAHASH_PATH = DATA_PATH.concat("DataHash");
             File dataHashFolder = new File(DATAHASH_PATH);
-            if(!dataHashFolder.exists())
-            	dataHashFolder.mkdir();
+            if(!dataHashFolder.exists()) {
+            	  dataHashFolder.mkdir();
+            	  generateHashtableBG();
+            }
+            	
 
             Background background = new Background();
             Thread backThread = new Thread(background);
