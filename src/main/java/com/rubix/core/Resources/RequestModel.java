@@ -25,6 +25,7 @@ public class RequestModel {
     private int startRange;
     private int endRange;
     private int type;
+    private String pvtKeyPass;
 
 
 
@@ -34,7 +35,7 @@ public class RequestModel {
     public String getToken(){return token;}
     public String getThreadExt(){ return threadExt;}
     public String getComment(){return comment;}
-    public double getTokenCount(){ return tokenCount; }
+    public double getTokenCount(){ return tokenCount; } 
     public double getAmount(){ return amount; }
     public String getTransactionID(){return transactionID;}
     public int getTxnCount(){return txnCount;}
@@ -55,5 +56,6 @@ public class RequestModel {
     public int getStartRange(){return startRange;}
     public int getEndRange(){return endRange; }
     public String getPeerid(){return peerid;}
+    public String getPvtKeyPass(){return pvtKeyPass;}
 
 }

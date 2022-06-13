@@ -282,13 +282,13 @@ public class NftOperations{
             return response.toString();
         }
 
-        if (nftRequestModel.getReturnKey()!=0 || nftRequestModel.getReturnKey()!=1) {
-            response.put("data", "");
-            response.put("message", "Return Key flag should be either 0 or 1");
-            response.put("status", "false");
+        // if (nftRequestModel.getReturnKey()!=0 || nftRequestModel.getReturnKey()!=1) {
+        //     response.put("data", "");
+        //     response.put("message", "Return Key flag should be either 0 or 1");
+        //     response.put("status", "false");
 
-            return response.toString();
-        }
+        //     return response.toString();
+        // }
 
 
         String password = nftRequestModel.getPvtKeyPass();
@@ -323,6 +323,11 @@ public class NftOperations{
                 response.put("status", "true");
                 response.put("content", res);
             }
+
+    
+        int responseCode = addPubKeyData_DIDserver();  // Updating the public key's ipfs hash to the DID server. Defined in rubixcore-NFTFunctions.
+
+       
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
