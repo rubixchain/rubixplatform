@@ -99,6 +99,8 @@ public class Basics {
               stakeFolder.mkdir();
             }
             
+            /*
+             *  Background Thread is commented for Token file Missing Issue.
             String DATAHASH_PATH = DATA_PATH.concat("DataHash");
             File dataHashFolder = new File(DATAHASH_PATH);
             if(!dataHashFolder.exists()) {
@@ -110,7 +112,7 @@ public class Basics {
             Background background = new Background();
             Thread backThread = new Thread(background);
             backThread.start();
-            
+            */
             
 
             JSONObject result = new JSONObject();
@@ -204,7 +206,8 @@ public class Basics {
         result.put("status", "true");
         return result.toString();
     }
-
+    
+    /* An alternate solution has been implemented for generating Hash... So commented this
     @RequestMapping(value = "/generateHashtable", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
     public static String generateHashtable() throws IOException, JSONException {
@@ -228,6 +231,7 @@ public class Basics {
     public static void generateHashtableBG() throws JSONException, IOException {
     	String str = generateHashtable();
     }
+    */
     @RequestMapping(value = "/bootstrap", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
     public String getBootstrap() throws IOException, JSONException {
 
