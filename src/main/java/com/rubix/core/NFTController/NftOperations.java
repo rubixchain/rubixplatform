@@ -27,6 +27,8 @@ import com.rubix.NFTResources.NFTAPIHandler;
 import com.rubix.core.Controllers.Basics;
 import com.rubix.core.NFTResources.NftRequestModel;
 
+import static com.rubix.LevelTwoToken.LTwoAPIHandler.*;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
@@ -519,5 +523,46 @@ public class NftOperations{
         return result.toString();
 
     }
+    
+    @RequestMapping(value = "/enableL2Wallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public static String createL2Wallet(@RequestBody NftRequestModel requestModel) {
 
+        try {
+            if (!mainDir()) {
+                return checkDirectory();
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //nftPathSet();
+        // enableNft();
+
+        String l2TokenName = requestModel.getComment();
+        JSONObject response = new JSONObject();
+
+        String checkL2Wallet = checkL2TokenWalletFolders(l2TokenName);
+
+        JSONObject checkL2WalletObj = new JSONObject(checkL2Wallet);
+
+        if(checkL2WalletObj.getString("Status")!="Success")
+        {
+            System.out.println("L2 Token "+l2TokenName+" Wallet not enabled");
+            System.out.println("Enabling L2 Token "+l2TokenName+" Wallet");
+
+           enableL2Wallet(l2TokenName);
+        }
+        else{
+            System.out.println("L2 Token "+l2TokenName+" Wallet enabled");
+        }
+
+        response.put("message", "NFT wallet Enabled");
+        response.put("status", "true");
+        return response.toString();
+    }
 }
