@@ -39,12 +39,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
-public class NftOperations{
+public class NftOperations {
     @RequestMapping(value = { "/initiateNftTransfer" }, method = { RequestMethod.POST }, produces = {
             "application/json", "application/xml" })
     public static String initiateNftTransaction(@RequestBody NftRequestModel requestModel) throws Exception {
 
-        String sellerDid, nftTokenIpfsHash, comments, sellerPubKeyIpfsHash, saleContractIpfsHash, buyerPubKeyIpfsHash="",
+        String sellerDid, nftTokenIpfsHash, comments, sellerPubKeyIpfsHash, saleContractIpfsHash,
+                buyerPubKeyIpfsHash = "",
                 pvtKey, pvtKeyPass;
         int type;
         double tokenCount;
@@ -269,7 +270,6 @@ public class NftOperations{
 
         String password = nftRequestModel.getPvtKeyPass();
         int returnKey = nftRequestModel.getReturnKey();
-        
 
         try {
             if (!mainDir()) {
@@ -352,25 +352,23 @@ public class NftOperations{
         JSONObject response = new JSONObject();
 
         if (nftRequestModel.getSellerDid().isBlank()) {
-            response.put("contractIpfsHash", "");            
+            response.put("contractIpfsHash", "");
             response.put("message", "Seller DID cannot be Empty");
             response.put("status", "false");
 
             return response.toString();
         }
 
-        if(nftRequestModel.getNftToken().isBlank())
-        {
-            response.put("contractIpfsHash", "");            
+        if (nftRequestModel.getNftToken().isBlank()) {
+            response.put("contractIpfsHash", "");
             response.put("message", "NFT TOken value cannot be Empty");
             response.put("status", "false");
 
             return response.toString();
         }
 
-        if(nftRequestModel.getPvtKeyPass().isBlank())
-        {
-            response.put("contractIpfsHash", "");            
+        if (nftRequestModel.getPvtKeyPass().isBlank()) {
+            response.put("contractIpfsHash", "");
             response.put("message", "Private Key password cannot be Empty");
             response.put("status", "false");
 
@@ -386,9 +384,8 @@ public class NftOperations{
         if (nftRequestModel.getPvtKey().length() != 0 && nftRequestModel.getPvtKey() != null) {
             sellerPvtKey = nftRequestModel.getPvtKey();
             data.put("sellerPvtKey", sellerPvtKey);
-        }
-        else{
-            response.put("contractIpfsHash", "");            
+        } else {
+            response.put("contractIpfsHash", "");
             response.put("message", "Private Key cannot be Empty");
             response.put("status", "false");
 
@@ -403,7 +400,6 @@ public class NftOperations{
         String result = createNftSaleContract(data.toString());
 
         JSONObject responseObj = new JSONObject(result);
-
 
         if (responseObj.getString("status").equals("Failed")) {
             response.put("message", responseObj.getString("message"));
@@ -517,6 +513,74 @@ public class NftOperations{
             // TODO: handle exception
         }
         return result.toString();
+
+    }
+
+    @RequestMapping(value = "/generateCryptoKeys", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public static String generateCrypKeys(@RequestBody NftRequestModel nftRequestModel) {
+        JSONObject respoObject = new JSONObject();
+        String password = nftRequestModel.getPvtKeyPass();
+        int returnKey = nftRequestModel.getReturnKey();
+
+        String keyType = nftRequestModel.getKeyType();
+
+        System.out.println("KeyType = " + keyType);
+
+        if (password.isBlank()) {
+            respoObject.put("content", "");
+            respoObject.put("message", "Private Key password cannot be Empty");
+            respoObject.put("status", "false");
+
+            return respoObject.toString();
+        }
+
+        if (keyType.isBlank()) {
+            respoObject.put("content", "");
+            respoObject.put("message", "Type of Keys to be created value cannot be Empty");
+            respoObject.put("status", "false");
+
+            return respoObject.toString();
+        }
+
+        if (!keyType.equals("RSA") && !keyType.equals("ECDSA")) {
+            respoObject.put("content", "");
+            respoObject.put("message", "Unsupported Key Type. Please Choose either RSA or ECDSA");
+            respoObject.put("status", "false");
+
+            return respoObject.toString();
+        }
+
+        if (returnKey == 0) {
+            boolean keyFileCheck = checkKeyFiles();
+            if (!keyFileCheck) {
+                System.out.println("private & public key not generated");
+                System.out.println("generating key files");
+            }
+        } else {
+            System.out.println("private & public key not generated");
+            System.out.println("generating key files");
+        }
+
+        String result = NFTAPIHandler.generateCryptoKeys(password, keyType, returnKey);
+
+        if (result == null) {
+            respoObject.put("status", "false");
+            respoObject.put("message", "Key Files not generated");
+            respoObject.put("content", "");
+            return respoObject.toString();
+        }
+
+        if (returnKey == 0 && checkKeyFiles()) {
+            respoObject.put("status", "true");
+            respoObject.put("message", "Key Files generated");
+            respoObject.put("content", result);
+            return respoObject.toString();
+        }
+        respoObject.put("status", "true");
+        respoObject.put("message", "Key Files generated");
+        respoObject.put("content", result);
+        return respoObject.toString();
 
     }
 
