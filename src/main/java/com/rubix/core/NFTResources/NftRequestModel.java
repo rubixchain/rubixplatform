@@ -31,6 +31,7 @@ public class NftRequestModel {
     private String did;
     private int p2pFlag;
     private String userHash;
+    private String l2TokenName;
 
     public NftRequestModel() {
     }
@@ -145,5 +146,9 @@ public class NftRequestModel {
 
     public String getUserHash() {
         return this.userHash;
+    }
+
+    public String getL2TokenName() {
+        return this.l2TokenName;
     }
 }

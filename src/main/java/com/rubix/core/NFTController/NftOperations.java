@@ -224,6 +224,28 @@ public class NftOperations{
             if (!Basics.mutex)
                 start();
 
+                
+            String l2TokenName=null ;
+
+            if(!requestModel.getL2TokenName().isBlank())
+            {
+                l2TokenName = requestModel.getL2TokenName();
+
+                System.out.println("RAC being minted is L2 token "+l2TokenName);
+            }
+            String checkL2Wallet = checkL2TokenWalletFolders(l2TokenName);
+
+            JSONObject checkL2WalletObj = new JSONObject(checkL2Wallet);
+
+            if(!checkL2WalletObj.getString("Status").equals("Success"))
+            {
+                JSONObject resObj= new JSONObject();
+                resObj.put("token", "");
+                resObj.put("message", "L2 token "+l2TokenName+ "Token Wallet not enabled/does not exist. Please enable or create Wallet");
+                resObj.put("status", "false");
+                return resObj.toString();
+            }
+
             String creatorPeerID = getPeerID(DATA_PATH + "DID.json");
             String creatorDid = getValues(DATA_PATH + "DataTable.json", "didHash", "peerid", creatorPeerID);
             JSONObject creatorInput = new JSONObject(requestModel.getCreatorInput());
