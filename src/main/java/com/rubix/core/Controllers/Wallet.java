@@ -42,7 +42,7 @@ public class Wallet {
 
         //changes are made
         accountObject.put("staked token", APIHandler.stakedTokencount()); 
-        accountObject.put("available balance", APIHandler.getAvailableBalance());
+        accountObject.put("Withdrawal balance", APIHandler.getAvailableBalance());
 
         
         JSONObject result = new JSONObject();
