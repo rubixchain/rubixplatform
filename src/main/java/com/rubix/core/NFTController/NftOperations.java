@@ -23,6 +23,7 @@ import java.util.Date;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.Resources.IntegrityCheck.*;
 
+import com.rubix.KeyPairGen.EcDSAKeyGen;
 import com.rubix.NFTResources.NFTAPIHandler;
 import com.rubix.core.Controllers.Basics;
 import com.rubix.core.NFTResources.NftRequestModel;
@@ -255,7 +256,7 @@ public class NftOperations {
         return result;
     }
 
-    @RequestMapping(value = "/generateRsaKeys", method = RequestMethod.POST, produces = { "application/json",
+    /* @RequestMapping(value = "/generateRsaKeys", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public static String generateRsaKeys(@RequestBody NftRequestModel nftRequestModel) {
 
@@ -307,7 +308,7 @@ public class NftOperations {
             e.printStackTrace();
         }
         return response.toString();
-    }
+    } */
 
     @RequestMapping(value = "/enableNFT", method = RequestMethod.GET, produces = { "application/json",
             "application/xml" })
@@ -516,7 +517,7 @@ public class NftOperations {
 
     }
 
-    @RequestMapping(value = "/generateCryptoKeys", method = RequestMethod.POST, produces = { "application/json",
+    /* @RequestMapping(value = "/generateCryptoKeys", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public static String generateCrypKeys(@RequestBody NftRequestModel nftRequestModel) {
         JSONObject respoObject = new JSONObject();
@@ -582,6 +583,60 @@ public class NftOperations {
         respoObject.put("content", result);
         return respoObject.toString();
 
+    } */
+
+    @RequestMapping(value = "/generateEcDSAKeys", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public static String generateEcDSAKeys(@RequestBody NftRequestModel nftRequestModel) {
+
+        JSONObject response = new JSONObject();
+        if (nftRequestModel.getPvtKeyPass().isBlank()) {
+            response.put("data", "");
+            response.put("message", "Private Key password cannot be Empty");
+            response.put("status", "false");
+
+            return response.toString();
+        }
+
+        String password = nftRequestModel.getPvtKeyPass();
+        int returnKey = nftRequestModel.getReturnKey();
+
+        try {
+            if (!mainDir()) {
+                return checkDirectory();
+            }
+
+            boolean keyFileCheck = checkKeyFiles();
+            if (!keyFileCheck) {
+                System.out.println("private & public key not generated");
+                System.out.println("generating key files");
+            }
+
+            if (returnKey == 0) {
+                EcDSAKeyGen.generateKeyPair(password);
+                keyFileCheck = checkKeyFiles();
+                if (!keyFileCheck) {
+                    response.put("message", "Key Files not generated");
+                    response.put("status", "false");
+                } else {
+                    response.put("message", "Key Files generated and stored in Rubix/DATA folder");
+                    response.put("status", "true");
+                }
+            }
+            if (returnKey == 1) {
+                String res = EcDSAKeyGen.genAndRetKey(password);
+                response.put("message", "Key Files Generated");
+                response.put("status", "true");
+                response.put("content", res);
+            }
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return response.toString();
     }
 
 }
