@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class NftOperations {
-    @RequestMapping(value = { "/initiateNftTransfer" }, method = { RequestMethod.POST }, produces = {
+    /* @RequestMapping(value = { "/initiateNftTransfer" }, method = { RequestMethod.POST }, produces = {
             "application/json", "application/xml" })
     public static String initiateNftTransaction(@RequestBody NftRequestModel requestModel) throws Exception {
 
@@ -208,7 +208,7 @@ public class NftOperations {
         result.put("status", "false");
         return result.toString();
 
-    }
+    } */
 
     @RequestMapping(value = "/generateRac", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
