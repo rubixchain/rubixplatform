@@ -35,6 +35,7 @@ public class CallerFunctions {
         File bank01File = new File(location + "BNK01.json");
         File bank10File = new File(location + "BNK10.json");
         File bank11File = new File(location + "BNK11.json");
+        File data00File = new File(location + "DAT01.json");
         FileWriter bank00writer = new FileWriter(bank00File, false);
         bank00writer.write(array.toString());
         bank00writer.close();
@@ -47,6 +48,9 @@ public class CallerFunctions {
         FileWriter bank11writer = new FileWriter(bank11File, false);
         bank11writer.write(array.toString());
         bank11writer.close();
+        FileWriter dat01writer = new FileWriter(data00File, false);
+        dat01writer.write(array.toString());
+        dat01writer.close();
 
         JSONArray tokenMapArray = new JSONArray();
         JSONObject bank00Object = new JSONObject();
@@ -64,11 +68,17 @@ public class CallerFunctions {
         JSONObject bank11Object = new JSONObject();
         bank11Object.put("type", "BNK11");
         bank11Object.put("value", 1000);
+        
+        JSONObject dat01Object = new JSONObject();
+        dat01Object.put("type", "DAT01");
+        dat01Object.put("value", 1);
 
         tokenMapArray.put(bank00Object);
         tokenMapArray.put(bank01Object);
         tokenMapArray.put(bank10Object);
         tokenMapArray.put(bank11Object);
+        tokenMapArray.put(dat01Object);
+
 
         File tokenMapFile = new File(location + "TokenMap.json");
         FileWriter tokenWriter = new FileWriter(tokenMapFile, false);

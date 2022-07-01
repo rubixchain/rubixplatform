@@ -205,7 +205,7 @@ return result.toString();
 
         System.out.println("Opertaions - Starting to commit block");
         System.out.println("Opertaions - ObjectSend " + objectSend.toString());
-        JSONObject commitBlockObject = send(objectSend.toString());
+        JSONObject commitBlockObject = APIHandler.commit(objectSend.toString());
         System.out.println("Opertaions -block commit object is " + commitBlockObject.toString());
         // System.out.println("Block commit status is "+
         // commitBlockObject.getString("status").toLowerCase());

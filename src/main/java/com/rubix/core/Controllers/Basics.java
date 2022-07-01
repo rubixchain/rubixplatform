@@ -100,8 +100,10 @@ public class Basics {
             
         	String datumFolderPath = DATUM_CHAIN_PATH;
             File datumFolder = new File(datumFolderPath);
-        	File datumCommitChain = new File(datumFolderPath.concat("datumCommitChain.json"));
-        	File datumCommitToken = new File(datumFolderPath.concat("dataToken.json"));
+        	File datumCommitChain = new File(datumFolderPath.concat("/datumCommitChain.json"));
+        	File datumCommitToken = new File(datumFolderPath.concat("/dataToken.json"));
+        	File datumCommitHistory = new File(datumFolderPath.concat("/datumCommitHistory.json"));
+
         	if(!datumFolder.exists()) {
         		datumFolder.mkdir();
         	}
@@ -112,6 +114,11 @@ public class Basics {
         	if(!datumCommitToken.exists()) {
         		datumCommitToken.createNewFile();
         		writeToFile(datumCommitToken.toString(), "[]", false);
+        	}
+        	if(!datumCommitHistory.exists()) {
+        		datumCommitHistory.createNewFile();
+        		writeToFile(datumCommitHistory.toString(), "[]", false);
+
         	}
 
             Background background = new Background();
