@@ -21,7 +21,6 @@ import java.lang.InterruptedException;
 import static RubixDID.DIDCreation.DIDimage.createDID;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
-import static com.rubix.Mining.HashChain.*;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.*;
 import static com.rubix.Mining.HashChain.*;
