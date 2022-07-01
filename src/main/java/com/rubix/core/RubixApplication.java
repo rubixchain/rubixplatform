@@ -1,6 +1,7 @@
 package com.rubix.core;
 
 import com.rubix.core.Controllers.Basics;
+import static com.rubix.core.Resources.Version.*;
 import org.json.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

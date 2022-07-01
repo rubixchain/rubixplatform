@@ -52,8 +52,8 @@ public class Transactions {
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        contentObject.put("response", transactionDetails(txnId));
-        contentObject.put("count", transactionDetails(txnId).length());
+        contentObject.put("response", transactionDetails);
+        contentObject.put("count", transactionDetails.length());
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
@@ -117,7 +117,7 @@ public class Transactions {
             start();
 
         String comment = requestModel.getComment();
-
+        
         JSONArray transactionsByComment = transactionsByComment(comment);
 
         if(transactionsByComment.length()==0) {
@@ -157,6 +157,7 @@ public class Transactions {
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
+
         JSONArray transactionsByCount = transactionsByCount(n);
         contentObject.put("response", transactionsByCount);
         contentObject.put("count", transactionsByCount.length());
