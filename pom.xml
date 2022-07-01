@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.rubix</groupId>
-	<artifactId>core</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>gecko</artifactId>
+	<version>1.0</version>
 	<name>Rubix</name>
 	<description>Rubix Project</description>
 
@@ -21,13 +21,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.did.core</groupId>
-			<artifactId>did</artifactId>
-			<version>Kappa-1</version>
+   			<artifactId>did</artifactId>
+    		<version>8.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.rubix.core</groupId>
-			<artifactId>rubix</artifactId>
-			<version>kappa-1.3</version>
+  			<artifactId>rubixDataJar</artifactId>
+  			<version>0.1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

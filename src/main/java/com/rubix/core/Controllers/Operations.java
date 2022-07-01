@@ -1,3 +1,4 @@
+
 package com.rubix.core.Controllers;
 
 import com.rubix.Resources.APIHandler;
@@ -29,7 +30,7 @@ import static com.rubix.Mining.HashChain.*;
 @RestController
 public class Operations {
 
-    @RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST,
+	@RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
     public static String initiateTransaction(@RequestBody RequestModel requestModel) throws Exception {
         if (!mainDir())
@@ -72,7 +73,7 @@ public class Operations {
         }
 
 
-        Double available = Functions.getBalance();
+        Double available = com.rubix.Resources.Functions.getBalance();
         if (tokenCount > available) {
             System.out.println("Amount greater than available");
             JSONObject resultObject = new JSONObject();
@@ -110,8 +111,7 @@ public class Operations {
 
     }
 
-    @RequestMapping(value = "/mine", method = RequestMethod.GET,
-            produces = {"application/json", "application/xml"})
+    @RequestMapping(value = "/mine", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
     public static String mine(int type) throws Exception {
         if (!mainDir())
             return checkRubixDir();
@@ -124,27 +124,27 @@ public class Operations {
 
     }
 
+    @RequestMapping(value = "/create", method = RequestMethod.POST, produces = { "application/json",
+    "application/xml" })
+public String Create(@RequestParam("image") MultipartFile imageFile, @RequestParam("data") String value)
+    throws Exception {
+setDir();
+File RubixFolder = new File(dirPath);
+if (RubixFolder.exists())
+    deleteFolder(RubixFolder);
+JSONObject didResult = createDID(imageFile.getInputStream());
+if (didResult.getString("Status").contains("Success"))
+    createWorkingDirectory();
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST,
-            produces = {"application/json", "application/xml"})
-    public String Create(@RequestParam("image") MultipartFile imageFile) throws IOException, JSONException, InterruptedException {
-        setDir();
-        File RubixFolder = new File(dirPath);
-        if (RubixFolder.exists())
-            deleteFolder(RubixFolder);
-        JSONObject didResult = createDID(imageFile.getInputStream());
-        if (didResult.getString("Status").contains("Success"))
-            createWorkingDirectory();
+JSONObject result = new JSONObject();
+JSONObject contentObject = new JSONObject();
+contentObject.put("response", didResult);
+result.put("data", contentObject);
+result.put("message", "");
+result.put("status", "true");
+return result.toString();
+}
 
-        start();
-        JSONObject result = new JSONObject();
-        JSONObject contentObject = new JSONObject();
-        contentObject.put("response", didResult);
-        result.put("data", contentObject);
-        result.put("message", "");
-        result.put("status", "true");
-        return result.toString();
-    }
 
     @RequestMapping(value = "/hashchain", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
@@ -166,15 +166,15 @@ public class Operations {
         int height = 256;
         String src = null;
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        //File f;
+        // File f;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int a = (int) (Math.random() * 256); //alpha
-                int r = (int) (Math.random() * 256); //red
-                int g = (int) (Math.random() * 256); //green
-                int b = (int) (Math.random() * 256); //blue
+                int a = (int) (Math.random() * 256); // alpha
+                int r = (int) (Math.random() * 256); // red
+                int g = (int) (Math.random() * 256); // green
+                int b = (int) (Math.random() * 256); // blue
 
-                int p = (a << 24) | (r << 16) | (g << 8) | b; //pixel
+                int p = (a << 24) | (r << 16) | (g << 8) | b; // pixel
                 img.setRGB(x, y, p);
             }
         }
@@ -196,4 +196,83 @@ public class Operations {
         result.put("status", "true");
         return result.toString();
     }
+
+    @RequestMapping(value = "/commitBlock", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public static String commitBlock(@RequestBody RequestModel requestModel) throws Exception {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            start();
+
+        String blockHash = requestModel.getBlockHash();
+        String comments = requestModel.getComment();
+        int type = requestModel.getType();
+
+        System.out.println("Opertaions - blockHash " + blockHash + " comments " + comments + " type " + type);
+
+        JSONObject objectSend = new JSONObject();
+        objectSend.put("blockHash", blockHash);
+        objectSend.put("type", type);
+        objectSend.put("comment", comments);
+
+        System.out.println("Opertaions - objectsend is " + objectSend.toString());
+
+        System.out.println("Opertaions - Starting to commit block");
+        System.out.println("Opertaions - ObjectSend " + objectSend.toString());
+        JSONObject commitBlockObject = APIHandler.commit(objectSend.toString());
+        System.out.println("Opertaions -block commit object is " + commitBlockObject.toString());
+        // System.out.println("Block commit status is "+
+        // commitBlockObject.getString("status").toLowerCase());
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", commitBlockObject);
+        System.out.println("Opertaions - commitBlockObject " + commitBlockObject.toString());
+        System.out.println("Opertaions - contentObject " + contentObject.toString());
+        result.put("data", contentObject);
+        //result.put("message", "");
+        result.put("status", "true");
+        System.out.println("result " + result.toString());
+
+        return result.toString();
+
+    }
+    
+    
+    @RequestMapping(value = "/verifyCommit", method = RequestMethod.POST, produces = { "application/json",
+    "application/xml" })
+    public static String verifyCommit(@RequestBody RequestModel requestModel) throws Exception {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            start();
+
+        String blockHash = requestModel.getBlockHash();
+        
+
+        System.out.println("Opertaions - blockHash " + blockHash);
+
+        JSONObject objectSend = new JSONObject();
+        objectSend.put("blockHash", blockHash);
+
+        System.out.println("Opertaions - objectsend is " + objectSend.toString());
+        JSONObject commitBlockObject = verifySpecificCommit(blockHash);
+        // System.out.println("Block commit status is "+
+        // commitBlockObject.getString("status").toLowerCase());
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", commitBlockObject);
+        System.out.println("Opertaions - commitBlockObject " + commitBlockObject.toString());
+        System.out.println("Opertaions - contentObject " + contentObject.toString());
+        result.put("data", contentObject);
+        //result.put("message", "");
+        result.put("status", "true");
+        System.out.println("result " + result.toString());
+
+        return result.toString();
+
+    }
+    
 }
