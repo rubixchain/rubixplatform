@@ -2,6 +2,7 @@ package com.rubix.core.Controllers;
 
 import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Ping.PingCheck;
+import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.core.NFTResources.NFTReceiver;
@@ -99,12 +100,25 @@ public class Basics {
 
             String STAKE_PATH = WALLET_DATA_PATH.concat("Stake/");
             File stakeFolder = new File(STAKE_PATH);
-            if (!stakeFolder.exists())
+            if (!stakeFolder.exists()) {
               stakeFolder.mkdir();
+            }
+            
+            /*
+             *  Background Thread is commented for Token file Missing Issue.
+            String DATAHASH_PATH = DATA_PATH.concat("DataHash");
+            File dataHashFolder = new File(DATAHASH_PATH);
+            if(!dataHashFolder.exists()) {
+            	  dataHashFolder.mkdir();
+            	  generateHashtableBG();
+            }
+            	
 
             Background background = new Background();
             Thread backThread = new Thread(background);
             backThread.start();
+            */
+            
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -182,7 +196,7 @@ public class Basics {
 
     @RequestMapping(value = "/sync", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String sync() throws IOException, JSONException {
+    public String sync() throws IOException, JSONException, InterruptedException {
         if (!mainDir())
             return checkRubixDir();
         if(!mutex)
@@ -197,7 +211,32 @@ public class Basics {
         result.put("status", "true");
         return result.toString();
     }
-
+    
+    /* An alternate solution has been implemented for generating Hash... So commented this
+    @RequestMapping(value = "/generateHashtable", method = RequestMethod.GET,
+            produces = {"application/json", "application/xml"})
+    public static String generateHashtable() throws IOException, JSONException {
+    	System.out.println("generateHashtable request received");
+    	System.out.println("mainDir "+mainDir()+" mutex is "+mutex);
+        JSONArray result = new JSONArray();
+        System.out.println("Received generateHashtable request");
+        try {
+			result.put(tokenHashTableGeneration());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        return result.toString();
+    }
+    
+    public static void generateHashtableBG() throws JSONException, IOException {
+    	String str = generateHashtable();
+    }
+    */
     @RequestMapping(value = "/bootstrap", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
     public String getBootstrap() throws IOException, JSONException {
 
@@ -273,7 +312,7 @@ public class Basics {
 
     @RequestMapping(value = "/p2pClose", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String p2pClose() throws JSONException, IOException {
+    public String p2pClose() throws JSONException, IOException, InterruptedException {
         if(!mutex)
             start();
         closeStreams();
@@ -310,7 +349,7 @@ public class Basics {
 
     @RequestMapping(value = "/validateReceiver", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
-    public String validateReceiver(@RequestParam("receiverDID") String receiverDID) throws IOException{
+    public String validateReceiver(@RequestParam("receiverDID") String receiverDID) throws IOException, JSONException, InterruptedException{
         System.out.println(receiverDID);
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();

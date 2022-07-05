@@ -1,6 +1,7 @@
 package com.rubix.core.Controllers;
 
 
+import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
 import io.ipfs.api.Peer;
 import org.json.JSONArray;
@@ -39,6 +40,11 @@ public class Wallet {
         accountObject.put("balance", getBalance());
         accountObject.put("credits", creditsInfo());
 
+        //changes are made
+        accountObject.put("staked token", APIHandler.stakedTokencount()); 
+        accountObject.put("Withdrawal balance", APIHandler.getAvailableBalance());
+
+        
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", accountObject);
@@ -266,5 +272,43 @@ public class Wallet {
         result.put("status", "true");
         return result.toString();
 
+    }
+    
+    @RequestMapping(value = { "/getStakedTokens" }, method = { RequestMethod.POST }, produces = { "application/json", "application/xml" })
+    public String getStakedTokens() throws Exception, IOException {
+
+    	if (!mainDir())
+            return checkRubixDir();
+        if (!mutex)
+            start();
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        JSONArray returnTokens = new JSONArray();
+        int counter = 0;
+        String stakedtokens = Functions.WALLET_DATA_PATH.concat("Stake/");
+        File stakedtokensfile = new File(stakedtokens);
+        File[] filesList = stakedtokensfile.listFiles();
+        if (stakedtokensfile.exists()) {
+            for ( File file : filesList) {
+                String sFile = file.getName();
+               
+                String k =  stakedtokens+sFile;
+                String contactsFile = Functions.readFile(k);
+                JSONObject js = new JSONObject(contactsFile);
+                JSONObject stakedata = js.getJSONObject("stakeData");
+                String staked_mineid = stakedata.getString("stakedToken");
+                 
+                 returnTokens.put(staked_mineid);               
+                 ++counter;
+                
+            }
+        }
+        contentObject.put("response", returnTokens);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true"); 
+       
+      return result.toString();   
     }
 }
