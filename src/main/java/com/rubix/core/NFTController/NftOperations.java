@@ -611,6 +611,11 @@ public class NftOperations {
                 System.out.println("private & public key not generated");
                 System.out.println("generating key files");
             }
+            else{
+                response.put("message", "Key Files generated and stored in Rubix/DATA folder");
+                response.put("status", "true");
+                return response.toString();
+            }
 
             if (returnKey == 0) {
                 EcDSAKeyGen.generateKeyPair(password);
