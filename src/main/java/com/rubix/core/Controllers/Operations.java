@@ -1,9 +1,10 @@
 
 package com.rubix.core.Controllers;
 
+import com.rubix.core.Resources.*;
 import com.rubix.Resources.APIHandler;
+import com.rubix.Resources.APIHandler.*;
 import com.rubix.Resources.Functions;
-import com.rubix.core.Resources.RequestModel;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,11 +16,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import java.lang.InterruptedException;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
-import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.*;
@@ -30,7 +31,7 @@ public class Operations {
 
 	@RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})
-    public static String initiateTransaction(@RequestBody RequestModel requestModel) throws Exception {
+	public static String initiateTransaction(@RequestBody RequestModel requestModel) throws Exception {
         if (!mainDir())
             return checkRubixDir();
         if (!Basics.mutex)
@@ -65,13 +66,12 @@ public class Operations {
             contentObject.put("response", resultObject);
             result.put("data", contentObject);
             result.put("message", "");
-            result.put("status", "true");
             return result.toString();
 
         }
 
 
-        Double available = com.rubix.Resources.Functions.getBalance();
+        Double available = Functions.getBalance();
         if (tokenCount > available) {
             System.out.println("Amount greater than available");
             JSONObject resultObject = new JSONObject();
@@ -85,7 +85,6 @@ public class Operations {
             contentObject.put("response", resultObject);
             result.put("data", contentObject);
             result.put("message", "");
-            result.put("status", "true");
             return result.toString();
         }
 
@@ -97,7 +96,8 @@ public class Operations {
         objectSend.put("amount", tokenCount);
 
         System.out.println("Starting Whole Amount Transfer...");
-        JSONObject wholeTransferResult = send(objectSend.toString());
+        JSONObject wholeTransferResult = com.rubix.Resources.APIHandler.send(objectSend.toString());
+        		//send(objectSend.toString());
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
@@ -194,31 +194,31 @@ return result.toString();
         String comments = requestModel.getComment();
         int type = requestModel.getType();
 
-        System.out.println("Opertaions - blockHash " + blockHash + " comments " + comments + " type " + type);
+        //System.out.println("Opertaions - blockHash " + blockHash + " comments " + comments + " type " + type);
 
         JSONObject objectSend = new JSONObject();
         objectSend.put("blockHash", blockHash);
         objectSend.put("type", type);
         objectSend.put("comment", comments);
 
-        System.out.println("Opertaions - objectsend is " + objectSend.toString());
+        //System.out.println("Opertaions - objectsend is " + objectSend.toString());
 
-        System.out.println("Opertaions - Starting to commit block");
-        System.out.println("Opertaions - ObjectSend " + objectSend.toString());
-        JSONObject commitBlockObject = send(objectSend.toString());
-        System.out.println("Opertaions -block commit object is " + commitBlockObject.toString());
+        //System.out.println("Opertaions - Starting to commit block");
+        //System.out.println("Opertaions - ObjectSend " + objectSend.toString());
+        JSONObject commitBlockObject = APIHandler.commit(objectSend.toString());
+        //System.out.println("Opertaions -block commit object is " + commitBlockObject.toString());
         // System.out.println("Block commit status is "+
         // commitBlockObject.getString("status").toLowerCase());
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", commitBlockObject);
-        System.out.println("Opertaions - commitBlockObject " + commitBlockObject.toString());
-        System.out.println("Opertaions - contentObject " + contentObject.toString());
+        //System.out.println("Opertaions - commitBlockObject " + commitBlockObject.toString());
+        //System.out.println("Opertaions - contentObject " + contentObject.toString());
         result.put("data", contentObject);
         //result.put("message", "");
         result.put("status", "true");
-        System.out.println("result " + result.toString());
+        //System.out.println("result " + result.toString());
 
         return result.toString();
 
@@ -258,6 +258,28 @@ return result.toString();
 
         return result.toString();
 
+    }
+    
+    @RequestMapping(value = "/ownerIdentity", method = RequestMethod.POST,
+            produces = {"application/json", "application/xml"})
+    public String ownerIdentity(@RequestParam("tokens") JSONArray tokensArray) throws IOException, JSONException, InterruptedException {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            start();
+
+        Functions.pathSet();
+        String didFile = readFile(DATA_PATH.concat("DID.json"));
+        JSONArray didArray = new JSONArray(didFile);
+        String did = didArray.getJSONObject(0).getString("didHash");
+        Functions.ownerIdentity(tokensArray, did);
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", "Successfully Updated");
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
     }
     
 }

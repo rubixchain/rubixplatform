@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.rubix</groupId>
-	<artifactId>gecko</artifactId>
-	<version>1.0</version>
-	<name>Rubix</name>
+	<artifactId>Datum</artifactId>
+	<version>Eismeer-V2.1.02</version>
+	<name>Datum</name>
 	<description>Rubix Project</description>
 
 	<properties>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.rubix.core</groupId>
   			<artifactId>rubixDataJar</artifactId>
-  			<version>0.1.5</version>
+  			<version>d0.3.01</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
