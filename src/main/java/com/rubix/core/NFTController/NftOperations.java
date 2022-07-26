@@ -610,6 +610,14 @@ public class NftOperations {
             if (!keyFileCheck) {
                 System.out.println("private & public key not generated");
                 System.out.println("generating key files");
+            } else {
+
+                response.put("data", "");
+                response.put("message", "Key files already present. Cannot create more than one key pair.");
+                response.put("status", "false");
+
+                return response.toString();
+
             }
 
             if (returnKey == 0) {
@@ -619,6 +627,9 @@ public class NftOperations {
                     response.put("message", "Key Files not generated");
                     response.put("status", "false");
                 } else {
+
+                    addPubKeyData_DIDserver();  // Updating the public key's ipfs hash to the DID server. Defined in rubixcore-NFTFunctions.
+                   
                     response.put("message", "Key Files generated and stored in Rubix/DATA folder");
                     response.put("status", "true");
                 }
@@ -629,6 +640,8 @@ public class NftOperations {
                 response.put("status", "true");
                 response.put("content", res);
             }
+
+            
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
