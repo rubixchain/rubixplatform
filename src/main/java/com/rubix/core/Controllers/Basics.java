@@ -16,10 +16,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.rubix.core.Resources.RequestModel;
 
 import static com.rubix.Constants.IPFSConstants.bootstrap;
 
 import java.io.*;
+import java.util.Scanner;
 
 import static com.rubix.Resources.APIHandler.*;
 import static com.rubix.Resources.Functions.*;
@@ -48,19 +50,7 @@ public class Basics {
             mutex = true;
             launch();
             pathSet();
-
-            QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT);
-            Thread alpha1Thread = new Thread(alpha1);
-            alpha1Thread.start();
-
-            QuorumConsensus beta1 = new QuorumConsensus("beta",QUORUM_PORT+1);
-            Thread beta1Thread = new Thread(beta1);
-            beta1Thread.start();
-
-            QuorumConsensus gamma1 = new QuorumConsensus("gamma",QUORUM_PORT+2);
-            Thread gamma1Thread = new Thread(gamma1);
-            gamma1Thread.start();
-
+            
             Receiver receiver = new Receiver();
             Thread receiverThread = new Thread(receiver);
             receiverThread.start();
@@ -68,10 +58,6 @@ public class Basics {
             ReceiverPingReceive receiverPingReceive = new ReceiverPingReceive();
             Thread receiverPingThread = new Thread(receiverPingReceive);
             receiverPingThread.start();
-
-            QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
-            Thread quorumPingThread = new Thread(quorumPingReceiveThread);
-            quorumPingThread.start();
 
             NFTReceiver nftReceiver = new NFTReceiver();
             Thread nftReceiverThread= new Thread(nftReceiver);
@@ -132,6 +118,55 @@ public class Basics {
             return checkRubixDir();
         }
     }
+
+
+    @RequestMapping(value = "/startQuorumService", method = RequestMethod.POST,
+    produces = {"application/json", "application/xml"})
+    public static String startQuorumService(@RequestBody RequestModel requestModel) throws IOException, JSONException, InterruptedException {
+        if (!mainDir())
+            return checkRubixDir();
+        if(!mutex)
+            start();
+
+        
+/*         System.out.println("Please enter your Quorum private key password to complete Quorum setup:");
+        Scanner scanner = new Scanner(System.in);
+        String quorumKeyPass = scanner.nextLine(); */
+
+        String quorumKeyPass = requestModel.getPvtKeyPass();
+
+        if(quorumKeyPass == requestModel.getPvtKeyPass()){
+            System.out.println("Password captured");
+        }        
+
+        QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT, quorumKeyPass);
+        Thread alpha1Thread = new Thread(alpha1);
+        alpha1Thread.start();
+
+        QuorumConsensus beta1 = new QuorumConsensus("beta",QUORUM_PORT+1, quorumKeyPass);
+        Thread beta1Thread = new Thread(beta1);
+        beta1Thread.start();
+
+        QuorumConsensus gamma1 = new QuorumConsensus("gamma",QUORUM_PORT+2, quorumKeyPass);
+        Thread gamma1Thread = new Thread(gamma1);
+        gamma1Thread.start();
+    
+
+        QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
+        Thread quorumPingThread = new Thread(quorumPingReceiveThread);
+        quorumPingThread.start();
+
+        
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", "Quorum service started");
+        result.put("data",contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+}
+
+
 
     @RequestMapping(value = "/check", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})

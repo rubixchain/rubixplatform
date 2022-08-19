@@ -46,12 +46,12 @@ public class Operations {
 
         //If user forgets to input the private key password in the curl request.
         if(pvtKeyPass==null){
-            System.out.println("Please include your private key password in the data part of the curl request.");
+            System.out.println("Please include your private key password in the transaction request");
             JSONObject resultObject = new JSONObject();
             resultObject.put("did", "");
             resultObject.put("tid", "null");
             resultObject.put("status", "Failed");
-            resultObject.put("message", "Your private Key password must be provided. If you haven't generated keys, use /generateRsaKeys and then proceed to perform token transfer");
+            resultObject.put("message", "Your private Key password must be provided. If you haven't generated keys, use /generateEcDSAKeys and then proceed to perform token transfer");
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
             contentObject.put("response", resultObject);
@@ -127,6 +127,9 @@ public class Operations {
         return result.toString();
 
     }
+
+
+    
 
     @RequestMapping(value = "/mine", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
