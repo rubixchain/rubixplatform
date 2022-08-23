@@ -42,6 +42,24 @@ public class Operations {
         double tokenCount = requestModel.getTokenCount();
         String comments = requestModel.getComment();
         int type = requestModel.getType();
+        String pvtKeyPass = requestModel.getPvtKeyPass();
+
+        //If user forgets to input the private key password in the curl request.
+        if(pvtKeyPass==null){
+            System.out.println("Please include your private key password in the transaction request");
+            JSONObject resultObject = new JSONObject();
+            resultObject.put("did", "");
+            resultObject.put("tid", "null");
+            resultObject.put("status", "Failed");
+            resultObject.put("message", "Your private Key password must be provided. If you haven't generated keys, use /generateEcDSAKeys and then proceed to perform token transfer");
+            JSONObject result = new JSONObject();
+            JSONObject contentObject = new JSONObject();
+            contentObject.put("response", resultObject);
+            result.put("data", contentObject);
+            result.put("message", "");
+            result.put("status", "true");
+            return result.toString();
+        }
 
 
         int intPart = (int) tokenCount;
@@ -95,6 +113,7 @@ public class Operations {
         objectSend.put("type", type);
         objectSend.put("comment", comments);
         objectSend.put("amount", tokenCount);
+        objectSend.put("pvtKeyPass", pvtKeyPass);
 
         System.out.println("Starting Whole Amount Transfer...");
         JSONObject wholeTransferResult = send(objectSend.toString());
@@ -108,6 +127,9 @@ public class Operations {
         return result.toString();
 
     }
+
+
+    
 
     @RequestMapping(value = "/mine", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})

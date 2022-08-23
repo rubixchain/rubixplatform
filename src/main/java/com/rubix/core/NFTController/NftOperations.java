@@ -610,6 +610,14 @@ public class NftOperations {
             if (!keyFileCheck) {
                 System.out.println("private & public key not generated");
                 System.out.println("generating key files");
+            } else {
+
+                response.put("data", "");
+                response.put("message", "Key files already present. Cannot create more than one key pair.");
+                response.put("status", "false");
+
+                return response.toString();
+
             }
             else{
                 response.put("message", "Key Files generated and stored in Rubix/DATA folder");
@@ -624,6 +632,9 @@ public class NftOperations {
                     response.put("message", "Key Files not generated");
                     response.put("status", "false");
                 } else {
+
+                    addPubKeyData_DIDserver();  // Updating the public key's ipfs hash to the DID server. Defined in rubixcore-NFTFunctions.
+                   
                     response.put("message", "Key Files generated and stored in Rubix/DATA folder");
                     response.put("status", "true");
                 }
@@ -634,6 +645,8 @@ public class NftOperations {
                 response.put("status", "true");
                 response.put("content", res);
             }
+
+            
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -643,5 +656,74 @@ public class NftOperations {
         }
         return response.toString();
     }
+
+
+    @RequestMapping(value = "/generateQuorumKeys", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public static String generateQuorumKeys(@RequestBody NftRequestModel nftRequestModel) {
+
+        JSONObject response = new JSONObject();
+        if (nftRequestModel.getPvtKeyPass().isBlank()) {
+            response.put("data", "");
+            response.put("message", "Quorum Private Key password cannot be Empty");
+            response.put("status", "false");
+
+            return response.toString();
+        }
+
+        String password = nftRequestModel.getPvtKeyPass();
+        int returnKey = nftRequestModel.getReturnKey();
+
+        try {
+            if (!mainDir()) {
+                return checkDirectory();
+            }
+
+            boolean keyFileCheck = checkKeyFiles_Quorum();
+            if (!keyFileCheck) {
+                System.out.println("Quorum private & public key not generated");
+                System.out.println("Generating key files");
+            } else {
+
+                response.put("data", "");
+                response.put("message", "Key files already present. Cannot create more than one key pair.");
+                response.put("status", "false");
+
+                return response.toString();
+
+            }
+
+            if (returnKey == 0) {
+                EcDSAKeyGen.generateKeyPair_Quorum(password);
+                keyFileCheck = checkKeyFiles_Quorum();
+                if (!keyFileCheck) {
+                    response.put("message", "Key Files not generated");
+                    response.put("status", "false");
+                } else {
+
+                    addPubKeyData_DIDserver();  // Updating the public key's ipfs hash to the DID server. Defined in rubixcore-NFTFunctions.
+                   
+                    response.put("message", "Quorum Key Files generated and stored in Rubix/DATA folder");
+                    response.put("status", "true");
+                }
+            }
+            /* if (returnKey == 1) {
+                String res = EcDSAKeyGen.genAndRetKey(password);
+                response.put("message", "Key Files Generated");
+                response.put("status", "true");
+                response.put("content", res);
+            } */
+
+            
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return response.toString();
+    }
+
 
 }
