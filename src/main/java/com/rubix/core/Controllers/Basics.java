@@ -5,6 +5,7 @@ import com.rubix.Ping.PingCheck;
 import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
+import com.rubix.core.NFTResources.NFTReceiver;
 import com.rubix.core.Resources.Background;
 import com.rubix.core.Resources.QuorumPingReceiveThread;
 import com.rubix.core.Resources.Receiver;
@@ -71,6 +72,10 @@ public class Basics {
             QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
             Thread quorumPingThread = new Thread(quorumPingReceiveThread);
             quorumPingThread.start();
+
+            NFTReceiver nftReceiver = new NFTReceiver();
+            Thread nftReceiverThread= new Thread(nftReceiver);
+            nftReceiverThread.start();
 
             tokenBank();
 
