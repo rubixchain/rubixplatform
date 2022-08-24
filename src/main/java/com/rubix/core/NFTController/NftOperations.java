@@ -610,7 +610,10 @@ public class NftOperations {
                 return response.toString();
 
             }
+<<<<<<< HEAD
       
+=======
+>>>>>>> 0ace204 (Fixed extra else block bug in ECDSAKey Gen.)
 
             if (returnKey == 0) {
                 EcDSAKeyGen.generateKeyPair(password);
