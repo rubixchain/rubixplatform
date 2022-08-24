@@ -619,11 +619,6 @@ public class NftOperations {
                 return response.toString();
 
             }
-            else{
-                response.put("message", "Key Files generated and stored in Rubix/DATA folder");
-                response.put("status", "true");
-                return response.toString();
-            }
 
             if (returnKey == 0) {
                 EcDSAKeyGen.generateKeyPair(password);
