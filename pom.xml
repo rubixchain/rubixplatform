@@ -9,8 +9,8 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.rubix</groupId>
-  <artifactId>Mu</artifactId>
-  <version>7.8</version>
+  <artifactId>Eismeer-Nft</artifactId>
+  <version>0.4</version>
   <name>Rubix</name>
   <description>Rubix Project</description>
 
@@ -45,12 +45,12 @@
         <dependency>
       <groupId>com.did.core</groupId>
       <artifactId>did</artifactId>
-      <version>12</version>
+      <version>10</version>
     </dependency>
       <dependency>
       <groupId>com.rubix.core</groupId>
-      <artifactId>rubixCoreTokenAuth</artifactId>
-      <version>7.8</version>
+      <artifactId>rubix</artifactId>
+      <version>10</version>
     </dependency>
   </dependencies>
 
