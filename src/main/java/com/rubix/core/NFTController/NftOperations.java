@@ -1,21 +1,15 @@
 package com.rubix.core.NFTController;
 
-import static com.rubix.KeyPairGen.RsaKeyGen.*;
-
-import static com.rubix.core.Controllers.Basics.checkRubixDir;
+import static com.rubix.core.Controllers.Basics.*;
 
 import static com.rubix.core.Controllers.Basics.start;
 
-import static com.rubix.core.Resources.CallerFunctions.mainDir;
+import static com.rubix.core.Resources.CallerFunctions.*;
 
 import static com.rubix.NFTResources.NFTAPIHandler.*;
 import static com.rubix.NFTResources.EnableNft.*;
 import static com.rubix.NFTResources.NFTFunctions.*;
-import static com.rubix.Resources.IPFSNetwork.*;
-
-import java.io.File;
 import java.io.IOException;
-import java.security.PublicKey;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,18 +18,15 @@ import static com.rubix.Resources.Functions.*;
 import static com.rubix.Resources.IntegrityCheck.*;
 
 import com.rubix.KeyPairGen.EcDSAKeyGen;
-import com.rubix.NFTResources.NFTAPIHandler;
 import com.rubix.core.Controllers.Basics;
-import com.rubix.core.NFTResources.NftRequestModel;
+import com.rubix.core.Resources.CallerFunctions;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "http://localhost:1898")
@@ -421,7 +412,7 @@ public class NftOperations {
         try {
             if (!mainDir())
                 return checkRubixDir();
-            if (!mutex)
+            if (!Basics.mutex)
                 start();
         } catch (IOException e) {
             // TODO: handle exception
@@ -470,7 +461,7 @@ public class NftOperations {
         try {
             if (!mainDir())
                 return checkRubixDir();
-            if (!mutex)
+            if (!Basics.mutex)
                 start();
         } catch (IOException e) {
             // TODO: handle exception
@@ -619,11 +610,7 @@ public class NftOperations {
                 return response.toString();
 
             }
-            else{
-                response.put("message", "Key Files generated and stored in Rubix/DATA folder");
-                response.put("status", "true");
-                return response.toString();
-            }
+      
 
             if (returnKey == 0) {
                 EcDSAKeyGen.generateKeyPair(password);
@@ -675,7 +662,8 @@ public class NftOperations {
         int returnKey = nftRequestModel.getReturnKey();
 
         try {
-            if (!mainDir()) {
+        //	com.rubix.core.Resources.CallerFunctions.mainDir();
+            if (!CallerFunctions.mainDir()) {
                 return checkDirectory();
             }
 

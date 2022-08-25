@@ -1,6 +1,5 @@
 package com.rubix.core.Resources;
 
-import com.rubix.core.Controllers.Basics;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -8,10 +7,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.core.Controllers.Basics.checkRubixDir;
 import static com.rubix.core.Controllers.Basics.location;

@@ -31,11 +31,10 @@ public class RubixApplication {
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args);
 		getVersion();
-		System.out.println("minig pledge test of version : "+jarVersion);
+		System.out.println("Release Version : "+jarVersion);
 		System.out.println("Build Version: " + buildVersion());
 		System.out.println("Jar started on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " UTC");
 		Basics.start();
-
 	}
 
 	//Adding CORS - All Origins
