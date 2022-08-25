@@ -10,7 +10,7 @@
   </parent>
   <groupId>com.rubix</groupId>
   <artifactId>Eismeer-Nft</artifactId>
-  <version>0.4</version>
+  <version>0.7</version>
   <name>Rubix</name>
   <description>Rubix Project</description>
 
@@ -50,7 +50,7 @@
       <dependency>
       <groupId>com.rubix.core</groupId>
       <artifactId>rubix</artifactId>
-      <version>10</version>
+      <version>12</version>
     </dependency>
   </dependencies>
 
