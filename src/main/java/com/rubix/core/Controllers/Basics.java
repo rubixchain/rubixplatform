@@ -11,6 +11,8 @@ import com.rubix.core.Resources.QuorumPingReceiveThread;
 import com.rubix.core.Resources.Receiver;
 import com.rubix.core.Resources.ReceiverPingReceive;
 import io.ipfs.api.IPFS;
+
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +23,7 @@ import com.rubix.core.Resources.RequestModel;
 import static com.rubix.Constants.IPFSConstants.bootstrap;
 
 import java.io.*;
+
 import java.util.Scanner;
 
 import static com.rubix.Resources.APIHandler.*;
@@ -35,6 +38,7 @@ public class Basics {
     public static String location = "";
     public static boolean mutex = false;
     public static boolean quorumStatus = false;
+    public static Logger BasicsLogger = Logger.getLogger(Basics.class);
 
     @RequestMapping(value = "/start", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
@@ -140,7 +144,7 @@ public class Basics {
                 boolean checkFlag  = checkForQuorumKeyPassword(quorumKeyPass);
         
                 if(checkFlag==false){
-                    System.out.println("\n Incorrect password for quorum private key. Please use the correct password and re-run the service.\n");
+                    BasicsLogger.debug("\n Response code : 400. Incorrect password for quorum private key. Please use the correct password and re-run the service.\n");
                     JSONObject resultObject = new JSONObject();
                     //resultObject.put("did", "");
                     //resultObject.put("tid", "null");
@@ -151,8 +155,9 @@ public class Basics {
                     JSONObject contentObject = new JSONObject();
                     contentObject.put("response", resultObject);
                     result.put("data", contentObject);
-                    result.put("message", "");
-                    result.put("status", "true");
+                    //result.put("message", "");
+                    //result.put("status", "true");
+                    result.put("response code",400);
                     return result.toString();
                 }
         
@@ -178,26 +183,28 @@ public class Basics {
                 
                 JSONObject result = new JSONObject();
                 JSONObject contentObject = new JSONObject();
-                contentObject.put("response", "Response code : 200. Quorum service successfully started.");
+                contentObject.put("response", "Quorum service successfully started.");
                 result.put("data",contentObject);
-                //result.put("message", "");
+                result.put("message", "");
                 result.put("status", "true");
+                result.put("response code",200);
                 return result.toString();
             }else {
 
-                System.out.println("\nResponse code : 201. Quorum Service is already running. In case you want to re-initiate, re-initiate Rubix jar and run the service again.\n");
+                    BasicsLogger.debug("\nResponse code : 409. Quorum Service is already running. In case you want to re-initiate, re-initiate Rubix jar and run the service again.\n");
                     JSONObject resultObject = new JSONObject();
                     //resultObject.put("did", "");
                     //resultObject.put("tid", "null");
                     resultObject.put("status", "Failed");
-                    resultObject.put("message", "Response code : 201. Quorum Service is already running. In case you want to re-initiate, re-initiate Rubix jar and run the service again.");
+                    resultObject.put("message", "Quorum Service is already running. In case you want to re-initiate, re-initiate Rubix jar and run the service again.");
                     
                     JSONObject result = new JSONObject();
                     JSONObject contentObject = new JSONObject();
                     contentObject.put("response", resultObject);
                     result.put("data", contentObject);
-                    result.put("message", "");
-                    result.put("status", "true");
+                    //result.put("message", "");
+                    //result.put("status", "false");
+                    result.put("response code",409);
                     return result.toString();
 
             }
