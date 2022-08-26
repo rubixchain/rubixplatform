@@ -254,7 +254,7 @@ if (!mainDir())
     return checkRubixDir();
 if (!Basics.mutex)
     start();
-
+System.out.println(requestModel.toString());
 String blockHash = requestModel.getBlockHash();
 String comments = requestModel.getComment();
 int type = requestModel.getType();
@@ -283,6 +283,8 @@ JSONObject objectSend = new JSONObject();
 objectSend.put("blockHash", blockHash);
 objectSend.put("type", type);
 objectSend.put("comment", comments);
+objectSend.put("pvtKeyPass", pvtKeyPass);
+
 
 //System.out.println("Opertaions - objectsend is " + objectSend.toString());
 
