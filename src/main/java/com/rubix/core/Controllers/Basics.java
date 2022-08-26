@@ -136,25 +136,6 @@ public class Basics {
         
                 String quorumKeyPass = requestModel.getPvtKeyPass();
         
-                //check for no pvt key password entered.
-             /*     if(quorumKeyPass == null){
-                    System.out.println("No password entered for quorum private key. Please enter the password and re-run the service");
-                    JSONObject resultObject = new JSONObject();
-                    resultObject.put("did", "");
-                    resultObject.put("tid", "null");
-                    resultObject.put("status", "Failed");
-                    resultObject.put("message", "No password entered for quorum private key. Please enter password and re-run the service.");
-                    
-                    JSONObject result = new JSONObject();
-                    JSONObject contentObject = new JSONObject();
-                    contentObject.put("response", resultObject);
-                    result.put("data", contentObject);
-                    result.put("message", "");
-                    result.put("status", "true");
-                    return result.toString();
-                }     */    
-        
-
                 //check for wrong pvt key password entered
                 boolean checkFlag  = checkForQuorumKeyPassword(quorumKeyPass);
         
