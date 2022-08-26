@@ -27,12 +27,14 @@ import static com.rubix.Resources.APIHandler.*;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.Resources.IPFSNetwork.executeIPFSCommandsResponse;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
+import static com.rubix.NFTResources.NFTFunctions.*;
 
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Basics {
     public static String location = "";
     public static boolean mutex = false;
+    public static boolean quorumMutex = false;
 
     @RequestMapping(value = "/start", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
@@ -123,49 +125,104 @@ public class Basics {
     @RequestMapping(value = "/startQuorumService", method = RequestMethod.POST,
     produces = {"application/json", "application/xml"})
     public static String startQuorumService(@RequestBody RequestModel requestModel) throws IOException, JSONException, InterruptedException {
-        if (!mainDir())
-            return checkRubixDir();
-        if(!mutex)
-            start();
-
-        
-/*         System.out.println("Please enter your Quorum private key password to complete Quorum setup:");
-        Scanner scanner = new Scanner(System.in);
-        String quorumKeyPass = scanner.nextLine(); */
-
-        String quorumKeyPass = requestModel.getPvtKeyPass();
-
-        if(quorumKeyPass == requestModel.getPvtKeyPass()){
-            System.out.println("Password captured");
-        }        
-
-        QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT, quorumKeyPass);
-        Thread alpha1Thread = new Thread(alpha1);
-        alpha1Thread.start();
-
-        QuorumConsensus beta1 = new QuorumConsensus("beta",QUORUM_PORT+1, quorumKeyPass);
-        Thread beta1Thread = new Thread(beta1);
-        beta1Thread.start();
-
-        QuorumConsensus gamma1 = new QuorumConsensus("gamma",QUORUM_PORT+2, quorumKeyPass);
-        Thread gamma1Thread = new Thread(gamma1);
-        gamma1Thread.start();
+            
+            if (!mainDir())
+                return checkRubixDir();
+            if(!mutex)
+                start();
     
-
-        QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
-        Thread quorumPingThread = new Thread(quorumPingReceiveThread);
-        quorumPingThread.start();
+            if(quorumMutex==false){
 
         
-        JSONObject result = new JSONObject();
-        JSONObject contentObject = new JSONObject();
-        contentObject.put("response", "Quorum service started");
-        result.put("data",contentObject);
-        result.put("message", "");
-        result.put("status", "true");
-        return result.toString();
-}
+                String quorumKeyPass = requestModel.getPvtKeyPass();
+        
+                //check for no pvt key password entered.
+             /*     if(quorumKeyPass == null){
+                    System.out.println("No password entered for quorum private key. Please enter the password and re-run the service");
+                    JSONObject resultObject = new JSONObject();
+                    resultObject.put("did", "");
+                    resultObject.put("tid", "null");
+                    resultObject.put("status", "Failed");
+                    resultObject.put("message", "No password entered for quorum private key. Please enter password and re-run the service.");
+                    
+                    JSONObject result = new JSONObject();
+                    JSONObject contentObject = new JSONObject();
+                    contentObject.put("response", resultObject);
+                    result.put("data", contentObject);
+                    result.put("message", "");
+                    result.put("status", "true");
+                    return result.toString();
+                }     */    
+        
 
+                //check for wrong pvt key password entered
+                boolean checkFlag  = checkForQuorumKeyPassword(quorumKeyPass);
+        
+                if(checkFlag==false){
+                    System.out.println("\n Incorrect password for quorum private key. Please use the correct password and re-run the service.\n");
+                    JSONObject resultObject = new JSONObject();
+                    //resultObject.put("did", "");
+                    //resultObject.put("tid", "null");
+                    resultObject.put("status", "Failed");
+                    resultObject.put("message", "Incorrect password for quorum private key. Please use the correct password and re-run the service.");
+                    
+                    JSONObject result = new JSONObject();
+                    JSONObject contentObject = new JSONObject();
+                    contentObject.put("response", resultObject);
+                    result.put("data", contentObject);
+                    result.put("message", "");
+                    result.put("status", "true");
+                    return result.toString();
+                }
+        
+                
+                QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT, quorumKeyPass);
+                Thread alpha1Thread = new Thread(alpha1);
+                alpha1Thread.start();
+        
+                QuorumConsensus beta1 = new QuorumConsensus("beta",QUORUM_PORT+1, quorumKeyPass);
+                Thread beta1Thread = new Thread(beta1);
+                beta1Thread.start();
+        
+                QuorumConsensus gamma1 = new QuorumConsensus("gamma",QUORUM_PORT+2, quorumKeyPass);
+                Thread gamma1Thread = new Thread(gamma1);
+                gamma1Thread.start();
+            
+        
+                QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
+                Thread quorumPingThread = new Thread(quorumPingReceiveThread);
+                quorumPingThread.start();
+        
+                quorumMutex = true;
+                
+                JSONObject result = new JSONObject();
+                JSONObject contentObject = new JSONObject();
+                contentObject.put("response", "Response code : 200. Quorum service successfully started.");
+                result.put("data",contentObject);
+                //result.put("message", "");
+                result.put("status", "true");
+                return result.toString();
+            }else {
+
+                System.out.println("\nResponse code : 201. Quorum Service is already running. In case you want to re-initiate, re-initiate Rubix jar and run the service again.\n");
+                    JSONObject resultObject = new JSONObject();
+                    //resultObject.put("did", "");
+                    //resultObject.put("tid", "null");
+                    resultObject.put("status", "Failed");
+                    resultObject.put("message", "Response code : 201. Quorum Service is already running. In case you want to re-initiate, re-initiate Rubix jar and run the service again.");
+                    
+                    JSONObject result = new JSONObject();
+                    JSONObject contentObject = new JSONObject();
+                    contentObject.put("response", resultObject);
+                    result.put("data", contentObject);
+                    result.put("message", "");
+                    result.put("status", "true");
+                    return result.toString();
+
+            }
+    
+    }
+    
 
 
     @RequestMapping(value = "/check", method = RequestMethod.GET,
