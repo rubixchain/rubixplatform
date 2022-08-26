@@ -34,7 +34,7 @@ import static com.rubix.NFTResources.NFTFunctions.*;
 public class Basics {
     public static String location = "";
     public static boolean mutex = false;
-    public static boolean quorumMutex = false;
+    public static boolean quorumStatus = false;
 
     @RequestMapping(value = "/start", method = RequestMethod.GET,
             produces = {"application/json", "application/xml"})
@@ -131,7 +131,7 @@ public class Basics {
             if(!mutex)
                 start();
     
-            if(quorumMutex==false){
+            if(quorumStatus==false){
 
         
                 String quorumKeyPass = requestModel.getPvtKeyPass();
@@ -174,7 +174,7 @@ public class Basics {
                 Thread quorumPingThread = new Thread(quorumPingReceiveThread);
                 quorumPingThread.start();
         
-                quorumMutex = true;
+                quorumStatus = true;
                 
                 JSONObject result = new JSONObject();
                 JSONObject contentObject = new JSONObject();
