@@ -92,6 +92,30 @@ public class Basics {
               stakeFolder.mkdir();
             }
             
+            String datumFolderPath = DATUM_CHAIN_PATH;
+            File datumFolder = new File(datumFolderPath);
+        	File datumCommitChain = new File(datumFolderPath.concat("/datumCommitChain.json"));
+        	File datumCommitToken = new File(datumFolderPath.concat("/dataToken.json"));
+        	File datumCommitHistory = new File(datumFolderPath.concat("/datumCommitHistory.json"));
+
+        	if(!datumFolder.exists()) {
+        		datumFolder.mkdir();
+        	}
+        	if(!datumCommitChain.exists()) {
+        		datumCommitChain.createNewFile();
+        		writeToFile(datumCommitChain.toString(), "[]", false);
+        	}
+        	if(!datumCommitToken.exists()) {
+        		datumCommitToken.createNewFile();
+        		writeToFile(datumCommitToken.toString(), "[]", false);
+        	}
+        	if(!datumCommitHistory.exists()) {
+        		datumCommitHistory.createNewFile();
+        		writeToFile(datumCommitHistory.toString(), "[]", false);
+
+        	}
+
+            
             /*
              *  Background Thread is commented for Token file Missing Issue.
             String DATAHASH_PATH = DATA_PATH.concat("DataHash");
