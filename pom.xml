@@ -44,13 +44,13 @@
 
         <dependency>
       <groupId>com.did.core</groupId>
-      <artifactId>did</artifactId>
-      <version>12</version>
+      <artifactId>didColdWallet</artifactId>
+          <version>13</version>
     </dependency>
       <dependency>
       <groupId>com.rubix.core</groupId>
-      <artifactId>rubixCoreTokenAuth</artifactId>
-      <version>7.8</version>
+      <artifactId>rubixColdWallet</artifactId>
+      <version>13</version>
     </dependency>
   </dependencies>
 
