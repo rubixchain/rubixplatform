@@ -19,6 +19,7 @@ import org.json.JSONException;
 import java.lang.InterruptedException;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
+import static RubixDID.DIDCreation.DIDimage.*;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.Mining.HashChain.*;
@@ -244,6 +245,35 @@ public class Operations {
             result.put("message", "Cold wallet Signature process Success");
             result.put("status", "true");
         }
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/createHotWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String Create_Hot_Wallet(@RequestParam("image") MultipartFile DID,@RequestParam("image") MultipartFile PublicShare)
+            throws IOException, JSONException, InterruptedException {
+        setDir();
+        File RubixFolder = new File(dirPath);
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+
+        if (RubixFolder.exists()) {
+            contentObject.put("response", "Rubix Wallet already exists!");
+        } else {
+            // deleteFolder(RubixFolder);
+            JSONObject didResult = setupDID(DID.getInputStream(), PublicShare.getInputStream());
+            if (didResult.getString("Status").contains("Success"))
+                createWorkingDirectory();
+
+            start();
+
+            contentObject.put("response", didResult);
+        }
+        APIHandler.networkInfo();
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
         return result.toString();
     }
 
