@@ -18,7 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.lang.InterruptedException;
 
-import static RubixDID.DIDCreation.DIDimage.createDID;
+
 import static RubixDID.DIDCreation.DIDimage.*;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
@@ -250,7 +250,7 @@ public class Operations {
 
     @RequestMapping(value = "/createHotWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String Create_Hot_Wallet(@RequestParam("image") MultipartFile DID,@RequestParam("image") MultipartFile PublicShare)
+    public String Create_Hot_Wallet(@RequestParam("did") MultipartFile DID,@RequestParam("publicshare") MultipartFile PublicShare)
             throws IOException, JSONException, InterruptedException {
         setDir();
         File RubixFolder = new File(dirPath);
