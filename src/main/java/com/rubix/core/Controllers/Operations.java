@@ -18,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.lang.InterruptedException;
 
-
 import static RubixDID.DIDCreation.DIDimage.*;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
@@ -250,7 +249,8 @@ public class Operations {
 
     @RequestMapping(value = "/createHotWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String Create_Hot_Wallet(@RequestParam("did") MultipartFile DID,@RequestParam("publicshare") MultipartFile PublicShare)
+    public String Create_Hot_Wallet(@RequestParam("did") MultipartFile DID,
+            @RequestParam("publicshare") MultipartFile PublicShare, @RequestParam("walletType") int type)
             throws IOException, JSONException, InterruptedException {
         setDir();
         File RubixFolder = new File(dirPath);
@@ -258,11 +258,23 @@ public class Operations {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
 
+        String walletType = "";
+        if (type == 1) {
+            walletType = "STANDARD";
+        } else if (type == 2) {
+            walletType = "HOTWALLET";
+        } else {
+            result.put("data", "");
+            result.put("message", "Wrong wallet type");
+            result.put("status", "false");
+            return result.toString();
+        }
+
         if (RubixFolder.exists()) {
             contentObject.put("response", "Rubix Wallet already exists!");
         } else {
-            // deleteFolder(RubixFolder);
-            JSONObject didResult = setupDID(DID.getInputStream(), PublicShare.getInputStream());
+            deleteFolder(RubixFolder);
+            JSONObject didResult = setupDID(DID.getInputStream(), PublicShare.getInputStream(),walletType);
             if (didResult.getString("Status").contains("Success"))
                 createWorkingDirectory();
 
