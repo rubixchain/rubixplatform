@@ -1,11 +1,9 @@
 package com.rubix.core.Controllers;
 
 import com.rubix.Consensus.QuorumConsensus;
-import com.rubix.Ping.PingCheck;
-import com.rubix.Resources.APIHandler;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
-import com.rubix.core.Resources.Background;
+import com.rubix.TokenTransfer.TransferPledge.Pledger;
 import com.rubix.core.Resources.QuorumPingReceiveThread;
 import com.rubix.core.Resources.Receiver;
 import com.rubix.core.Resources.ReceiverPingReceive;
@@ -14,7 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
 
 import static com.rubix.Constants.IPFSConstants.bootstrap;
 
@@ -71,6 +69,10 @@ public class Basics {
             QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
             Thread quorumPingThread = new Thread(quorumPingReceiveThread);
             quorumPingThread.start();
+
+            Pledger pledger = new Pledger();
+            Thread pledgerThread = new Thread(pledger);
+            pledgerThread.start();
 
             tokenBank();
 
