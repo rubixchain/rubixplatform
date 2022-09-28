@@ -273,8 +273,8 @@ public class Operations {
         if (RubixFolder.exists()) {
             contentObject.put("response", "Rubix Wallet already exists!");
         } else {
-            deleteFolder(RubixFolder);
-            JSONObject didResult = setupDID(DID.getInputStream(), PublicShare.getInputStream(),walletType);
+            // deleteFolder(RubixFolder);
+            JSONObject didResult = setupDID(DID.getInputStream(), PublicShare.getInputStream(), walletType);
             if (didResult.getString("Status").contains("Success"))
                 createWorkingDirectory();
 
@@ -285,6 +285,46 @@ public class Operations {
         APIHandler.networkInfo();
         result.put("data", contentObject);
         result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/enableHotWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String enableHotWallet(@RequestParam("walletType") int type) {
+        JSONObject result = new JSONObject();
+        String walletType = "";
+        if (type == 1) {
+            walletType = "STANDARD";
+        } else if (type == 2) {
+            walletType = "HOTWALLET";
+        } else {
+            result.put("data", "");
+            result.put("message", "Wrong wallet type");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        boolean enableWalletCheck = setWalletType(walletType);
+        if (!enableWalletCheck) {
+            result.put("data", "");
+            result.put("message", "Hot Wallet not enabled");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        // export share function here
+        boolean exportSharesCheck =exportShares();
+
+        if (!exportSharesCheck) {
+            result.put("data", "");
+            result.put("message", "Shares not exported");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        result.put("data", "");
+        result.put("message", "Hot Wallet enabled and shares exported");
         result.put("status", "true");
         return result.toString();
     }
