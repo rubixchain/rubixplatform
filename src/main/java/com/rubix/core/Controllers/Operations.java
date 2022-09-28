@@ -326,12 +326,12 @@ public class Operations {
          */
 
         result.put("data", "");
-        result.put("message", "Hot Wallet enabled and shares exported");
+        result.put("message", "Hot Wallet enabled");
         result.put("status", "true");
         return result.toString();
     }
 
-    @RequestMapping(value = "/enableHotWallet", method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value = "/exportShares", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public String exportShares() {
         String shareStr = exportShareImages();
