@@ -313,19 +313,42 @@ public class Operations {
             return result.toString();
         }
 
-        // export share function here
-        boolean exportSharesCheck =exportShares();
-
-        if (!exportSharesCheck) {
-            result.put("data", "");
-            result.put("message", "Shares not exported");
-            result.put("status", "false");
-            return result.toString();
-        }
+        /*
+         * // export share function here
+         * boolean exportSharesCheck =exportShares();
+         * 
+         * if (!exportSharesCheck) {
+         * result.put("data", "");
+         * result.put("message", "Shares not exported");
+         * result.put("status", "false");
+         * return result.toString();
+         * }
+         */
 
         result.put("data", "");
         result.put("message", "Hot Wallet enabled and shares exported");
         result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/enableHotWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String exportShares() {
+        String shareStr = exportShareImages();
+        JSONObject result = new JSONObject();
+
+        if (shareStr.isBlank()) {
+            result.put("data", "");
+            result.put("message", "Shares not export");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        result.put("data", shareStr);
+        result.put("message", "Shares export");
+        result.put("status", "true");
+
         return result.toString();
     }
 
