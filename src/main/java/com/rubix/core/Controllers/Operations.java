@@ -247,10 +247,10 @@ public class Operations {
         return result.toString();
     }
 
-    @RequestMapping(value = "/createHotWallet", method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value = "/createColdtWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String Create_Hot_Wallet(@RequestParam("did") String DID,
-            @RequestParam("publicshare") String PublicShare, @RequestParam("walletType") int type)
+    public String Create_Cold_Wallet(@RequestParam("did") String DID,
+            @RequestParam("publicshare") String PublicShare)
             throws IOException, JSONException, InterruptedException {
         setDir();
         File RubixFolder = new File(dirPath);
@@ -258,17 +258,8 @@ public class Operations {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
 
-        String walletType = "";
-        if (type == 1) {
-            walletType = "STANDARD";
-        } else if (type == 2) {
-            walletType = "HOTWALLET";
-        } else {
-            result.put("data", "");
-            result.put("message", "Wrong wallet type");
-            result.put("status", "false");
-            return result.toString();
-        }
+        String walletType = "COLDWALLET";
+
 
         if (RubixFolder.exists()) {
             contentObject.put("response", "Rubix Wallet already exists!");
@@ -289,18 +280,26 @@ public class Operations {
         return result.toString();
     }
 
-    @RequestMapping(value = "/enableHotWallet", method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value = "/disableHotWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String enableHotWallet(@RequestParam("walletType") int type) {
+    public String enableColdWallet(@RequestParam("Response") String response) {
         JSONObject result = new JSONObject();
-        String walletType = "";
-        if (type == 1) {
-            walletType = "STANDARD";
-        } else if (type == 2) {
-            walletType = "HOTWALLET";
-        } else {
+        String walletType ="COLDWALLET";
+
+        String checkWalletType = checkWalleType();
+
+        if(checkWalletType.equals("WALLET_TYPE_NOT_SET"))
+        {
             result.put("data", "");
-            result.put("message", "Wrong wallet type");
+            result.put("message", "WALLET_TYPE not set");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        if(checkWalletType.equals("COLDWALLET"))
+        {
+            result.put("data", "");
+            result.put("message", "WALLET_TYPE already set as COLDWALLET");
             result.put("status", "false");
             return result.toString();
         }
@@ -308,45 +307,59 @@ public class Operations {
         boolean enableWalletCheck = setWalletType(walletType);
         if (!enableWalletCheck) {
             result.put("data", "");
-            result.put("message", "Hot Wallet not enabled");
+            result.put("message", "Cold Wallet not enabled");
             result.put("status", "false");
             return result.toString();
         }
 
-        /*
-         * // export share function here
-         * boolean exportSharesCheck =exportShares();
-         * 
-         * if (!exportSharesCheck) {
-         * result.put("data", "");
-         * result.put("message", "Shares not exported");
-         * result.put("status", "false");
-         * return result.toString();
-         * }
-         */
+        if(response.equals("true"))
+        {
+            deletePvtShare();
+        }
 
         result.put("data", "");
-        result.put("message", "Hot Wallet enabled");
+        result.put("message", "Cold Wallet enabled");
         result.put("status", "true");
+
         return result.toString();
     }
 
     @RequestMapping(value = "/exportShares", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public String exportShares() {
-        String shareStr = exportShareImages();
         JSONObject result = new JSONObject();
+        String walletType = getWalletType();
+        boolean checkShares = checkSharesPresent();
 
+        if(walletType.equals("COLDWALLET") && checkSharesExported())
+        {
+            result.put("data", "");
+            result.put("message", "Shares Already Exported");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        if(!walletType.equals("STANDARD") && !checkShares)
+        {
+            result.put("data", "");
+            result.put("message", "Error");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+        String shareStr = exportShareImages();
+       
         if (shareStr.isBlank()) {
             result.put("data", "");
-            result.put("message", "Shares not export");
+            result.put("message", "Shares not exported");
             result.put("status", "false");
 
             return result.toString();
         }
 
         result.put("data", shareStr);
-        result.put("message", "Shares export");
+        result.put("message", "Shares exported");
         result.put("status", "true");
 
         return result.toString();
