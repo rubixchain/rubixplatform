@@ -249,8 +249,8 @@ public class Operations {
 
     @RequestMapping(value = "/createHotWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String Create_Hot_Wallet(@RequestParam("did") MultipartFile DID,
-            @RequestParam("publicshare") MultipartFile PublicShare, @RequestParam("walletType") int type)
+    public String Create_Hot_Wallet(@RequestParam("did") String DID,
+            @RequestParam("publicshare") String PublicShare, @RequestParam("walletType") int type)
             throws IOException, JSONException, InterruptedException {
         setDir();
         File RubixFolder = new File(dirPath);
@@ -274,7 +274,7 @@ public class Operations {
             contentObject.put("response", "Rubix Wallet already exists!");
         } else {
             // deleteFolder(RubixFolder);
-            JSONObject didResult = setupDID(DID.getInputStream(), PublicShare.getInputStream(), walletType);
+            JSONObject didResult = setupDID(DID, PublicShare, walletType);
             if (didResult.getString("Status").contains("Success"))
                 createWorkingDirectory();
 
