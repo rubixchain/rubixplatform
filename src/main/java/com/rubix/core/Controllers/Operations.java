@@ -144,6 +144,19 @@ public class Operations {
         return APIHandler.create(type).toString();
 
     }
+
+
+    @RequestMapping(value = "/bulkStake", method = RequestMethod.POST,
+    produces = {"application/json", "application/xml"})
+    public static String bulkStake(@RequestBody RequestModel requestModel) throws IOException, JSONException, InterruptedException {
+        
+        int bulkStakeAmount = requestModel.getbulkStakeAmount();
+        
+        APIHandler.bulkStake(bulkStakeAmount);
+        
+        return null;
+    }
+
  
     @RequestMapping(value = "/create", method = RequestMethod.POST,
             produces = {"application/json", "application/xml"})

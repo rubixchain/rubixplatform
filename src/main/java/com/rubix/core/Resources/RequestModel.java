@@ -26,6 +26,7 @@ public class RequestModel {
 	private int endRange;
 	private int type;
 	private String pvtKeyPass;
+	private int bulkStakeAmount;
 	private String blockHash;
 
 	public RequestModel() {
@@ -113,6 +114,10 @@ public class RequestModel {
 
 	public String getBlockHash() {
 		return blockHash;
+	}
+
+	public int getbulkStakeAmount() {
+		return bulkStakeAmount;
 	}
 
 }
