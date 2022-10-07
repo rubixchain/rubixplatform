@@ -247,19 +247,19 @@ public class Operations {
         return result.toString();
     }
 
-    @RequestMapping(value = "/createColdtWallet", method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String Create_Cold_Wallet(@RequestParam("did") String DID,
-            @RequestParam("publicshare") String PublicShare)
+    public String Create_Cold_Wallet(@RequestBody RequestModel requestModel)
             throws IOException, JSONException, InterruptedException {
         setDir();
         File RubixFolder = new File(dirPath);
 
+        String DID = requestModel.getDidString();
+        String PublicShare = requestModel.getPublicShareString();
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
 
-        String walletType = "COLDWALLET";
-
+        int walletType = 2;
 
         if (RubixFolder.exists()) {
             contentObject.put("response", "Rubix Wallet already exists!");
@@ -280,27 +280,56 @@ public class Operations {
         return result.toString();
     }
 
-    @RequestMapping(value = "/disableHotWallet", method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value = "/disableStandardWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String enableColdWallet(@RequestParam("Response") String response) {
+    public String enableColdWallet(@RequestParam("status") String status, @RequestParam("authToken") String authToken,
+            @RequestParam("challengeSign") String challengeSign) {
         JSONObject result = new JSONObject();
-        String walletType ="COLDWALLET";
+        int walletType = 2;
 
-        String checkWalletType = checkWalleType();
+        int checkWalletType = getWalletType();
 
-        if(checkWalletType.equals("WALLET_TYPE_NOT_SET"))
-        {
+        /* JSONObject responseObj = new JSONObject(response);
+        String status = responseObj.getString("status");
+        String authToken = responseObj.getString("authToken");
+        String challengeSign = responseObj.getString("challengeStr"); */
+
+        if (!authToken.equals(Functions.IdentityToken)) {
+            result.put("data", "");
+            result.put("message", "Error. authToken Supplied does not match Identity Token of node session.");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        if (!status.equals("true")) {
+            result.put("data", "");
+            result.put("message", "Share Export and save not sucessful");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        if (checkWalletType == 0) {
             result.put("data", "");
             result.put("message", "WALLET_TYPE not set");
             result.put("status", "false");
             return result.toString();
         }
 
-        if(checkWalletType.equals("COLDWALLET"))
-        {
+        if (checkWalletType == 2) {
             result.put("data", "");
             result.put("message", "WALLET_TYPE already set as COLDWALLET");
             result.put("status", "false");
+            return result.toString();
+        }
+
+        boolean challengeCheck = verifyChallengeString(challengeSign);
+
+        if (!challengeCheck) {
+            result.put("data", "");
+            result.put("message", "Error. challengeSignature not verified");
+            result.put("status", "false");
+
             return result.toString();
         }
 
@@ -312,8 +341,7 @@ public class Operations {
             return result.toString();
         }
 
-        if(response.equals("true"))
-        {
+        if (challengeCheck) {
             deletePvtShare();
         }
 
@@ -324,15 +352,22 @@ public class Operations {
         return result.toString();
     }
 
-    @RequestMapping(value = "/exportShares", method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value = "/exportShares", method = RequestMethod.GET, produces = { "application/json",
             "application/xml" })
-    public String exportShares() {
+    public String exportShares(@RequestParam("authToken") String authToken) {
         JSONObject result = new JSONObject();
-        String walletType = getWalletType();
+        int walletType = getWalletType();
         boolean checkShares = checkSharesPresent();
 
-        if(walletType.equals("COLDWALLET") && checkSharesExported())
-        {
+        if (!authToken.equals(Functions.IdentityToken)) {
+            result.put("data", "");
+            result.put("message", "Error. authToken Supplied does not match Identity Token of node session.");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        if (walletType == 2 && checkSharesExported()) {
             result.put("data", "");
             result.put("message", "Shares Already Exported");
             result.put("status", "false");
@@ -340,16 +375,16 @@ public class Operations {
             return result.toString();
         }
 
-        if(!walletType.equals("STANDARD") && !checkShares)
-        {
+        if (walletType != 1 && !checkShares) {
             result.put("data", "");
             result.put("message", "Error");
             result.put("status", "false");
 
             return result.toString();
         }
+
         String shareStr = exportShareImages();
-       
+
         if (shareStr.isBlank()) {
             result.put("data", "");
             result.put("message", "Shares not exported");
