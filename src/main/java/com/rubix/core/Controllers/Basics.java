@@ -1,6 +1,7 @@
 package com.rubix.core.Controllers;
 
 import com.rubix.Consensus.QuorumConsensus;
+import com.rubix.Datum.Dependency;
 import com.rubix.Ping.PingCheck;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
@@ -43,8 +44,11 @@ public class Basics {
             return result.toString();
         }
         if(mainDir()){
+        	
             mutex = true;
             launch();
+            Dependency.checkDatumPath();
+        	Dependency.checkDatumFolder();
             pathSet();
 
             QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT);
@@ -100,31 +104,33 @@ public class Basics {
             
             String datumFolderPath = DATUM_CHAIN_PATH;
             File datumFolder = new File(datumFolderPath);
-        	File datumCommitChain = new File(datumFolderPath.concat("/datumCommitChain.json"));
-        	File datumCommitToken = new File(datumFolderPath.concat("/dataToken.json"));
-        	File datumCommitHistory = new File(datumFolderPath.concat("/datumCommitHistory.json"));
-
-        	if(!datumFolder.exists()) {
+            if(!datumFolder.exists()) {
         		datumFolder.mkdir();
         	}
+            
+        	File datumCommitChain = new File(datumFolderPath.concat("/datumCommitChain.json"));
         	if(!datumCommitChain.exists()) {
         		datumCommitChain.createNewFile();
         		writeToFile(datumCommitChain.toString(), "[]", false);
         	}
+        	
+        	File datumCommitToken = new File(datumFolderPath.concat("/dataToken.json"));
         	if(!datumCommitToken.exists()) {
         		datumCommitToken.createNewFile();
         		writeToFile(datumCommitToken.toString(), "[]", false);
         	}
+        	
+        	File datumCommitHistory = new File(datumFolderPath.concat("/datumCommitHistory.json"));
+
         	if(!datumCommitHistory.exists()) {
         		datumCommitHistory.createNewFile();
         		writeToFile(datumCommitHistory.toString(), "[]", false);
-
         	}
 
 
-            Background background = new Background();
-            Thread backThread = new Thread(background);
-            backThread.start();
+//            Background background = new Background();
+//            Thread backThread = new Thread(background);
+//            backThread.start();
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();

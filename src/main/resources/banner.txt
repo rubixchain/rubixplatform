@@ -6,10 +6,5 @@ ${AnsiColor.GREEN}
  | | \ \  | |__| | | |_) |  _| |_   / . \ 
  |_|  \_\  \____/  |____/  |_____| /_/ \_\
  
-${Ansi.RED} _____________---------------________________ 
-${Ansi.RED}|${Ansi.GREEN}  .__    __     __  __  __   __    ___      ${Ansi.RED}|
-${Ansi.RED}|  ${Ansi.GREEN}|_ \_/|__)|  /  \|__)|_   |  \ /\ |  /\   ${Ansi.RED}|
-${Ansi.RED}|  ${Ansi.GREEN}|__/ \|   |__\__/| \ |__  |__//--\| /--\  ${Ansi.RED}|
-${Ansi.RED}|____________________________________________|                                         
-                                         
+
 ${Ansi.RED} Running ${AnsiColor.GREEN}${application.title} ${Ansi.RED}build with version ${AnsiColor.GREEN}${application.version}
