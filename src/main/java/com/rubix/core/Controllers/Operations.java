@@ -149,8 +149,8 @@ public class Operations {
             produces = {"application/json", "application/xml"})
     public String Create(@RequestParam("image") MultipartFile imageFile) throws IOException, JSONException, InterruptedException {
         setDir();
-        File RubixFolder = new File(dirPath);
         
+        File RubixFolder = new File(dirPath);
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         
