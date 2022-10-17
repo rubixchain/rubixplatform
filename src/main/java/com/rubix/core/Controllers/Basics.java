@@ -47,6 +47,7 @@ import com.rubix.Consensus.QuorumConsensus;
 import com.rubix.Datum.Dependency;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
+import com.rubix.TokenTransfer.TransferPledge.Pledger;
 import com.rubix.core.NFTResources.NFTReceiver;
 import com.rubix.core.Resources.QuorumPingReceiveThread;
 import com.rubix.core.Resources.Receiver;
@@ -93,6 +94,10 @@ public class Basics {
             NFTReceiver nftReceiver = new NFTReceiver();
             Thread nftReceiverThread = new Thread(nftReceiver);
             nftReceiverThread.start();
+
+            Pledger pledger = new Pledger();
+            Thread pledgerThread = new Thread(pledger);
+            pledgerThread.start();
 
             tokenBank();
 
