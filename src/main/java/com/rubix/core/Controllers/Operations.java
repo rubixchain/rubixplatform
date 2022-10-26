@@ -247,7 +247,7 @@ public class Operations {
         return result.toString();
     }
 
-    @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value = "/newFexrHotWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public String Create_Cold_Wallet(@RequestBody RequestModel requestModel)
             throws IOException, JSONException, InterruptedException {
@@ -280,6 +280,67 @@ public class Operations {
         return result.toString();
     }
 
+    @RequestMapping(value = "/generateSecretShares", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String generateSecretShares(@RequestParam("image") MultipartFile imageFile,
+            @RequestParam("passPhrase") String passKey)
+            throws IOException, JSONException, InterruptedException {
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        if (checkSharesGenerated()) {
+            result.put("data", "");
+            result.put("message", "Shares Already Generated");
+            result.put("status", "true");
+            return result.toString();
+        }
+
+        JSONObject response = createSecretImages(imageFile, passKey);
+        if (!response.getString("Status").equals("Success")) {
+            result.put("data", "");
+            result.put("message", "Shares Not Generated");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        contentObject.put("response", response);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+
+    }
+
+    @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String newHotWallet(@RequestParam("DID") MultipartFile DID,
+            @RequestParam("PublicShare") MultipartFile PublicShare) {
+
+        int walletType = 3;
+
+        setDir();
+        File RubixFolder = new File(dirPath);
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+
+        if (RubixFolder.exists()) {
+            contentObject.put("response", "Rubix Wallet already exists!");
+        } else {
+            // deleteFolder(RubixFolder);
+            JSONObject didResult = setupHotWalletFolders(DID, PublicShare, walletType);
+            if (didResult.getString("Status").contains("Success"))
+                createWorkingDirectory();
+
+            start();
+
+            contentObject.put("response", didResult);
+        }
+
+        APIHandler.networkInfo();
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
     @RequestMapping(value = "/disableStandardWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public String enableColdWallet(@RequestParam("status") String status, @RequestParam("authToken") String authToken,
