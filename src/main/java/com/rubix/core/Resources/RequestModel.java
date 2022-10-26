@@ -6,6 +6,7 @@ import static com.rubix.Resources.Functions.getOsName;
 import static com.rubix.Resources.Functions.getSystemUser;
 
 public class RequestModel {
+
 	private String peerid;
 	private int value;
 	private String receiver;
@@ -27,6 +28,8 @@ public class RequestModel {
 	private int type;
 	private String pvtKeyPass;
 	private String blockHash;
+  private String didString;
+    private String publicShareString;
 
 	public RequestModel() {
 	}
@@ -114,5 +117,9 @@ public class RequestModel {
 	public String getBlockHash() {
 		return blockHash;
 	}
+  
+  public String getDidString(){return didString;}
+    public String getPublicShareString(){return publicShareString;}
+
 
 }

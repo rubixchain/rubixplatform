@@ -21,6 +21,9 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import static com.rubix.Resources.Functions.buildVersion;
+import static com.rubix.Resources.Functions.setBasicWalletType;
+import static com.rubix.Resources.Functions.tokenStringGen;
+import static com.rubix.Resources.Functions.IdentityToken;
 
 @SpringBootApplication
 public class RubixApplication {
@@ -34,7 +37,13 @@ public class RubixApplication {
 		System.out.println("Release Version : "+jarVersion);
 		System.out.println("Build Version: " + buildVersion());
 		System.out.println("Jar started on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " UTC");
+		setBasicWalletType();
 		Basics.start();
+		System.out.println("Please save the token. Valid till Node session ends i.e. node service shutsdown");
+		System.out.println("<################################>");
+		tokenStringGen();
+		System.out.println("AuthToken : "+ IdentityToken);
+		System.out.println("<################################>");
 	}
 
 	//Adding CORS - All Origins
