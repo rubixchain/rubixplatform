@@ -2,7 +2,7 @@ package com.rubix.core;
 
 import com.rubix.core.Controllers.Basics;
 import static com.rubix.core.Resources.Version.*;
-import org.json.*;
+import static com.rubix.core.Resources.CallerFunctions.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -28,25 +28,31 @@ import static com.rubix.Resources.Functions.IdentityToken;
 @SpringBootApplication
 public class RubixApplication {
 
-
-	public static void main(String[] args) throws ParseException, IOException, JSONException {
+	public static void main(String[] args) throws ParseException, IOException {
 
 		System.setProperty("server.port", String.valueOf(1898));
 		SpringApplication.run(RubixApplication.class, args);
 		getVersion();
-		System.out.println("Release Version : "+jarVersion);
+		System.out.println("Release Version : " + jarVersion);
 		System.out.println("Build Version: " + buildVersion());
 		System.out.println("Jar started on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " UTC");
-		setBasicWalletType();
+
+		if (mainDir()) {
+			setBasicWalletType();
+		}
+
 		Basics.start();
-		System.out.println("Please save the token. Valid till Node session ends i.e. node service shutsdown");
-		System.out.println("<################################>");
-		tokenStringGen();
-		System.out.println("AuthToken : "+ IdentityToken);
-		System.out.println("<################################>");
+
+		if (mainDir()) {
+			System.out.println("Please save the token. Valid till Node session ends i.e. node service shutsdown");
+			System.out.println("<################################>");
+			tokenStringGen();
+			System.out.println("AuthToken : " + IdentityToken);
+			System.out.println("<################################>");
+		}
 	}
 
-	//Adding CORS - All Origins
+	// Adding CORS - All Origins
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurerAdapter() {
@@ -57,6 +63,5 @@ public class RubixApplication {
 			}
 		};
 	}
-
 
 }
