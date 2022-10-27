@@ -311,23 +311,35 @@ public class Operations {
 
     @RequestMapping(value = "/sign", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
     public String sign() throws IOException, JSONException, InterruptedException {
-        if (!mainDir())
-            checkRubixDir();
-        if (!Basics.mutex)
-            start();
 
-        Functions.pathSet();
-        String response = Functions.getSign();
+        boolean response = Functions.getSign();
 
-        JSONObject resObj = new JSONObject(response);
         JSONObject result = new JSONObject();
-        if (resObj.getString("status").equals("false")) {
+        if (!response) {
             result.put("data", "");
             result.put("message", "Cold wallet Signature process failed");
             result.put("status", "false");
         } else {
             result.put("data", "");
-            result.put("message", "Cold wallet Signature process Success");
+            result.put("message", "Cold wallet Signature process Success. Move File back to Hot Wallet");
+            result.put("status", "true");
+        }
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/getPos", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
+    public String getPvtPositions() throws IOException, JSONException, InterruptedException {
+       
+        boolean response = Functions.getPvtPosArray();
+
+        JSONObject result = new JSONObject();
+        if (!response) {
+            result.put("data", "");
+            result.put("message", "Cold wallet Signature process failed");
+            result.put("status", "false");
+        } else {
+            result.put("data", "");
+            result.put("message", "Pvt Positions file generated in RubixShares. Move to Hot Wallet ");
             result.put("status", "true");
         }
         return result.toString();
