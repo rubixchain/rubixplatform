@@ -170,4 +170,20 @@ public class CallerFunctions {
 //        finalBalance = Double.parseDouble(df.format(numberFormat.doubleValue()));
 //        return finalBalance;
 //    }
+
+public static void nodeAuthToken() {
+    try {
+        
+		if (mainDir() && WALLET_TYPE == 1) {
+		    System.out.println("Please save the token. Valid till Node session ends i.e. node service shutsdown");
+		    System.out.println("<################################>");
+		    tokenStringGen();
+		    System.out.println("AuthToken : " + IdentityToken);
+		    System.out.println("<################################>");
+		}
+	} catch (JSONException | IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
 }
