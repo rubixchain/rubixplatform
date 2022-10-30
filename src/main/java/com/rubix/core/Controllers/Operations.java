@@ -19,6 +19,7 @@ import org.json.JSONException;
 import java.lang.InterruptedException;
 
 import static RubixDID.DIDCreation.DIDimage.*;
+import static RubixDID.HelperFunctions.Functions.*;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.Mining.HashChain.*;
@@ -230,7 +231,7 @@ public class Operations {
             start();
 
         Functions.pathSet();
-        String didFile = readFile(DATA_PATH.concat("DID.json"));
+        String didFile = Functions.readFile(Functions.DATA_PATH.concat("DID.json"));
         JSONArray didArray = new JSONArray(didFile);
         String did = didArray.getJSONObject(0).getString("didHash");
         Functions.ownerIdentity(tokensArray, did);
@@ -312,7 +313,7 @@ public class Operations {
     @RequestMapping(value = "/sign", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
     public String sign() throws IOException, JSONException, InterruptedException {
 
-        boolean response = Functions.getSign();
+        boolean response = Functions.putSignUsingShares();
 
         JSONObject result = new JSONObject();
         if (!response) {
@@ -329,8 +330,8 @@ public class Operations {
 
     @RequestMapping(value = "/getPos", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
     public String getPvtPositions() throws IOException, JSONException, InterruptedException {
-       
-        boolean response = Functions.getPvtPosArray();
+
+        boolean response = Functions.pvtPosInColdWallet();
 
         JSONObject result = new JSONObject();
         if (!response) {
@@ -392,7 +393,7 @@ public class Operations {
             return result.toString();
         }
 
-        JSONObject response = createSecretImages(imageFile, passKey);
+        JSONObject response = createSecretImages(imageFile.getInputStream(), passKey);
         if (!response.getString("Status").equals("Success")) {
             result.put("data", "");
             result.put("message", "Shares Not Generated");
@@ -420,20 +421,26 @@ public class Operations {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
 
-        if (RubixFolder.exists()) {
-            contentObject.put("response", "Rubix Wallet already exists!");
-        } else {
-            // deleteFolder(RubixFolder);
-            JSONObject didResult = setupHotWalletFolders(DID, PublicShare, walletType);
-            if (didResult.getString("Status").contains("Success"))
-                createWorkingDirectory();
+        try {
+            if (RubixFolder.exists()) {
+                contentObject.put("response", "Rubix Wallet already exists!");
+            } else {
+                // deleteFolder(RubixFolder);
+                JSONObject didResult = setupHotWalletFolders(DID.getInputStream(), PublicShare.getInputStream(),
+                        walletType);
+                if (didResult.getString("Status").contains("Success"))
+                    createWorkingDirectory();
 
-            start();
+                start();
 
-            contentObject.put("response", didResult);
+                contentObject.put("response", didResult);
+            }
+
+            APIHandler.networkInfo();
+        } catch (IOException e) {
+
         }
 
-        APIHandler.networkInfo();
         result.put("data", contentObject);
         result.put("message", "");
         result.put("status", "true");
