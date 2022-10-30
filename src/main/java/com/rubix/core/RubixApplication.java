@@ -42,14 +42,7 @@ public class RubixApplication {
 		}
 
 		Basics.start();
-
-		if (mainDir()) {
-			System.out.println("Please save the token. Valid till Node session ends i.e. node service shutsdown");
-			System.out.println("<################################>");
-			tokenStringGen();
-			System.out.println("AuthToken : " + IdentityToken);
-			System.out.println("<################################>");
-		}
+		nodeAuthToken();
 	}
 
 	// Adding CORS - All Origins
