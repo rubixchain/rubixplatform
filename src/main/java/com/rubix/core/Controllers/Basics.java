@@ -99,7 +99,7 @@ public class Basics {
             Thread pledgerThread = new Thread(pledger);
             pledgerThread.start();
 
-            tokenBank();
+//            tokenBank();
 
             System.out.println(repo());
 
