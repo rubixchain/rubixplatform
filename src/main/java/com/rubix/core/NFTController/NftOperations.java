@@ -247,60 +247,6 @@ public class NftOperations {
         return result;
     }
 
-    /* @RequestMapping(value = "/generateRsaKeys", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public static String generateRsaKeys(@RequestBody NftRequestModel nftRequestModel) {
-
-        JSONObject response = new JSONObject();
-        if (nftRequestModel.getPvtKeyPass().isBlank()) {
-            response.put("data", "");
-            response.put("message", "Private Key password cannot be Empty");
-            response.put("status", "false");
-
-            return response.toString();
-        }
-
-        String password = nftRequestModel.getPvtKeyPass();
-        int returnKey = nftRequestModel.getReturnKey();
-
-        try {
-            if (!mainDir()) {
-                return checkDirectory();
-            }
-
-            boolean keyFileCheck = checkKeyFiles();
-            if (!keyFileCheck) {
-                System.out.println("private & public key not generated");
-                System.out.println("generating key files");
-            }
-
-            if (returnKey == 0) {
-                generateKeyPair(password);
-                keyFileCheck = checkKeyFiles();
-                if (!keyFileCheck) {
-                    response.put("message", "Key Files not generated");
-                    response.put("status", "false");
-                } else {
-                    response.put("message", "Key Files generated and stored in Rubix/DATA folder");
-                    response.put("status", "true");
-                }
-            }
-            if (returnKey == 1) {
-                String res = genAndRetKey(password);
-                response.put("message", "Key Files Generated");
-                response.put("status", "true");
-                response.put("content", res);
-            }
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return response.toString();
-    } */
-
     @RequestMapping(value = "/enableNFT", method = RequestMethod.GET, produces = { "application/json",
             "application/xml" })
     public static String enableNFT() {
@@ -310,15 +256,12 @@ public class NftOperations {
                 return checkDirectory();
             }
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         nftPathSet();
-        // enableNft();
         JSONObject response = new JSONObject();
         boolean nftWalletcheck = checkWalletCompatibiltiy();
         if (nftWalletcheck) {
@@ -508,74 +451,6 @@ public class NftOperations {
 
     }
 
-    /* @RequestMapping(value = "/generateCryptoKeys", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public static String generateCrypKeys(@RequestBody NftRequestModel nftRequestModel) {
-        JSONObject respoObject = new JSONObject();
-        String password = nftRequestModel.getPvtKeyPass();
-        int returnKey = nftRequestModel.getReturnKey();
-
-        String keyType = nftRequestModel.getKeyType();
-
-        System.out.println("KeyType = " + keyType);
-
-        if (password.isBlank()) {
-            respoObject.put("content", "");
-            respoObject.put("message", "Private Key password cannot be Empty");
-            respoObject.put("status", "false");
-
-            return respoObject.toString();
-        }
-
-        if (keyType.isBlank()) {
-            respoObject.put("content", "");
-            respoObject.put("message", "Type of Keys to be created value cannot be Empty");
-            respoObject.put("status", "false");
-
-            return respoObject.toString();
-        }
-
-        if (!keyType.equals("RSA") && !keyType.equals("ECDSA")) {
-            respoObject.put("content", "");
-            respoObject.put("message", "Unsupported Key Type. Please Choose either RSA or ECDSA");
-            respoObject.put("status", "false");
-
-            return respoObject.toString();
-        }
-
-        if (returnKey == 0) {
-            boolean keyFileCheck = checkKeyFiles();
-            if (!keyFileCheck) {
-                System.out.println("private & public key not generated");
-                System.out.println("generating key files");
-            }
-        } else {
-            System.out.println("private & public key not generated");
-            System.out.println("generating key files");
-        }
-
-        String result = NFTAPIHandler.generateCryptoKeys(password, keyType, returnKey);
-
-        if (result == null) {
-            respoObject.put("status", "false");
-            respoObject.put("message", "Key Files not generated");
-            respoObject.put("content", "");
-            return respoObject.toString();
-        }
-
-        if (returnKey == 0 && checkKeyFiles()) {
-            respoObject.put("status", "true");
-            respoObject.put("message", "Key Files generated");
-            respoObject.put("content", result);
-            return respoObject.toString();
-        }
-        respoObject.put("status", "true");
-        respoObject.put("message", "Key Files generated");
-        respoObject.put("content", result);
-        return respoObject.toString();
-
-    } */
-
     @RequestMapping(value = "/generateEcDSAKeys", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public static String generateEcDSAKeys(@RequestBody NftRequestModel nftRequestModel) {
@@ -661,7 +536,6 @@ public class NftOperations {
         int returnKey = nftRequestModel.getReturnKey();
 
         try {
-        //	com.rubix.core.Resources.CallerFunctions.mainDir();
             if (!CallerFunctions.mainDir()) {
                 return checkDirectory();
             }
@@ -694,12 +568,6 @@ public class NftOperations {
                     response.put("status", "true");
                 }
             }
-            /* if (returnKey == 1) {
-                String res = EcDSAKeyGen.genAndRetKey(password);
-                response.put("message", "Key Files Generated");
-                response.put("status", "true");
-                response.put("content", res);
-            } */
 
             
         } catch (JSONException e) {
