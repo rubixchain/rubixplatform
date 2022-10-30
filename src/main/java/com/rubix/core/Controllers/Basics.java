@@ -147,22 +147,6 @@ public class Basics {
                 writeToFile(datumCommitHistory.toString(), "[]", false);
 
             }
-           
-
-            /*
-             * Background Thread is commented for Token file Missing Issue.
-             * String DATAHASH_PATH = DATA_PATH.concat("DataHash");
-             * File dataHashFolder = new File(DATAHASH_PATH);
-             * if(!dataHashFolder.exists()) {
-             * dataHashFolder.mkdir();
-             * generateHashtableBG();
-             * }
-             * 
-             * 
-             * Background background = new Background();
-             * Thread backThread = new Thread(background);
-             * backThread.start();
-             */
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
