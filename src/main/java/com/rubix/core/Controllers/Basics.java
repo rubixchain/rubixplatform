@@ -24,7 +24,7 @@ import static com.rubix.Resources.Functions.pathSet;
 import static com.rubix.Resources.Functions.readFile;
 import static com.rubix.Resources.Functions.sanityCheck;
 import static com.rubix.Resources.Functions.sanityMessage;
-import static com.rubix.Resources.Functions.tokenBank;
+//import static com.rubix.Resources.Functions.tokenBank;
 import static com.rubix.Resources.Functions.writeToFile;
 import static com.rubix.Resources.IPFSNetwork.executeIPFSCommandsResponse;
 import static com.rubix.core.Resources.CallerFunctions.mainDir;
@@ -99,7 +99,7 @@ public class Basics {
             Thread pledgerThread = new Thread(pledger);
             pledgerThread.start();
 
-            tokenBank();
+//            tokenBank();
 
             System.out.println(repo());
 
@@ -474,7 +474,7 @@ public class Basics {
 
     @RequestMapping(value = "/tokenParts", method = RequestMethod.GET, produces = { "application/json",
             "application/xml" })
-    public static Double tokenParts(@RequestParam("token") String tokenHash) {
+    public static Double tokenParts(@RequestParam("token") String tokenHash) throws JSONException {
         return Functions.partTokenBalance(tokenHash);
 
     }
