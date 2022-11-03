@@ -152,5 +152,80 @@ public class NCWalletOperations {
 
         return result.toString();
     }
+
+    @RequestMapping(value = "/disableStandardWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String enableColdWallet(@RequestParam("status") String status, @RequestParam("authToken") String authToken,
+            @RequestParam("challengeSign") String challengeSign) {
+        JSONObject result = new JSONObject();
+        int walletType = 2;
+
+        int checkWalletType = getWalletType();
+
+        /*
+         * JSONObject responseObj = new JSONObject(response);
+         * String status = responseObj.getString("status");
+         * String authToken = responseObj.getString("authToken");
+         * String challengeSign = responseObj.getString("challengeStr");
+         */
+
+        if (!authToken.equals(Functions.IdentityToken)) {
+            result.put("data", "");
+            result.put("message", "Error. authToken Supplied does not match Identity Token of node session.");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        if (!status.equals("true")) {
+            result.put("data", "");
+            result.put("message", "Share Export and save not sucessful");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        if (checkWalletType == 0) {
+            result.put("data", "");
+            result.put("message", "WALLET_TYPE not set");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        if (checkWalletType == 2) {
+            result.put("data", "");
+            result.put("message", "WALLET_TYPE already set as COLDWALLET");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        boolean challengeCheck = verifyChallengeString(challengeSign);
+
+        if (!challengeCheck) {
+            result.put("data", "");
+            result.put("message", "Error. challengeSignature not verified");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        boolean enableWalletCheck = setWalletType(walletType);
+        if (!enableWalletCheck) {
+            result.put("data", "");
+            result.put("message", "Cold Wallet not enabled");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        if (challengeCheck) {
+            deletePvtShare();
+        }
+
+        result.put("data", "");
+        result.put("message", "Cold Wallet enabled");
+        result.put("status", "true");
+
+        return result.toString();
+    }
+
     
 }
