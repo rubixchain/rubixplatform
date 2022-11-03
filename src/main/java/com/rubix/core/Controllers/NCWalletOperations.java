@@ -105,5 +105,52 @@ public class NCWalletOperations {
         return result.toString();
     }
 
+    @RequestMapping(value = "/exportShares", method = RequestMethod.GET, produces = { "application/json",
+            "application/xml" })
+    public String exportShares(@RequestParam("authToken") String authToken) {
+        JSONObject result = new JSONObject();
+        int walletType = getWalletType();
+        boolean checkShares = checkSharesPresent();
+
+        if (!authToken.equals(Functions.IdentityToken)) {
+            result.put("data", "");
+            result.put("message", "Error. authToken Supplied does not match Identity Token of node session.");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        if (walletType == 2 && checkSharesExported()) {
+            result.put("data", "");
+            result.put("message", "Shares Already Exported");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        if (walletType != 1 && !checkShares) {
+            result.put("data", "");
+            result.put("message", "Error");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        String shareStr = exportShareImages();
+
+        if (shareStr.isBlank()) {
+            result.put("data", "");
+            result.put("message", "Shares not exported");
+            result.put("status", "false");
+
+            return result.toString();
+        }
+
+        result.put("data", shareStr);
+        result.put("message", "Shares exported");
+        result.put("status", "true");
+
+        return result.toString();
+    }
     
 }
