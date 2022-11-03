@@ -264,4 +264,67 @@ public class NCWalletOperations {
         result.put("status", "true");
         return result.toString();
     }
+
+    @RequestMapping(value = "/newFexrHotWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String Create_Cold_Wallet(@RequestBody RequestModel requestModel)
+            throws IOException, JSONException, InterruptedException {
+        setDir();
+        File RubixFolder = new File(dirPath);
+
+        String DID = requestModel.getDidString();
+        String PublicShare = requestModel.getPublicShareString();
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+
+        int walletType = 2;
+
+        if (RubixFolder.exists()) {
+            contentObject.put("response", "Rubix Wallet already exists!");
+        } else {
+            // deleteFolder(RubixFolder);
+            JSONObject didResult = setupDID(DID, PublicShare, walletType);
+            if (didResult.getString("Status").contains("Success"))
+                createWorkingDirectory();
+
+            start();
+
+            contentObject.put("response", didResult);
+        }
+        APIHandler.networkInfo();
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
+    @RequestMapping(value = "/generateSecretShares", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String generateSecretShares(@RequestParam("image") MultipartFile imageFile,
+            @RequestParam("passPhrase") String passKey)
+            throws IOException, JSONException, InterruptedException {
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        if (checkSharesGenerated()) {
+            result.put("data", "");
+            result.put("message", "Shares Already Generated");
+            result.put("status", "true");
+            return result.toString();
+        }
+
+        JSONObject response = createSecretImages(imageFile.getInputStream(), passKey);
+        if (!response.getString("Status").equals("Success")) {
+            result.put("data", "");
+            result.put("message", "Shares Not Generated");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        contentObject.put("response", response);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+
+    }
 }
