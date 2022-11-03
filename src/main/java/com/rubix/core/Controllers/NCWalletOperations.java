@@ -226,6 +226,42 @@ public class NCWalletOperations {
 
         return result.toString();
     }
-
     
+    @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String newHotWallet(@RequestParam("DID") MultipartFile DID,
+            @RequestParam("PublicShare") MultipartFile PublicShare) {
+
+        int walletType = 3;
+
+        setDir();
+        File RubixFolder = new File(dirPath);
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+
+        try {
+            if (RubixFolder.exists()) {
+                contentObject.put("response", "Rubix Wallet already exists!");
+            } else {
+                // deleteFolder(RubixFolder);
+                JSONObject didResult = setupHotWalletFolders(DID.getInputStream(), PublicShare.getInputStream(),
+                        walletType);
+                if (didResult.getString("Status").contains("Success"))
+                    createWorkingDirectory();
+
+                start();
+
+                contentObject.put("response", didResult);
+            }
+
+            APIHandler.networkInfo();
+        } catch (IOException e) {
+
+        }
+
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
 }
