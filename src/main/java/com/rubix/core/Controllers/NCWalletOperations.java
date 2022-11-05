@@ -92,14 +92,20 @@ public class NCWalletOperations {
         objectSend.put("type", type);
         objectSend.put("comment", comments);
         objectSend.put("amount", tokenCount);
+        objectSend.put("operation", "PreProcess");
 
         System.out.println("Starting Whole Amount Transfer...");
         JSONObject response = send(objectSend.toString());
 
         JSONObject result = new JSONObject();
-        JSONObject contentObject = new JSONObject();
-        contentObject.put("response", response);
-        result.put("data", contentObject);
+        if (response.getString("status").equals("Failed")) {
+            result.put("data", response);
+            result.put("message", "");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        result.put("data", response);
         result.put("message", "");
         result.put("status", "true");
         return result.toString();
@@ -162,13 +168,6 @@ public class NCWalletOperations {
 
         int checkWalletType = getWalletType();
 
-        /*
-         * JSONObject responseObj = new JSONObject(response);
-         * String status = responseObj.getString("status");
-         * String authToken = responseObj.getString("authToken");
-         * String challengeSign = responseObj.getString("challengeStr");
-         */
-
         if (!authToken.equals(Functions.IdentityToken)) {
             result.put("data", "");
             result.put("message", "Error. authToken Supplied does not match Identity Token of node session.");
@@ -226,7 +225,7 @@ public class NCWalletOperations {
 
         return result.toString();
     }
-    
+
     @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public String newHotWallet(@RequestParam("DID") MultipartFile DID,
@@ -282,7 +281,6 @@ public class NCWalletOperations {
         if (RubixFolder.exists()) {
             contentObject.put("response", "Rubix Wallet already exists!");
         } else {
-            // deleteFolder(RubixFolder);
             JSONObject didResult = setupDID(DID, PublicShare, walletType);
             if (didResult.getString("Status").contains("Success"))
                 createWorkingDirectory();
@@ -325,6 +323,31 @@ public class NCWalletOperations {
         result.put("message", "");
         result.put("status", "true");
         return result.toString();
-
     }
+
+
+    @RequestMapping(value = "/sendPositions", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String sendPositions(@RequestBody RequestModel requestModel)
+            throws IOException, JSONException, InterruptedException {
+        JSONObject result = new JSONObject();
+
+        String positions = requestModel.getPvtPositions();
+
+        if(positions.isBlank())
+        {
+            JSONObject resultObject = new JSONObject();
+                result.put("data", "");
+                result.put("message", "Positions Array value is empty");
+                result.put("status", "false");
+                return result.toString();
+        }
+
+        boolean response = setPvtPositions();
+        result.put("data", "");
+        result.put("message", "Positions Array set Successsfully");
+        result.put("status", "true");
+        return result.toString();
+    }
+
 }
