@@ -28,6 +28,7 @@ public class RubixApplication {
 		System.out.println("Rubix");
 		System.out.println("Build Version: " + buildVersion());
 		System.out.println("Jar started on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " UTC");
+		setBasicWalletType();
 		Basics.start();
 
 	}
