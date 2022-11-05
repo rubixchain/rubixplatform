@@ -1,14 +1,12 @@
 package com.rubix.core.Controllers;
 
 import static com.rubix.Constants.IPFSConstants.bootstrap;
-import static com.rubix.NFTResources.NFTFunctions.checkForQuorumKeyPassword;
 import static com.rubix.Resources.APIHandler.addPublicData;
 import static com.rubix.Resources.APIHandler.closeStreams;
 import static com.rubix.Resources.APIHandler.ipfs;
 import static com.rubix.Resources.APIHandler.networkInfo;
 import static com.rubix.Resources.Functions.BOOTSTRAPS;
 import static com.rubix.Resources.Functions.DATA_PATH;
-import static com.rubix.Resources.Functions.DATUM_CHAIN_PATH;
 import static com.rubix.Resources.Functions.IPFS_PORT;
 import static com.rubix.Resources.Functions.PAYMENTS_PATH;
 import static com.rubix.Resources.Functions.QUORUM_PORT;
@@ -44,11 +42,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rubix.Consensus.QuorumConsensus;
-import com.rubix.Datum.Dependency;
 import com.rubix.Resources.Functions;
 import com.rubix.Resources.IPFSNetwork;
 import com.rubix.TokenTransfer.TransferPledge.Pledger;
-import com.rubix.core.NFTResources.NFTReceiver;
 import com.rubix.core.Resources.QuorumPingReceiveThread;
 import com.rubix.core.Resources.Receiver;
 import com.rubix.core.Resources.ReceiverPingReceive;
@@ -66,7 +62,7 @@ public class Basics {
 
     @RequestMapping(value = "/start", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
     public static String start() throws JSONException, IOException {
-        if (mutex) {
+        if(mutex){
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
             contentObject.put("response", "Already Setup");
@@ -75,13 +71,22 @@ public class Basics {
             result.put("status", "true");
             return result.toString();
         }
-        if (mainDir()) {
-        	
+        if(mainDir()){
             mutex = true;
             launch();
-            Dependency.checkDatumPath();
-        	Dependency.checkDatumFolder();
             pathSet();
+
+            QuorumConsensus alpha1 = new QuorumConsensus("alpha",QUORUM_PORT);
+            Thread alpha1Thread = new Thread(alpha1);
+            alpha1Thread.start();
+
+            QuorumConsensus beta1 = new QuorumConsensus("beta",QUORUM_PORT+1);
+            Thread beta1Thread = new Thread(beta1);
+            beta1Thread.start();
+
+            QuorumConsensus gamma1 = new QuorumConsensus("gamma",QUORUM_PORT+2);
+            Thread gamma1Thread = new Thread(gamma1);
+            gamma1Thread.start();
 
             Receiver receiver = new Receiver();
             Thread receiverThread = new Thread(receiver);
@@ -91,15 +96,15 @@ public class Basics {
             Thread receiverPingThread = new Thread(receiverPingReceive);
             receiverPingThread.start();
 
-            NFTReceiver nftReceiver = new NFTReceiver();
-            Thread nftReceiverThread = new Thread(nftReceiver);
-            nftReceiverThread.start();
+            QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
+            Thread quorumPingThread = new Thread(quorumPingReceiveThread);
+            quorumPingThread.start();
 
             Pledger pledger = new Pledger();
             Thread pledgerThread = new Thread(pledger);
             pledgerThread.start();
 
-            tokenBank();
+//            tokenBank();
 
             System.out.println(repo());
 
@@ -123,46 +128,23 @@ public class Basics {
             String STAKE_PATH = WALLET_DATA_PATH.concat("Stake/");
             File stakeFolder = new File(STAKE_PATH);
             if (!stakeFolder.exists()) {
-                stakeFolder.mkdir();
+              stakeFolder.mkdir();
             }
-
-            String datumFolderPath = DATUM_CHAIN_PATH;
-            File datumFolder = new File(datumFolderPath);
-            if (!datumFolder.exists()) {
-                datumFolder.mkdir();
-            }
-            File datumCommitChain = new File(datumFolderPath.concat("/datumCommitChain.json"));
-            if (!datumCommitChain.exists()) {
-                datumCommitChain.createNewFile();
-                writeToFile(datumCommitChain.toString(), "[]", false);
-            }
-            File datumCommitToken = new File(datumFolderPath.concat("/dataToken.json"));
-            if (!datumCommitToken.exists()) {
-                datumCommitToken.createNewFile();
-                writeToFile(datumCommitToken.toString(), "[]", false);
-            }
-            File datumCommitHistory = new File(datumFolderPath.concat("/datumCommitHistory.json"));
-            if (!datumCommitHistory.exists()) {
-                datumCommitHistory.createNewFile();
-                writeToFile(datumCommitHistory.toString(), "[]", false);
-
-            }
-           
-
+            
             /*
-             * Background Thread is commented for Token file Missing Issue.
-             * String DATAHASH_PATH = DATA_PATH.concat("DataHash");
-             * File dataHashFolder = new File(DATAHASH_PATH);
-             * if(!dataHashFolder.exists()) {
-             * dataHashFolder.mkdir();
-             * generateHashtableBG();
-             * }
-             * 
-             * 
-             * Background background = new Background();
-             * Thread backThread = new Thread(background);
-             * backThread.start();
-             */
+             *  Background Thread is commented for Token file Missing Issue.
+            String DATAHASH_PATH = DATA_PATH.concat("DataHash");
+            File dataHashFolder = new File(DATAHASH_PATH);
+            if(!dataHashFolder.exists()) {
+            	  dataHashFolder.mkdir();
+            	  generateHashtableBG();
+            }
+            	
+            Background background = new Background();
+            Thread backThread = new Thread(background);
+            backThread.start();
+            */
+            
 
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
@@ -171,96 +153,10 @@ public class Basics {
             result.put("message", "");
             result.put("status", "true");
             return result.toString();
-        } else {
+        }
+        else{
             return checkRubixDir();
         }
-    }
-
-    @RequestMapping(value = "/startQuorumService", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public static String startQuorumService(@RequestBody RequestModel requestModel)
-            throws IOException, JSONException, InterruptedException {
-
-        if (!mainDir())
-            return checkRubixDir();
-        if (!mutex)
-            start();
-
-        if (quorumStatus == false) {
-
-            String quorumKeyPass = requestModel.getPvtKeyPass();
-
-            // check for wrong pvt key password entered
-            boolean checkFlag = checkForQuorumKeyPassword(quorumKeyPass);
-
-            if (checkFlag == false) {
-                BasicsLogger.debug(
-                        "\n Response code : 400. Incorrect password for quorum private key. Please use the correct password and re-run the service.\n");
-                JSONObject resultObject = new JSONObject();
-                // resultObject.put("did", "");
-                // resultObject.put("tid", "null");
-                resultObject.put("status", "Failed");
-                resultObject.put("message",
-                        "Incorrect password for quorum private key. Please use the correct password and re-run the service.");
-
-                JSONObject result = new JSONObject();
-                JSONObject contentObject = new JSONObject();
-                contentObject.put("response", resultObject);
-                result.put("data", contentObject);
-                // result.put("message", "");
-                // result.put("status", "true");
-                result.put("response code", 400);
-                return result.toString();
-            }
-
-            QuorumConsensus alpha1 = new QuorumConsensus("alpha", QUORUM_PORT, quorumKeyPass);
-            Thread alpha1Thread = new Thread(alpha1);
-            alpha1Thread.start();
-
-            QuorumConsensus beta1 = new QuorumConsensus("beta", QUORUM_PORT + 1, quorumKeyPass);
-            Thread beta1Thread = new Thread(beta1);
-            beta1Thread.start();
-
-            QuorumConsensus gamma1 = new QuorumConsensus("gamma", QUORUM_PORT + 2, quorumKeyPass);
-            Thread gamma1Thread = new Thread(gamma1);
-            gamma1Thread.start();
-
-            QuorumPingReceiveThread quorumPingReceiveThread = new QuorumPingReceiveThread();
-            Thread quorumPingThread = new Thread(quorumPingReceiveThread);
-            quorumPingThread.start();
-
-            quorumStatus = true;
-
-            JSONObject result = new JSONObject();
-            JSONObject contentObject = new JSONObject();
-            contentObject.put("response", "Quorum service successfully started.");
-            result.put("data", contentObject);
-            result.put("message", "");
-            result.put("status", "true");
-            result.put("response code", 200);
-            return result.toString();
-        } else {
-
-            BasicsLogger.debug(
-                    "\nResponse code : 409. Quorum Service is already running. In case you want to re-initiate, re-initiate Rubix jar and run the service again.\n");
-            JSONObject resultObject = new JSONObject();
-            // resultObject.put("did", "");
-            // resultObject.put("tid", "null");
-            resultObject.put("status", "Failed");
-            resultObject.put("message",
-                    "Quorum Service is already running. In case you want to re-initiate, re-initiate Rubix jar and run the service again.");
-
-            JSONObject result = new JSONObject();
-            JSONObject contentObject = new JSONObject();
-            contentObject.put("response", resultObject);
-            result.put("data", contentObject);
-            // result.put("message", "");
-            // result.put("status", "false");
-            result.put("response code", 409);
-            return result.toString();
-
-        }
-
     }
 
     @RequestMapping(value = "/check", method = RequestMethod.GET, produces = { "application/json", "application/xml" })
@@ -476,14 +372,6 @@ public class Basics {
             "application/xml" })
     public static Double tokenParts(@RequestParam("token") String tokenHash) {
         return Functions.partTokenBalance(tokenHash);
-
-    }
-
-    @RequestMapping(value = "/checkDatum", method = RequestMethod.GET, produces = { "application/json",
-            "application/xml" })
-    public static void checkDatum() throws IOException {
-        System.out.println("checkDatum initated");
-        Dependency.checkDatumFolder();
 
     }
 
