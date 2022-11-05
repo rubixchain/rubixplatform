@@ -2,6 +2,7 @@ package com.rubix.core;
 
 import static com.rubix.Resources.Functions.buildVersion;
 import static com.rubix.core.Resources.Version.getVersion;
+import static com.rubix.core.Resources.CallerFunctions.*;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -29,7 +30,9 @@ public class RubixApplication {
 		System.out.println("Rubix");
 		System.out.println("Build Version: " + buildVersion());
 		System.out.println("Jar started on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " UTC");
-		setBasicWalletType();
+		if (mainDir()) {
+			setBasicWalletType();
+		}
 		Basics.start();
 
 	}
