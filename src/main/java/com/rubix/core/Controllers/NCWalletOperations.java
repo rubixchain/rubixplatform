@@ -18,7 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import java.lang.InterruptedException;
 
-import static RubixDID.DIDCreation.DIDimage.createDID;
+import static RubixDID.DIDCreation.DIDimage.*;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.Mining.HashChain.*;
@@ -303,12 +303,12 @@ public class NCWalletOperations {
             throws IOException, JSONException, InterruptedException {
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
-        if (checkSharesGenerated()) {
+       /*  if (checkSharesGenerated()) {
             result.put("data", "");
             result.put("message", "Shares Already Generated");
             result.put("status", "true");
             return result.toString();
-        }
+        } */
 
         JSONObject response = createSecretImages(imageFile.getInputStream(), passKey);
         if (!response.getString("Status").equals("Success")) {
@@ -343,7 +343,7 @@ public class NCWalletOperations {
                 return result.toString();
         }
 
-        boolean response = setPvtPositions();
+        boolean response = setPvtPositiions(positions);
         result.put("data", "");
         result.put("message", "Positions Array set Successsfully");
         result.put("status", "true");
