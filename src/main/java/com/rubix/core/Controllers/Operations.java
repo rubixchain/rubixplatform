@@ -43,6 +43,7 @@ public class Operations {
         String comments = requestModel.getComment();
         int type = requestModel.getType();
 
+        int walletType = getWalletType();
 
         int intPart = (int) tokenCount;
         double decimal = tokenCount - intPart;
@@ -95,6 +96,28 @@ public class Operations {
         objectSend.put("type", type);
         objectSend.put("comment", comments);
         objectSend.put("amount", tokenCount);
+
+        if (walletType == 2) {
+            String signedPayload = requestModel.getSignedPayload();
+
+            if (signedPayload.isBlank()) {
+                JSONObject resultObject = new JSONObject();
+                resultObject.put("did", "");
+                resultObject.put("tid", "null");
+                resultObject.put("status", "Failed");
+                resultObject.put("message", "Signed Payload cannot be empty");
+
+                JSONObject result = new JSONObject();
+                JSONObject contentObject = new JSONObject();
+                contentObject.put("response", resultObject);
+                result.put("data", contentObject);
+                result.put("message", "");
+                return result.toString();
+            }
+
+            objectSend.put("payload", signedPayload);
+            objectSend.put("operation", "ContinueTxn");
+        }
 
         System.out.println("Starting Whole Amount Transfer...");
         JSONObject wholeTransferResult = send(objectSend.toString());
