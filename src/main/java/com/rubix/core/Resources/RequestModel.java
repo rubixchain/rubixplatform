@@ -27,6 +27,8 @@ public class RequestModel {
     private int type;
     private String signedPayload;
     private String pvtPositions;
+    private String didString;
+    private String publicShareString;
 
 
 
@@ -59,5 +61,7 @@ public class RequestModel {
     public String getPeerid(){return peerid;}
     public String getSignedPayload(){return signedPayload;}
     public String getPvtPositions(){return pvtPositions;}
+    public String getDidString(){return didString;}
+    public String getPublicShareString(){return publicShareString;}
 
 }
