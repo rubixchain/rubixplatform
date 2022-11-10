@@ -2,117 +2,129 @@ package com.rubix.core.Resources;
 
 import org.json.JSONArray;
 
-import static com.rubix.Resources.Functions.getOsName;
-import static com.rubix.Resources.Functions.getSystemUser;
-
 public class RequestModel {
-	private String peerid;
-	private int value;
-	private String receiver;
-	private String sender;
-	private JSONArray quorum;
-	private double tokenCount;
-	private double amount;
-	private String transactionID;
-	private String threadExt;
-	private String comment;
-	private String token;
-	private int txnCount;
-	private String sDate;
-	private String eDate;
-	private String groupId;
-	private String did;
-	private int startRange;
-	private int endRange;
-	private int type;
-	private String pvtKeyPass;
-	private String blockHash;
+    private String peerid;
+    private int value;
+    private String receiver;
+    private String sender;
+    private JSONArray quorum;
+    private double tokenCount;
+    private double amount;
+    private String transactionID;
+    private String threadExt;
+    private String comment;
+    private String token;
+    private int txnCount;
+    private String sDate;
+    private String eDate;
+    private String groupId;
+    private String did;
+    private int startRange;
+    private int endRange;
+    private int type;
+    private String pvtKeyPass;
+    private String blockHash;
+    private String hashMatchString;
+    private int powLevel;
+    private String tokenList;
 
-	public RequestModel() {
-	}
+    public RequestModel() {
+    }
 
-	public String getGroupId() {
-		return groupId;
-	}
+    public String getGroupId() {
+        return groupId;
+    }
 
-	public String getToken() {
-		return token;
-	}
+    public int getpowLevel() {
+        return powLevel;
+    }
 
-	public String getThreadExt() {
-		return threadExt;
-	}
+    public String getTokenList() {
+        return tokenList;
+    }
 
-	public String getComment() {
-		return comment;
-	}
+    public String gethashMatchString() {
+        return hashMatchString;
+    }
 
-	public double getTokenCount() {
-		return tokenCount;
-	}
+    public String getToken() {
+        return token;
+    }
 
-	public double getAmount() {
-		return amount;
-	}
+    public String getThreadExt() {
+        return threadExt;
+    }
 
-	public String getTransactionID() {
-		return transactionID;
-	}
+    public String getComment() {
+        return comment;
+    }
 
-	public int getTxnCount() {
-		return txnCount;
-	}
+    public double getTokenCount() {
+        return tokenCount;
+    }
 
-	public int getType() {
-		return type;
-	}
+    public double getAmount() {
+        return amount;
+    }
 
-	public String getReceiver() {
-		return receiver;
-	}
+    public String getTransactionID() {
+        return transactionID;
+    }
 
-	public String getSender() {
-		return sender;
-	}
+    public int getTxnCount() {
+        return txnCount;
+    }
 
-	public String getDid() {
-		return did;
-	}
+    public int getType() {
+        return type;
+    }
 
-	public int getValue() {
-		return value;
-	}
+    public String getReceiver() {
+        return receiver;
+    }
 
-	public JSONArray getQuorum() {
-		return quorum;
-	}
+    public String getSender() {
+        return sender;
+    }
 
-	public String getsDate() {
-		return sDate;
-	}
+    public String getDid() {
+        return did;
+    }
 
-	public String geteDate() {
-		return eDate;
-	}
+    public int getValue() {
+        return value;
+    }
 
-	public int getStartRange() {
-		return startRange;
-	}
+    public JSONArray getQuorum() {
+        return quorum;
+    }
 
-	public int getEndRange() {
-		return endRange;
-	}
+    public String getsDate() {
+        return sDate;
+    }
 
-	public String getPeerid() {
-		return peerid;
-	}
+    public String geteDate() {
+        return eDate;
+    }
 
-	public String getPvtKeyPass() {
-		return pvtKeyPass;
-	}
+    public int getStartRange() {
+        return startRange;
+    }
 
-	public String getBlockHash() {
-		return blockHash;
-	}
+    public int getEndRange() {
+        return endRange;
+    }
+
+    public String getPeerid() {
+        return peerid;
+    }
+
+    public String getPvtKeyPass() {
+        return pvtKeyPass;
+    }
+
+    public String getBlockHash() {
+        return blockHash;
+    }
 
 }
