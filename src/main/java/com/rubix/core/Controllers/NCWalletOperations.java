@@ -41,7 +41,7 @@ public class NCWalletOperations {
         String recDID = requestModel.getReceiver();
         double tokenCount = requestModel.getTokenCount();
         String comments = requestModel.getComment();
-        int type = requestModel.getType();
+    
 
         int intPart = (int) tokenCount;
         double decimal = tokenCount - intPart;
@@ -89,7 +89,6 @@ public class NCWalletOperations {
 
         JSONObject objectSend = new JSONObject();
         objectSend.put("receiverDidIpfsHash", recDID);
-        objectSend.put("type", type);
         objectSend.put("comment", comments);
         objectSend.put("amount", tokenCount);
         objectSend.put("operation", "PreProcess");
