@@ -34,28 +34,27 @@ import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.*;
 import static com.rubix.Mining.HashChain.*;
 
+
+
+
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Operations {
     
-    @RequestMapping(value="/transcationFinality",method = RequestMethod.POST, produces = { "application/json",
+    @RequestMapping(value="/transactionFinality",method = RequestMethod.POST, produces = { "application/json",
     "application/xml" })
-    public static String transcationFinality(@RequestBody RequestModel requestModel) throws Exception {
+    public static String transcationFinality(@RequestBody String requestModel) throws Exception {
         if (!mainDir())
             return checkRubixDir();
         if (!Basics.mutex)
             start();
+        System.out.println(requestModel);
         
-        String authSenderByRecHash = requestModel.getAuthSenderByRecHash();
-        JSONArray lastObject = requestModel.getLastObject();
-        String senderPayloadSign = requestModel.getSenderPayloadSign();
+        JSONObject jsonObject = new JSONObject(requestModel);
         
-        JSONObject objectSend = new JSONObject();
-        objectSend.put("authSenderByRecHash", authSenderByRecHash);
-        objectSend.put("lastObject",lastObject);
-        objectSend.put("senderPayloadSign", senderPayloadSign);
+        System.out.println(jsonObject.toString());
         
-        JSONObject wholeTransferResult = APIHandler.sendB(objectSend);
+        JSONObject wholeTransferResult = APIHandler.sendB(jsonObject);
         
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
@@ -71,7 +70,7 @@ public class Operations {
     }
     
     
-        @RequestMapping(value = "/newFexrHotWallet", method = RequestMethod.POST, produces = { "application/json",
+        @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
         "application/xml" })
     public String Create_Cold_Wallet(@RequestBody RequestModel requestModel)
         throws IOException, JSONException, InterruptedException {
