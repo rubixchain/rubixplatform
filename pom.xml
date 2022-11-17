@@ -9,8 +9,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.rubix</groupId>
-	<artifactId>SHA-G</artifactId>
-	<version>1.011</version>
+	<artifactId>SHA-G-ncWallet</artifactId>
+	<version>0.7</version>
 	<name>SHA-G</name>
 	<description>Rubix Project</description>
 
@@ -26,8 +26,8 @@
 		</dependency>
 		<dependency>
 			<groupId>com.rubix.core</groupId>
-  <artifactId>SHA-G</artifactId>
-  <version>2.1.021</version>
+  <artifactId>ncWallet</artifactId>
+  <version>2.1.023</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
