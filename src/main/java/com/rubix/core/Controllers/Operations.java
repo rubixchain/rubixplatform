@@ -34,73 +34,71 @@ import static com.rubix.core.Controllers.Basics.*;
 import static com.rubix.core.Resources.CallerFunctions.*;
 import static com.rubix.Mining.HashChain.*;
 
-
-
-
 @CrossOrigin(origins = "http://localhost:1898")
 @RestController
 public class Operations {
-    
-    @RequestMapping(value="/transactionFinality",method = RequestMethod.POST, produces = { "application/json",
-    "application/xml" })
+
+    @RequestMapping(value = "/transactionFinality", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
     public static String transcationFinality(@RequestBody String requestModel) throws Exception {
         if (!mainDir())
             return checkRubixDir();
         if (!Basics.mutex)
             start();
         System.out.println(requestModel);
-        
+
         JSONObject jsonObject = new JSONObject(requestModel);
-        
+
         System.out.println(jsonObject.toString());
-        
+
         JSONObject wholeTransferResult = APIHandler.sendB(jsonObject);
-        
+
+        String status = 
+        wholeTransferResult.has("status") && wholeTransferResult.getString("status").equals("Failed") ? "false" : "true";
+
+    
+
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", wholeTransferResult);
         result.put("data", contentObject);
         result.put("message", "");
-        result.put("status", "true");
+        result.put("status", status);
         return result.toString();
 
-        
+    }
 
-        
-    }
-    
-    
-        @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
-        "application/xml" })
+    @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
     public String Create_Cold_Wallet(@RequestBody RequestModel requestModel)
-        throws IOException, JSONException, InterruptedException {
-    setDir();
-    File RubixFolder = new File(dirPath);
-    
-    String DID = requestModel.getDidString();
-    String PublicShare = requestModel.getPublicShareString();
-    JSONObject result = new JSONObject();
-    JSONObject contentObject = new JSONObject();
-    
-    int walletType = 2;
-    
-    if (RubixFolder.exists()) {
-        contentObject.put("response", "Rubix Wallet already exists!");
-    } else {
-        // deleteFolder(RubixFolder);
-        JSONObject didResult = DIDimage.setupDID(DID, PublicShare, walletType);
-        if (didResult.getString("Status").contains("Success"))
-            createWorkingDirectory();
-    
-        start();
-    
-        contentObject.put("response", didResult);
-    }
-    APIHandler.networkInfo();
-    result.put("data", contentObject);
-    result.put("message", "");
-    result.put("status", "true");
-    return result.toString();
+            throws IOException, JSONException, InterruptedException {
+        setDir();
+        File RubixFolder = new File(dirPath);
+
+        String DID = requestModel.getDidString();
+        String PublicShare = requestModel.getPublicShareString();
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+
+        int walletType = 2;
+
+        if (RubixFolder.exists()) {
+            contentObject.put("response", "Rubix Wallet already exists!");
+        } else {
+            // deleteFolder(RubixFolder);
+            JSONObject didResult = DIDimage.setupDID(DID, PublicShare, walletType);
+            if (didResult.getString("Status").contains("Success"))
+                createWorkingDirectory();
+
+            start();
+
+            contentObject.put("response", didResult);
+        }
+        APIHandler.networkInfo();
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
     }
 
     @RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST, produces = { "application/json",
@@ -189,12 +187,15 @@ public class Operations {
         System.out.println("Starting Whole Amount Transfer...");
         JSONObject wholeTransferResult = send(objectSend.toString());
 
+        String status = 
+        wholeTransferResult.has("status") && wholeTransferResult.getString("status").equals("Failed") ? "false" : "true";
+
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", wholeTransferResult);
         result.put("data", contentObject);
         result.put("message", "");
-        result.put("status", "true");
+        result.put("status", status);
         return result.toString();
 
     }
@@ -329,7 +330,7 @@ public class Operations {
         int type = requestModel.getType();
         String pvtKeyPass = requestModel.getPvtKeyPass();
 
-//If user forgets to input the private key password in the curl request.
+        // If user forgets to input the private key password in the curl request.
         if (pvtKeyPass == null) {
             System.out.println("Please include your private key password in the transaction request");
             JSONObject resultObject = new JSONObject();
@@ -347,7 +348,8 @@ public class Operations {
             return result.toString();
         }
 
-//System.out.println("Opertaions - blockHash " + blockHash + " comments " + comments + " type " + type);
+        // System.out.println("Opertaions - blockHash " + blockHash + " comments " +
+        // comments + " type " + type);
 
         JSONObject objectSend = new JSONObject();
         objectSend.put("blockHash", blockHash);
@@ -355,25 +357,27 @@ public class Operations {
         objectSend.put("comment", comments);
         objectSend.put("pvtKeyPass", pvtKeyPass);
 
-//System.out.println("Opertaions - objectsend is " + objectSend.toString());
+        // System.out.println("Opertaions - objectsend is " + objectSend.toString());
 
-//System.out.println("Opertaions - Starting to commit block");
-//System.out.println("Opertaions - ObjectSend " + objectSend.toString());
+        // System.out.println("Opertaions - Starting to commit block");
+        // System.out.println("Opertaions - ObjectSend " + objectSend.toString());
         JSONObject commitBlockObject = APIHandler.commit(objectSend.toString());
 
-//System.out.println("Opertaions -block commit object is " + commitBlockObject.toString());
-// System.out.println("Block commit status is "+
-// commitBlockObject.getString("status").toLowerCase());
+        // System.out.println("Opertaions -block commit object is " +
+        // commitBlockObject.toString());
+        // System.out.println("Block commit status is "+
+        // commitBlockObject.getString("status").toLowerCase());
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", commitBlockObject);
-//System.out.println("Opertaions - commitBlockObject " + commitBlockObject.toString());
-//System.out.println("Opertaions - contentObject " + contentObject.toString());
+        // System.out.println("Opertaions - commitBlockObject " +
+        // commitBlockObject.toString());
+        // System.out.println("Opertaions - contentObject " + contentObject.toString());
         result.put("data", contentObject);
-//result.put("message", "");
+        // result.put("message", "");
         result.put("status", "true");
-//System.out.println("result " + result.toString());
+        // System.out.println("result " + result.toString());
 
         return result.toString();
 
@@ -387,15 +391,15 @@ public class Operations {
         if (!Basics.mutex)
             start();
 
-       // String trnxId = requestModel.getTransactionID();
-       // String hashMatch = requestModel.gethashMatchString();
-       // int powLevel = requestModel.getpowLevel();
+        // String trnxId = requestModel.getTransactionID();
+        // String hashMatch = requestModel.gethashMatchString();
+        // int powLevel = requestModel.getpowLevel();
         String tokenList = requestModel.getTokenList();
 
-       // System.out.println(powLevel);
-        //System.out.println(requestModel.getpowLevel());
+        // System.out.println(powLevel);
+        // System.out.println(requestModel.getpowLevel());
 
-       // List<String> hashMatchList = Arrays.asList(hashMatch);
+        // List<String> hashMatchList = Arrays.asList(hashMatch);
         List<String> tokenListList = Arrays.asList(tokenList);
 
         boolean pledgeStatus = APIHandler.proofGeneration(tokenListList);
@@ -420,7 +424,7 @@ public class Operations {
         String receiver = requestModel.getReceiver();
         String transactionID = requestModel.getTransactionID();
 
-        boolean powVerified = Unpledge.verifyProof(tokenList,receiver,transactionID);
+        boolean powVerified = Unpledge.verifyProof(tokenList, receiver, transactionID);
 
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();

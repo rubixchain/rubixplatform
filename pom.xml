@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.rubix</groupId>
 	<artifactId>SHA-G-ncWallet</artifactId>
-	<version>0.7</version>
+	<version>0.11</version>
 	<name>SHA-G</name>
 	<description>Rubix Project</description>
 
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>com.rubix.core</groupId>
   <artifactId>ncWallet</artifactId>
-  <version>2.1.023</version>
+  <version>2.1.031</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
