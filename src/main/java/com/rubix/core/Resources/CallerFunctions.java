@@ -1,15 +1,20 @@
 package com.rubix.core.Resources;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import static com.rubix.Resources.Functions.DATA_PATH;
+import static com.rubix.Resources.Functions.dirPath;
+import static com.rubix.Resources.Functions.pathSet;
+import static com.rubix.Resources.Functions.setDir;
+import static com.rubix.Resources.Functions.writeToFile;
+import static com.rubix.core.Controllers.Basics.checkRubixDir;
+import static com.rubix.core.Controllers.Basics.location;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import static com.rubix.Resources.Functions.*;
-import static com.rubix.core.Controllers.Basics.checkRubixDir;
-import static com.rubix.core.Controllers.Basics.location;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class CallerFunctions {
 
@@ -70,7 +75,6 @@ public class CallerFunctions {
         tokenWriter.write(tokenMapArray.toString());
         tokenWriter.close();
 
-
         File contactsFile = new File(DATA_PATH + "Contacts.json");
         if (!contactsFile.exists())
             contactsFile.createNewFile();
@@ -88,86 +92,91 @@ public class CallerFunctions {
         file.delete();
     }
 
-//    public static double getBalance() throws JSONException {
-//        pathSet();
-//
-//        DecimalFormat df = new DecimalFormat("#.####");
-//        df.setRoundingMode(RoundingMode.CEILING);
-//
-//        double balance = 0;
-//        String tokenMapFile = readFile(location + "TokenMap.json");
-//        JSONArray tokenMapArray = new JSONArray(tokenMapFile);
-//
-//        String didFile = readFile(DATA_PATH.concat("DID.json"));
-//        JSONArray didArray = new JSONArray(didFile);
-//        String myDID = didArray.getJSONObject(0).getString("didHash");
-//
-//        for (int i = 0; i < tokenMapArray.length(); i++) {
-//            String bankFile = readFile(location + tokenMapArray.getJSONObject(i).getString("type") + ".json");
-//            JSONArray bankArray = new JSONArray(bankFile);
-//            int tokenCount = bankArray.length();
-//            int value = tokenCount * tokenMapArray.getJSONObject(i).getInt("value");
-//            balance = balance + value;
-//        }
-//
-//        File partsFile = new File(Basics.location + "PartsToken.json");
-//        if (partsFile.exists()) {
-//            String PART_TOKEN_CHAIN_PATH = TOKENCHAIN_PATH.concat("/PARTS/");
-//            File partFolder = new File(PART_TOKEN_CHAIN_PATH);
-//            if (!partFolder.exists())
-//                partFolder.mkdir();
-//            String partsTokenFile = readFile(Basics.location + "PartsToken.json");
-//            JSONArray partTokensArray = new JSONArray(partsTokenFile);
-//            Double parts = 0.000D;
-//            if (partTokensArray.length() != 0) {
-//                for (int i = 0; i < partTokensArray.length(); i++) {
-//                    String token = partTokensArray.getJSONObject(i).getString("tokenHash");
-//                    String tokenChainFile = readFile(PART_TOKEN_CHAIN_PATH.concat(token).concat(".json"));
-//                    JSONArray tokenChainArray = new JSONArray(tokenChainFile);
-//
-//                    Double availableParts = 0.000D, senderCount = 0.000D, receiverCount = 0.000D;
-//                    for (int k = 0; k < tokenChainArray.length(); k++) {
-//                        if(tokenChainArray.getJSONObject(k).has("role")) {
-//                            if (tokenChainArray.getJSONObject(k).getString("role").equals("Sender") && tokenChainArray.getJSONObject(k).getString("sender").equals(myDID)){
-//                                senderCount += tokenChainArray.getJSONObject(k).getDouble("amount");
-//                            }
-//                            else if (tokenChainArray.getJSONObject(k).getString("role").equals("Receiver") && tokenChainArray.getJSONObject(k).getString("receiver").equals(myDID)){
-//                                receiverCount += tokenChainArray.getJSONObject(k).getDouble("amount");
-//                            }
-//                        }
-//                    }
-//                    availableParts = 1 - (senderCount - receiverCount);
-//                    parts += availableParts;
-//
-//                }
-//            }
-//            parts = ((parts*1e4)/1e4);
-//            balance = balance + parts;
-//
-//
-//            int count = 0;
-//            File shiftedFile = new File(PAYMENTS_PATH.concat("ShiftedTokens.json"));
-//            if (shiftedFile.exists()) {
-//                String shiftedContent = readFile(PAYMENTS_PATH.concat("ShiftedTokens.json"));
-//                JSONArray shiftedArray = new JSONArray(shiftedContent);
-//                ArrayList<String> arrayTokens = new ArrayList<>();
-//                for(int i = 0; i < shiftedArray.length(); i++)
-//                    arrayTokens.add(shiftedArray.getString(i));
-//
-//
-//                for(int i = 0; i < partTokensArray.length(); i++){
-//                    if(!arrayTokens.contains(partTokensArray.getJSONObject(i).getString("tokenHash")))
-//                        count++;
-//                }
-//            }else
-//                count = partTokensArray.length();
-//
-//            balance = balance - count;
-//        }
-//        String bal = String.format("%.3f", balance);
-//        double finalBalance = Double.parseDouble(bal);
-//        Number numberFormat = finalBalance;
-//        finalBalance = Double.parseDouble(df.format(numberFormat.doubleValue()));
-//        return finalBalance;
-//    }
+    // public static double getBalance() throws JSONException {
+    // pathSet();
+    //
+    // DecimalFormat df = new DecimalFormat("#.####");
+    // df.setRoundingMode(RoundingMode.CEILING);
+    //
+    // double balance = 0;
+    // String tokenMapFile = readFile(location + "TokenMap.json");
+    // JSONArray tokenMapArray = new JSONArray(tokenMapFile);
+    //
+    // String didFile = readFile(DATA_PATH.concat("DID.json"));
+    // JSONArray didArray = new JSONArray(didFile);
+    // String myDID = didArray.getJSONObject(0).getString("didHash");
+    //
+    // for (int i = 0; i < tokenMapArray.length(); i++) {
+    // String bankFile = readFile(location +
+    // tokenMapArray.getJSONObject(i).getString("type") + ".json");
+    // JSONArray bankArray = new JSONArray(bankFile);
+    // int tokenCount = bankArray.length();
+    // int value = tokenCount * tokenMapArray.getJSONObject(i).getInt("value");
+    // balance = balance + value;
+    // }
+    //
+    // File partsFile = new File(Basics.location + "PartsToken.json");
+    // if (partsFile.exists()) {
+    // String PART_TOKEN_CHAIN_PATH = TOKENCHAIN_PATH.concat("/PARTS/");
+    // File partFolder = new File(PART_TOKEN_CHAIN_PATH);
+    // if (!partFolder.exists())
+    // partFolder.mkdir();
+    // String partsTokenFile = readFile(Basics.location + "PartsToken.json");
+    // JSONArray partTokensArray = new JSONArray(partsTokenFile);
+    // Double parts = 0.000D;
+    // if (partTokensArray.length() != 0) {
+    // for (int i = 0; i < partTokensArray.length(); i++) {
+    // String token = partTokensArray.getJSONObject(i).getString("tokenHash");
+    // String tokenChainFile =
+    // readFile(PART_TOKEN_CHAIN_PATH.concat(token).concat(".json"));
+    // JSONArray tokenChainArray = new JSONArray(tokenChainFile);
+    //
+    // Double availableParts = 0.000D, senderCount = 0.000D, receiverCount = 0.000D;
+    // for (int k = 0; k < tokenChainArray.length(); k++) {
+    // if(tokenChainArray.getJSONObject(k).has("role")) {
+    // if (tokenChainArray.getJSONObject(k).getString("role").equals("Sender") &&
+    // tokenChainArray.getJSONObject(k).getString("sender").equals(myDID)){
+    // senderCount += tokenChainArray.getJSONObject(k).getDouble("amount");
+    // }
+    // else if
+    // (tokenChainArray.getJSONObject(k).getString("role").equals("Receiver") &&
+    // tokenChainArray.getJSONObject(k).getString("receiver").equals(myDID)){
+    // receiverCount += tokenChainArray.getJSONObject(k).getDouble("amount");
+    // }
+    // }
+    // }
+    // availableParts = 1 - (senderCount - receiverCount);
+    // parts += availableParts;
+    //
+    // }
+    // }
+    // parts = ((parts*1e4)/1e4);
+    // balance = balance + parts;
+    //
+    //
+    // int count = 0;
+    // File shiftedFile = new File(PAYMENTS_PATH.concat("ShiftedTokens.json"));
+    // if (shiftedFile.exists()) {
+    // String shiftedContent = readFile(PAYMENTS_PATH.concat("ShiftedTokens.json"));
+    // JSONArray shiftedArray = new JSONArray(shiftedContent);
+    // ArrayList<String> arrayTokens = new ArrayList<>();
+    // for(int i = 0; i < shiftedArray.length(); i++)
+    // arrayTokens.add(shiftedArray.getString(i));
+    //
+    //
+    // for(int i = 0; i < partTokensArray.length(); i++){
+    // if(!arrayTokens.contains(partTokensArray.getJSONObject(i).getString("tokenHash")))
+    // count++;
+    // }
+    // }else
+    // count = partTokensArray.length();
+    //
+    // balance = balance - count;
+    // }
+    // String bal = String.format("%.3f", balance);
+    // double finalBalance = Double.parseDouble(bal);
+    // Number numberFormat = finalBalance;
+    // finalBalance = Double.parseDouble(df.format(numberFormat.doubleValue()));
+    // return finalBalance;
+    // }
 }
