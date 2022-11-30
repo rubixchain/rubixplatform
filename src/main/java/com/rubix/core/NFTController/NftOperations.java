@@ -130,7 +130,6 @@ public class NftOperations {
                 objectSend.put("buyerPvtKey", pvtKey);
             }
             pvtKeyPass = requestModel.getPvtKeyPass();
-            String nodePvtKeyPass = requestModel.getNodePvtKeyPass();
 
             tokenCount = requestModel.getAmount();
             int intPart = (int) tokenCount;
@@ -182,7 +181,6 @@ public class NftOperations {
             objectSend.put("buyerPubKeyIpfsHash", buyerPubKeyIpfsHash);
             
             objectSend.put("buyerPvtKeyPass", pvtKeyPass);
-            objectSend.put("nodePvtKeyPass", nodePvtKeyPass);
             objectSend.put("amount", tokenCount);
         } else {
             objectSend.put(buyerPubKeyIpfsHash, getPubKeyIpfsHash());
