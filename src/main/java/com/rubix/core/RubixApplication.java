@@ -21,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 import com.rubix.Datum.Dependency;
 import com.rubix.core.Controllers.Basics;
+import com.rubix.core.NFTController.NftOperations;
 
 @SpringBootApplication
 public class RubixApplication {
@@ -34,6 +35,7 @@ public class RubixApplication {
 		System.out.println("Build Version: " + buildVersion());
 		System.out.println("Jar started on " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " UTC");
 		Basics.start();
+		NftOperations.enableNFT();
 	}
 
 	// Adding CORS - All Origins
