@@ -38,9 +38,11 @@ import static com.rubix.Mining.HashChain.*;
 @RestController
 public class Operations {
 
-    @RequestMapping(value = "/transactionFinality", method = RequestMethod.POST, produces = { "application/json",
-            "application/xml" })
-    public static String transcationFinality(@RequestBody String requestModel) throws Exception {
+    
+    @RequestMapping(value="/transactionFinality",method = RequestMethod.POST, produces = { "application/json",
+    "application/xml" })
+    public static String transactionFinality(@RequestBody String requestModel) throws Exception {
+
         if (!mainDir())
             return checkRubixDir();
         if (!Basics.mutex)
