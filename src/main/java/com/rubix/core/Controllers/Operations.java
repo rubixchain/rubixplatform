@@ -72,7 +72,7 @@ public class Operations {
 
     @RequestMapping(value = "/newHotWallet", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
-    public String Create_Cold_Wallet(@RequestBody RequestModel requestModel)
+    public String newHotWallet(@RequestBody RequestModel requestModel)
             throws IOException, JSONException, InterruptedException {
         setDir();
         File RubixFolder = new File(dirPath);
