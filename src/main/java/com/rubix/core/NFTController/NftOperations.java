@@ -18,6 +18,7 @@ import static com.rubix.Resources.Functions.*;
 import static com.rubix.Resources.IntegrityCheck.*;
 
 import com.rubix.KeyPairGen.EcDSAKeyGen;
+import com.rubix.Resources.APIHandler;
 import com.rubix.core.Controllers.Basics;
 import com.rubix.core.Resources.CallerFunctions;
 
@@ -501,6 +502,7 @@ public class NftOperations {
 
                     addPubKeyData_DIDserver();  // Updating the public key's ipfs hash to the DID server. Defined in rubixcore-NFTFunctions.
                    
+                    APIHandler.networkInfo();
                     response.put("message", "Key Files generated and stored in Rubix/DATA folder");
                     response.put("status", "true");
                 }
@@ -569,7 +571,8 @@ public class NftOperations {
                 } else {
 
                     addPubKeyData_DIDserver();  // Updating the public key's ipfs hash to the DID server. Defined in rubixcore-NFTFunctions.
-                   
+
+                    APIHandler.networkInfo();
                     response.put("message", "Quorum Key Files generated and stored in Rubix/DATA folder");
                     response.put("status", "true");
                 }
