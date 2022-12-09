@@ -27,6 +27,8 @@ import org.json.JSONException;
 import java.lang.InterruptedException;
 
 import static RubixDID.DIDCreation.DIDimage.createDID;
+import static RubixDID.DIDCreation.DIDimage.*;
+import static RubixDID.HelperFunctions.Functions.checkSharesGenerated;
 import static com.rubix.Resources.APIHandler.send;
 import static com.rubix.Resources.Functions.*;
 import static com.rubix.Mining.HashChain.*;
@@ -434,6 +436,36 @@ public class Operations {
         result.put("data", contentObject);
         result.put("status", "true");
         return result.toString();
+    }
+
+    @RequestMapping(value = "/newColdWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String createColdWallet(@RequestParam("image") MultipartFile imageFile,
+            @RequestParam("passPhrase") String passKey)
+            throws IOException, JSONException, InterruptedException {
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        if (checkSharesGenerated()) {
+            result.put("data", "");
+            result.put("message", "Shares Already Generated");
+            result.put("status", "true");
+            return result.toString();
+        }
+
+        JSONObject response = setUpColdWallet(imageFile.getInputStream(), passKey);
+        if (!response.getString("Status").equals("Success")) {
+            result.put("data", "");
+            result.put("message", "Shares Not Generated");
+            result.put("status", "false");
+            return result.toString();
+        }
+
+        contentObject.put("response", response);
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+
     }
 
 }
