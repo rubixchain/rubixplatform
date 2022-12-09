@@ -164,6 +164,7 @@ public class Basics {
              * backThread.start();
              */
 
+            networkInfo();
             JSONObject result = new JSONObject();
             JSONObject contentObject = new JSONObject();
             contentObject.put("response", "Setup Complete");
