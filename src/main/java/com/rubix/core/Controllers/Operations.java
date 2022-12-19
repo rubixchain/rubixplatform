@@ -46,22 +46,30 @@ public class Operations {
     public static String transactionFinality(@RequestBody String requestModel) throws Exception {
 
         if (!mainDir())
-            return checkRubixDir();
+            return Basics.checkRubixDir();
         if (!Basics.mutex)
-            start();
+            Basics.start();
         System.out.println(requestModel);
-
+        if (requestModel.contains("transactionID")) {
+            boolean check = checkSignPayloadFile();
+            if (!check) {
+                JSONObject jSONObject1 = new JSONObject();
+                JSONObject jSONObject2 = new JSONObject();
+                jSONObject2.put("response", "");
+                jSONObject1.put("data", jSONObject2);
+                jSONObject1.put("message", "Input is Empty/signPayloadFile for txn does not exist");
+                jSONObject1.put("status", "false");
+                return jSONObject1.toString();
+            }
+            requestModel = readSignPayloadFile();
+            System.out.println("requestModel " + requestModel);
+        }
         JSONObject jsonObject = new JSONObject(requestModel);
-
         System.out.println(jsonObject.toString());
-
         JSONObject wholeTransferResult = APIHandler.sendB(jsonObject);
-
-        String status = 
-        wholeTransferResult.has("status") && wholeTransferResult.getString("status").equals("Failed") ? "false" : "true";
-
-    
-
+        String status = (wholeTransferResult.has("status") && wholeTransferResult.getString("status").equals("Failed"))
+                ? "false"
+                : "true";
         JSONObject result = new JSONObject();
         JSONObject contentObject = new JSONObject();
         contentObject.put("response", wholeTransferResult);
