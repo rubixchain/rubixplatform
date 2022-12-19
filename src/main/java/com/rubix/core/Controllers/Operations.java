@@ -468,4 +468,21 @@ public class Operations {
 
     }
 
+    @RequestMapping(value = { "/signChallenge" }, method = { RequestMethod.POST }, produces = { "application/json",
+            "application/xml" })
+    public static String signChallenge(@RequestBody RequestModel requestModel) throws Exception {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            Basics.start();
+        String tid = requestModel.getTransactionID();
+        boolean status = signChallengePayload(tid);
+        JSONObject result = new JSONObject();
+        String message = status ? "Challenge Payload signed" : "Challenge Payload file not found/ not signed";
+        result.put("message", message);
+        result.put("data", "");
+        result.put("status", status);
+        return result.toString();
+  }
+
 }
