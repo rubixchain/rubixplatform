@@ -113,6 +113,39 @@ public class Operations {
         return result.toString();
     }
 
+    @RequestMapping(value = "/hotWallet", method = RequestMethod.POST, produces = { "application/json",
+            "application/xml" })
+    public String hotWallet(@RequestParam("did") MultipartFile DID,@RequestParam("publicShare") MultipartFile PublicShare)
+            throws IOException, JSONException, InterruptedException {
+        setDir();
+        File RubixFolder = new File(dirPath);
+
+        /* String DID = requestModel.getDidString();
+        String PublicShare = requestModel.getPublicShareString(); */
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+
+        int walletType = 2;
+
+        if (RubixFolder.exists()) {
+            contentObject.put("response", "Rubix Wallet already exists!");
+        } else {
+            // deleteFolder(RubixFolder);
+            JSONObject didResult = DIDimage.setupHotWalletFolders(DID.getInputStream(), PublicShare.getInputStream(), walletType);
+            if (didResult.getString("Status").contains("Success"))
+                createWorkingDirectory();
+
+            start();
+
+            contentObject.put("response", didResult);
+        }
+        APIHandler.networkInfo();
+        result.put("data", contentObject);
+        result.put("message", "");
+        result.put("status", "true");
+        return result.toString();
+    }
+
     @RequestMapping(value = "/initiateTransaction", method = RequestMethod.POST, produces = { "application/json",
             "application/xml" })
     public static String initiateTransaction(@RequestBody RequestModel requestModel) throws Exception {
@@ -492,5 +525,40 @@ public class Operations {
         result.put("status", status);
         return result.toString();
   }
+
+  @RequestMapping(value = "/verifyCommit", method = RequestMethod.POST, produces = { "application/json",
+    "application/xml" })
+    public static String verifyCommit(@RequestBody RequestModel requestModel) throws Exception {
+        if (!mainDir())
+            return checkRubixDir();
+        if (!Basics.mutex)
+            start();
+
+        String blockHash = requestModel.getBlockHash();
+        
+
+        System.out.println("Opertaions - blockHash " + blockHash);
+
+        JSONObject objectSend = new JSONObject();
+        objectSend.put("blockHash", blockHash);
+
+        System.out.println("Opertaions - objectsend is " + objectSend.toString());
+        JSONObject commitBlockObject = Functions.verifySpecificCommit(blockHash);
+        // System.out.println("Block commit status is "+
+        // commitBlockObject.getString("status").toLowerCase());
+
+        JSONObject result = new JSONObject();
+        JSONObject contentObject = new JSONObject();
+        contentObject.put("response", commitBlockObject);
+        System.out.println("Opertaions - commitBlockObject " + commitBlockObject.toString());
+        System.out.println("Opertaions - contentObject " + contentObject.toString());
+        result.put("data", contentObject);
+        //result.put("message", "");
+        result.put("status", "true");
+        System.out.println("result " + result.toString());
+
+        return result.toString();
+
+    }
 
 }
