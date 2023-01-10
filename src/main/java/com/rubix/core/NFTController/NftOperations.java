@@ -19,6 +19,7 @@ import static com.rubix.Resources.IntegrityCheck.*;
 
 import com.rubix.KeyPairGen.EcDSAKeyGen;
 import com.rubix.Resources.APIHandler;
+import com.rubix.Resources.Functions;
 import com.rubix.core.Controllers.Basics;
 import com.rubix.core.Resources.CallerFunctions;
 
@@ -82,21 +83,21 @@ public class NftOperations {
         objectSend.put("userHash", requestModel.getUserHash());
 
         if (p2pFlag == 0) {
-            if (requestModel.getSellerPubKeyIpfsHash().isBlank()) {
+            /* if (requestModel.getSellerPubKeyIpfsHash().isBlank()) {
                 result.put("data", "");
                 result.put("message", "Seller Public Key Ipfs Hash cannot be Empty");
                 result.put("status", "false");
 
                 return result.toString();
-            }
+            } */
 
-            if (requestModel.getBuyerPubKeyIpfsHash().isBlank()) {
+            /* if (requestModel.getBuyerPubKeyIpfsHash().isBlank()) {
                 result.put("data", "");
                 result.put("message", "Buyer Public Key Ipfs Hash cannot be Empty");
                 result.put("status", "false");
 
                 return result.toString();
-            }
+            } */
 
             if (requestModel.getSaleContractIpfsHash().isBlank()) {
                 result.put("data", "");
@@ -122,8 +123,8 @@ public class NftOperations {
                 return result.toString();
             }
 
-            sellerPubKeyIpfsHash = requestModel.getSellerPubKeyIpfsHash();
-            buyerPubKeyIpfsHash = requestModel.getBuyerPubKeyIpfsHash();
+            sellerPubKeyIpfsHash = APIHandler.getPubKeyIpfsHash_DIDserver(sellerDid,1);
+            buyerPubKeyIpfsHash = getPubKeyIpfsHash();
             saleContractIpfsHash = requestModel.getSaleContractIpfsHash();
             if(!requestModel.getPvtKey().isBlank())
             {
