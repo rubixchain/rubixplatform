@@ -501,6 +501,7 @@ public class Operations {
             return result.toString();
         }
 
+        createWorkingDirectory();
         contentObject.put("response", response);
         result.put("data", contentObject);
         result.put("message", "");
@@ -514,8 +515,6 @@ public class Operations {
     public static String signChallenge(@RequestBody RequestModel requestModel) throws Exception {
         if (!mainDir())
             return checkRubixDir();
-        if (!Basics.mutex)
-            Basics.start();
         String tid = requestModel.getTransactionID();
         boolean status = signChallengePayload(tid);
         JSONObject result = new JSONObject();

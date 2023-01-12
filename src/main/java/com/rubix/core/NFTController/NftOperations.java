@@ -19,6 +19,7 @@ import static com.rubix.Resources.IntegrityCheck.*;
 
 import com.rubix.KeyPairGen.EcDSAKeyGen;
 import com.rubix.Resources.APIHandler;
+import com.rubix.Resources.Functions;
 import com.rubix.core.Controllers.Basics;
 import com.rubix.core.Resources.CallerFunctions;
 
@@ -82,21 +83,21 @@ public class NftOperations {
         objectSend.put("userHash", requestModel.getUserHash());
 
         if (p2pFlag == 0) {
-            if (requestModel.getSellerPubKeyIpfsHash().isBlank()) {
+            /* if (requestModel.getSellerPubKeyIpfsHash().isBlank()) {
                 result.put("data", "");
                 result.put("message", "Seller Public Key Ipfs Hash cannot be Empty");
                 result.put("status", "false");
 
                 return result.toString();
-            }
+            } */
 
-            if (requestModel.getBuyerPubKeyIpfsHash().isBlank()) {
+            /* if (requestModel.getBuyerPubKeyIpfsHash().isBlank()) {
                 result.put("data", "");
                 result.put("message", "Buyer Public Key Ipfs Hash cannot be Empty");
                 result.put("status", "false");
 
                 return result.toString();
-            }
+            } */
 
             if (requestModel.getSaleContractIpfsHash().isBlank()) {
                 result.put("data", "");
@@ -122,14 +123,14 @@ public class NftOperations {
                 return result.toString();
             }
 
-            sellerPubKeyIpfsHash = requestModel.getSellerPubKeyIpfsHash();
-            buyerPubKeyIpfsHash = requestModel.getBuyerPubKeyIpfsHash();
+            sellerPubKeyIpfsHash = APIHandler.getPubKeyIpfsHash_DIDserver(sellerDid,1);
+            buyerPubKeyIpfsHash = getPubKeyIpfsHash();
             saleContractIpfsHash = requestModel.getSaleContractIpfsHash();
-            if(!requestModel.getPvtKey().isBlank())
+            /* if(!requestModel.getPvtKey().isBlank())
             {
                 pvtKey = requestModel.getPvtKey();
                 objectSend.put("buyerPvtKey", pvtKey);
-            }
+            } */
             pvtKeyPass = requestModel.getPvtKeyPass();
 
             tokenCount = requestModel.getAmount();
@@ -221,7 +222,7 @@ public class NftOperations {
             String creatorPeerID = getPeerID(DATA_PATH + "DID.json");
             String creatorDid = getValues(DATA_PATH + "DataTable.json", "didHash", "peerid", creatorPeerID);
             JSONObject creatorInput = new JSONObject(requestModel.getCreatorInput());
-            if (requestModel.getCreatorPubKeyIpfsHash().length() != 0
+            /* if (requestModel.getCreatorPubKeyIpfsHash().length() != 0
                     && requestModel.getCreatorPubKeyIpfsHash() != null) {
                 creatorInput.put("creatorPubKeyIpfsHash", requestModel.getCreatorPubKeyIpfsHash());
                 data.put("creatorPubKeyIpfsHash", requestModel.getCreatorPubKeyIpfsHash());
@@ -229,7 +230,10 @@ public class NftOperations {
                 String creatorPubKeyIpfsHash = getPubKeyIpfsHash();
                 creatorInput.put("creatorPubKeyIpfsHash", creatorPubKeyIpfsHash);
                 data.put("creatorPubKeyIpfsHash", creatorPubKeyIpfsHash);
-            }
+            } */
+            String creatorPubKeyIpfsHash = getPubKeyIpfsHash();
+            creatorInput.put("creatorPubKeyIpfsHash", creatorPubKeyIpfsHash);
+            data.put("creatorPubKeyIpfsHash", creatorPubKeyIpfsHash);
             data.put("racType", requestModel.getType());
             data.put("creatorDid", creatorDid);
             data.put("totalSupply", requestModel.getTotalSupply());
@@ -239,9 +243,9 @@ public class NftOperations {
                 data.put("url", requestModel.getUrl());
             }
 
-            if (requestModel.getPvtKey().length() != 0 && requestModel.getPvtKey() != null) {
+            /* if (requestModel.getPvtKey().length() != 0 && requestModel.getPvtKey() != null) {
                 data.put("pvtKeyStr", requestModel.getPvtKey());
-            }
+            } */
 
             data.put("pvtKeyPass", requestModel.getPvtKeyPass());
 
@@ -326,10 +330,10 @@ public class NftOperations {
         String sellerPvtKey;
         JSONObject data = new JSONObject();
 
-        if (nftRequestModel.getPvtKey().length() != 0 && nftRequestModel.getPvtKey() != null) {
+        /* if (nftRequestModel.getPvtKey().length() != 0 && nftRequestModel.getPvtKey() != null) {
             sellerPvtKey = nftRequestModel.getPvtKey();
             data.put("sellerPvtKey", sellerPvtKey);
-        }
+        } */
 
         data.put("sellerDID", sellerDid);
         data.put("nftToken", nftToken);
